@@ -1,12 +1,5 @@
--- 1. Hello Screen (Transparent + Freeze Movement)
+-- 1. Hello Screen (Transparent + Freeze)
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
--- Freeze Player
-humanoid.WalkSpeed = 0
-humanoid.JumpPower = 0
-
 local welcomeGui = Instance.new("ScreenGui", game.CoreGui)
 local helloText = Instance.new("TextLabel", welcomeGui)
 helloText.Size = UDim2.new(1, 0, 1, 0)
@@ -16,88 +9,64 @@ helloText.TextColor3 = Color3.new(1, 1, 1)
 helloText.TextSize = 100
 helloText.Font = Enum.Font.SourceSansBold
 
--- Wait 2 seconds then unfreeze
+-- Freeze Movement
+local char = player.Character or player.CharacterAdded:Wait()
+local hum = char:WaitForChild("Humanoid")
+hum.WalkSpeed = 0
+
 task.wait(2)
 welcomeGui:Destroy()
-humanoid.WalkSpeed = 16
-humanoid.JumpPower = 50
+hum.WalkSpeed = 16
 
 -- 2. Core Variables
 local noclip = false
+local espEnabled = false
 local runService = game:GetService("RunService")
 
 -- Noclip Logic
 runService.Stepped:Connect(function()
     if noclip and player.Character then
-        for _, part in pairs(player.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
 end)
 
--- Reset on Death
-player.CharacterAdded:Connect(function(newChar)
-    noclip = false
-    character = newChar
-end)
+-- ESP Function (Green Highlight)
+local function applyESP(targetPlayer)
+    if targetPlayer ~= player then
+        targetPlayer.CharacterAdded:Connect(function(c)
+            if espEnabled then
+                local highlight = Instance.new("Highlight", c)
+                highlight.FillColor = Color3.new(0, 1, 0) -- Green
+                highlight.OutlineColor = Color3.new(1, 1, 1)
+            end
+        end)
+        if targetPlayer.Character and espEnabled then
+            local highlight = Instance.new("Highlight", targetPlayer.Character)
+            highlight.FillColor = Color3.new(0, 1, 0)
+        end
+    end
+end
 
--- 3. Main UI (Black Box)
+-- 3. Main UI (Compact Design)
 local mainGui = Instance.new("ScreenGui", game.CoreGui)
 mainGui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", mainGui)
-frame.Size = UDim2.new(0, 220, 0, 160)
-frame.Position = UDim2.new(0.5, -110, 0.5, -80)
+frame.Size = UDim2.new(0, 180, 0, 180) -- Smaller Frame
+frame.Position = UDim2.new(0.5, -90, 0.5, -90)
 frame.BackgroundColor3 = Color3.new(0, 0, 0)
 frame.Active = true
 frame.Draggable = true
 
 local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "NX2"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "NX2 SCRIPT"
 title.TextColor3 = Color3.new(1, 1, 0)
 title.BackgroundTransparency = 1
-title.TextSize = 25
+title.TextSize = 18
 
-local hackBtn = Instance.new("TextButton", frame)
-hackBtn.Size = UDim2.new(0.8, 0, 0.3, 0)
-hackBtn.Position = UDim2.new(0.1, 0, 0.4, 0)
-hackBtn.BackgroundColor3 = Color3.new(1, 0, 0) -- Red Button
-hackBtn.Text = "HACK"
-hackBtn.TextColor3 = Color3.new(1, 1, 1)
-hackBtn.TextSize = 20
-
-local statusMsg = Instance.new("TextLabel", frame)
-statusMsg.Position = UDim2.new(0, 0, 0.8, 0)
-statusMsg.Size = UDim2.new(1, 0, 0, 25)
-statusMsg.Text = "Waiting..."
-statusMsg.TextColor3 = Color3.new(1, 1, 1)
-statusMsg.BackgroundTransparency = 1
-
--- 4. Notification System
-local function notify(msg, color)
-    local notification = Instance.new("TextLabel", mainGui)
-    notification.Size = UDim2.new(0, 200, 0, 30)
-    notification.Position = UDim2.new(0.5, -100, 0.9, 0)
-    notification.Text = msg
-    notification.TextColor3 = color
-    notification.BackgroundColor3 = Color3.new(0,0,0)
-    notification.BackgroundTransparency = 0.5
-    task.delay(2, function() notification:Destroy() end)
-end
-
--- Button Logic
-hackBtn.MouseButton1Click:Connect(function()
-    noclip = not noclip
-    if noclip then
-        hackBtn.Text = "STOP"
-        statusMsg.Text = "Active"
-        notify("HACK ACTIVATED", Color3.new(0, 1, 0))
-    else
-        hackBtn.Text = "HACK"
-        statusMsg.Text = "Stopped"
-        notify("HACK DEACTIVATED", Color3.new(1, 0, 0))
-    end
-end)
+local devText = Instance.new("TextLabel", frame)
+devText.Size = UDim2.new(1, 0, 0, 20)
+devText
