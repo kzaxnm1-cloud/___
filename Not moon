@@ -30,12 +30,12 @@ startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 20
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
 
--- 2. واجهة الانتقال (VIP UI - ستكون مخفية في البداية)
+-- 2. واجهة الانتقال والديسكورد (VIP UI)
 local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 200, 0, 180)
-mainFrame.Position = UDim2.new(0.5, -100, 0.5, -90)
+mainFrame.Size = UDim2.new(0, 220, 0, 230) -- كبرت الحجم شوي عشان زر الديسكورد
+mainFrame.Position = UDim2.new(0.5, -110, 0.5, -115)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-mainFrame.Visible = false -- مخفية
+mainFrame.Visible = false
 mainFrame.Active = true
 mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
@@ -46,4 +46,56 @@ mainStroke.Thickness = 2
 local mainTitle = Instance.new("TextLabel", mainFrame)
 mainTitle.Size = UDim2.new(1, 0, 0, 40)
 mainTitle.Text = "NX2 v1"
-mainTitle.TextColor3 = Color3.fromRGB(0, 170,
+mainTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
+mainTitle.TextSize = 22
+mainTitle.Font = Enum.Font.SourceSansBold
+mainTitle.BackgroundTransparency = 1
+
+-- وظيفة لإنشاء الأزرار
+local function createBtn(text, pos, color)
+    local btn = Instance.new("TextButton", mainFrame)
+    btn.Size = UDim2.new(0.85, 0, 0.2, 0)
+    btn.Position = pos
+    btn.BackgroundColor3 = color
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextSize = 16
+    btn.Font = Enum.Font.SourceSansBold
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end
+
+-- أزرار الانتقال والديسكورد
+local forwardBtn = createBtn("Forward VIP ➔", UDim2.new(0.075, 0, 0.25, 0), Color3.fromRGB(0, 180, 0))
+local backBtn = createBtn("← Back VIP", UDim2.new(0.075, 0, 0.5, 0), Color3.fromRGB(0, 180, 0))
+local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.75, 0), Color3.fromRGB(88, 101, 242)) -- لون ديسكورد
+
+-- 3. البرمجة والمنطق
+startBtn.MouseButton1Click:Connect(function()
+    startFrame.Visible = false
+    mainFrame.Visible = true
+end)
+
+-- وظيفة النسخ
+discordBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/syPpUv8Jf") -- ينسخ الرابط فوراً
+    discordBtn.Text = "تم النسخ بنجاح!"
+    task.wait(2)
+    discordBtn.Text = "نسخ سيرفر ديسكورد"
+end)
+
+-- وظيفة الانتقال
+local function tp(dist)
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, dist)
+    end
+end
+
+forwardBtn.MouseButton1Click:Connect(function()
+    tp(-70)
+end)
+
+backBtn.MouseButton1Click:Connect(function()
+    tp(70)
+end)
