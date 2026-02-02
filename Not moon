@@ -1,65 +1,55 @@
--- إعدادات الواجهة
-local library = {flags = {}}
-print("hello") -- رسالة الترحيب عند التشغيل
-
--- تأخير بسيط لمدة ثانية كما طلبت
+-- إعدادات الواجهة-- رسالة الترحيب
+print("hello")
 task.wait(1)
 
--- إنشاء النافذة (الشاشة السوداء في المنتصف)
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-local ToggleBtn = Instance.new("TextButton")
-local StatusLabel = Instance.new("TextLabel")
+local player = game.Players.LocalPlayer
+local runService = game:GetService("RunService")
+local noclipConnection = nil
 
-ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "HackInterface"
+-- وظيفة اختراق الجدران
+local function startNoclip()
+    noclipConnection = runService.Stepped:Connect(function()
+        if player.Character then
+            for _, part in pairs(player.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end)
+end
 
--- تصميم الشاشة السوداء
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- لون أسود
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) -- في المنتصف تماماً
-MainFrame.Size = UDim2.new(0, 200, 0, 150)
-MainFrame.Active = true
-MainFrame.Draggable = true -- تسمح لك بتحريك النافذة
-
--- عنوان السكربت
-Title.Parent = MainFrame
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Text = "تشغيل اختراق"
-Title.TextColor3 = Color3.fromRGB(255, 0, 0) -- أحمر ليعطي شكل الهاك
-Title.BackgroundTransparency = 1
-
--- زر التشغيل والإيقاف
-ToggleBtn.Parent = MainFrame
-ToggleBtn.Position = UDim2.new(0.1, 0, 0.4, 0)
-ToggleBtn.Size = UDim2.new(0.8, 0, 0.3, 0)
-ToggleBtn.Text = "ابدأ العملية"
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-
--- حالة السكربت
-StatusLabel.Parent = MainFrame
-StatusLabel.Position = UDim2.new(0, 0, 0.8, 0)
-StatusLabel.Size = UDim2.new(1, 0, 0, 20)
-StatusLabel.Text = "بانتظار الأوامر..."
-StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-StatusLabel.BackgroundTransparency = 1
-
--- وظيفة الزر
-local active = false
-ToggleBtn.MouseButton1Click:Connect(function()
-    active = not active
-    if active then
-        ToggleBtn.Text = "إيقاف"
-        StatusLabel.Text = "تم تشغيل الاختراق"
-        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- أخضر
-        print("تم بدء السكربت بنجاح")
-    else
-        ToggleBtn.Text = "تشغيل"
-        StatusLabel.Text = "تم وقف الاختراق"
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        print("تم إيقاف السكربت")
+local function stopNoclip()
+    if noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
     end
-end)
+    if player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+-- إنشاء الواجهة
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -85)
+MainFrame.Size = UDim2.new(0, 220, 0, 170)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- إضافة نص NX2 بالأعلى
+local NX2Label = Instance.new("TextLabel", MainFrame)
+NX2Label.Size = UDim2.new(1, 0, 0, 30)
+NX2Label.Text = "NX2"
+NX2Label.TextColor3 = Color3.fromRGB(255, 255, 0) -- لون أصفر للتمييز
+NX2Label.BackgroundTransparency = 1
+NX2Label.TextSize = 22
+NX2Label.Font = Enum.Font.SourceSansBold
+
+-- عنوان السكربت الأصلي
+local Title =end)
