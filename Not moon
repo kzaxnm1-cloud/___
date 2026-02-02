@@ -1,32 +1,49 @@
--- 1. الإعدادات والواجهة (مطابقة للصورة)
 local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
+-- 1. واجهة البداية (START UI)
+local startFrame = Instance.new("Frame", screenGui)
+startFrame.Size = UDim2.new(0, 220, 0, 150)
+startFrame.Position = UDim2.new(0.5, -110, 0.5, -75)
+startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+startFrame.BorderSizePixel = 0
+Instance.new("UICorner", startFrame).CornerRadius = UDim.new(0, 10)
+local startStroke = Instance.new("UIStroke", startFrame)
+startStroke.Color = Color3.fromRGB(0, 170, 255)
+startStroke.Thickness = 2
+
+local startTitle = Instance.new("TextLabel", startFrame)
+startTitle.Size = UDim2.new(1, 0, 0, 60)
+startTitle.Text = "NX2 v1"
+startTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
+startTitle.TextSize = 24
+startTitle.Font = Enum.Font.SourceSansBold
+startTitle.BackgroundTransparency = 1
+
+local startBtn = Instance.new("TextButton", startFrame)
+startBtn.Size = UDim2.new(0.85, 0, 0.35, 0)
+startBtn.Position = UDim2.new(0.075, 0, 0.55, 0)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+startBtn.Text = "START"
+startBtn.TextColor3 = Color3.new(1, 1, 1)
+startBtn.TextSize = 20
+Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
+
+-- 2. واجهة الانتقال (VIP UI - ستكون مخفية في البداية)
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 200, 0, 180)
 mainFrame.Position = UDim2.new(0.5, -100, 0.5, -90)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- خلفية سوداء
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.Visible = false -- مخفية
 mainFrame.Active = true
 mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+local mainStroke = Instance.new("UIStroke", mainFrame)
+mainStroke.Color = Color3.fromRGB(0, 170, 255)
+mainStroke.Thickness = 2
 
--- حدود زرقاء
-local stroke = Instance.new("UIStroke", mainFrame)
-stroke.Color = Color3.fromRGB(0, 170, 255)
-stroke.Thickness = 2
-
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "NX2 v1"
-title.TextColor3 = Color3.fromRGB(0, 170, 255) -- لون أزرق
-title.TextSize = 22
-title.Font = Enum.Font.SourceSansBold
-title.BackgroundTransparency = 1
-
--- 2. أزرار الانتقال (لون أخضر وسط)
-local function createBtn(text, pos)
-    local btn = Instance.new("TextButton", mainFrame)
-    btn.Size = UDim2.new(0.85, 0, 0.25, 0)
-    btn.Position = pos
-    btn.BackgroundColor3 = Color3
+local mainTitle = Instance.new("TextLabel", mainFrame)
+mainTitle.Size = UDim2.new(1, 0, 0, 40)
+mainTitle.Text = "NX2 v1"
+mainTitle.TextColor3 = Color3.fromRGB(0, 170,
