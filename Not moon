@@ -1,92 +1,59 @@
--- 1. شاشة الترحيب (Hello) تملأ الشاشة لمدة ثانيتين-- 1. شاشة الترحيب (Hello) شفافة لمدة ثانيتين-- 1. شاشة الترحيب شفافة (بدون خلفية)
-local welcomeGui = Instance.new("ScreenGui", game.CoreGui)
-local helloTxt = Instance.new("TextLabel", welcomeGui)
-helloTxt.Size = UDim2.new(1, 0, 1, 0)
-helloTxt.Text = "Hello"
-helloTxt.TextColor3 = Color3.fromRGB(255, 255, 255)
-helloTxt.TextSize = 100
-helloTxt.BackgroundTransparency = 1 -- شفافة تماماً
-helloTxt.Font = Enum.Font.SourceSansBold
-helloTxt.TextStrokeTransparency = 0.5 -- لمعان خفيف للنص
+-- 1. شاشة الترحيب (Hello) تملأ الشاشة لمدة ثانيتين-- 1. شاشة الترحيب (Hello) شفافة لمدة ثانيتين-- 1. شاشة الترحيب شفافة (بدون خلفية)-- 1. شاشة Hello شفافة تماماً (تظهر وتختفي بسلاسة)
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+local helloLabel = Instance.new("TextLabel", screenGui)
+helloLabel.Size = UDim2.new(1, 0, 1, 0)
+helloLabel.BackgroundTransparency = 1
+helloLabel.Text = "Hello"
+helloLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+helloLabel.TextSize = 100
+helloLabel.Font = Enum.Font.SourceSansBold
+helloLabel.TextStrokeTransparency = 0
 
 task.delay(2, function()
-    welcomeGui:Destroy()
+    screenGui:Destroy()
 end)
 
--- 2. إعدادات الاختراق الدائم (Noclip)
+-- 2. نظام الاختراق (Noclip) الذي لا يتوقف أبداً
 local player = game.Players.LocalPlayer
-local noclip = false
+_G.NX2_Active = false -- متغير عالمي لضمان عدم التوقف
 
--- هذه الوظيفة تضمن أن الاختراق يعمل حتى بعد الموت
 game:GetService("RunService").Stepped:Connect(function()
-    if noclip and player.Character then
-        for _, part in pairs(player.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
+    if _G.NX2_Active then
+        if player.Character then
+            for _, part in pairs(player.Character:GetDescendants()) do
+                if part:IsA("BasePart") and part.CanCollide == true then
+                    part.CanCollide = false
+                end
             end
         end
     end
 end)
 
--- 3. واجهة NX2 الثابتة
+-- 3. الواجهة الرئيسية (ثابتة ولا تختفي عند الموت)
 local mainGui = Instance.new("ScreenGui", game.CoreGui)
-mainGui.ResetOnSpawn = false -- هذا السطر يمنع السكربت من الاختفاء عند الموت
+mainGui.Name = "NX2_Base"
+mainGui.ResetOnSpawn = false -- أهم سطر لضمان بقاء السكربت بعد الموت
 
 local frame = Instance.new("Frame", mainGui)
 frame.Size = UDim2.new(0, 220, 0, 160)
 frame.Position = UDim2.new(0.5, -110, 0.5, -80)
 frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-frame.BorderSizePixel = 2
 frame.Active = true
 frame.Draggable = true
 
-local nx2Title = Instance.new("TextLabel", frame)
-nx2Title.Size = UDim2.new(1, 0, 0, 40)
-nx2Title.Text = "NX2"
-nx2Title.TextColor3 = Color3.fromRGB(255, 255, 0)
-nx2Title.TextSize = 25
-nx2Title.BackgroundTransparency = 1
-
-local subTitle = Instance.new("TextLabel", frame)
-subTitle.Position = UDim2.new(0, 0, 0.25, 0)
-subTitle.Size = UDim2.new(1, 0, 0, 30)
-subTitle.Text = "تفعيل اختراق"
-subTitle.TextColor3 = Color3.fromRGB(255, 0, 0)
-subTitle.TextSize = 18
-subTitle.BackgroundTransparency = 1
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "NX2"
+title.TextColor3 = Color3.fromRGB(255, 255, 0)
+title.TextSize = 25
+title.BackgroundTransparency = 1
 
 local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(0.8, 0, 0.25, 0)
-btn.Position = UDim2.new(0.1, 0, 0.5, 0)
-btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+btn.Size = UDim2.new(0.8, 0, 0.3, 0)
+btn.Position = UDim2.new(0.1, 0, 0.45, 0)
+btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 btn.Text = "تشغيل"
 btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.TextSize = 20
 
-local status = Instance.new("TextLabel", frame)
-status.Position = UDim2.new(0, 0, 0.8, 0)
-status.Size = UDim2.new(1, 0, 0, 25)
-status.Text = "غير مفعل"
-status.TextColor3 = Color3.fromRGB(200, 200, 200)
-status.BackgroundTransparency = 1
-
--- برمجة الزر ليكون مستمراً
-btn.MouseButton1Click:Connect(function()
-    noclip = not noclip
-    if noclip then
-        btn.Text = "إيقاف"
-        status.Text = "تم التشغيل اختراق"
-        status.TextColor3 = Color3.fromRGB(0, 255, 0)
-    else
-        btn.Text = "تشغيل"
-        status.Text = "تم وقف اختراق"
-        status.TextColor3 = Color3.fromRGB(255, 0, 0)
-        -- إعادة التصادم عند الإيقاف يدوياً
-        if player.Character then
-            for _, part in pairs(player.Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = true
-                end
-            end
-        end
-    end
-end)btn.Size = UDim2.new(0.8, 0,end)
+local status =end)btn.Size = UDim2.new(0.8, 0,end)
