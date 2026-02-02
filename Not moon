@@ -1,57 +1,32 @@
--- 1. Setup
+-- 1. الإعدادات والواجهة (مطابقة للصورة)
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-
--- 2. Create UI (Based on your request)
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 200, 0, 180)
 mainFrame.Position = UDim2.new(0.5, -100, 0.5, -90)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-mainFrame.BorderSizePixel = 2
-mainFrame.BorderColor3 = Color3.fromRGB(0, 170, 255)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- خلفية سوداء
 mainFrame.Active = true
 mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 
+-- حدود زرقاء
+local stroke = Instance.new("UIStroke", mainFrame)
+stroke.Color = Color3.fromRGB(0, 170, 255)
+stroke.Thickness = 2
+
 local title = Instance.new("TextLabel", mainFrame)
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "NX2 v1"
-title.TextColor3 = Color3.fromRGB(0, 170, 255)
+title.TextColor3 = Color3.fromRGB(0, 170, 255) -- لون أزرق
 title.TextSize = 22
 title.Font = Enum.Font.SourceSansBold
 title.BackgroundTransparency = 1
 
--- Forward Button (Next VIP)
-local forwardBtn = Instance.new("TextButton", mainFrame)
-forwardBtn.Size = UDim2.new(0.8, 0, 0.25, 0)
-forwardBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
-forwardBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
-forwardBtn.Text = "VIP ➔"
-forwardBtn.TextColor3 = Color3.new(1, 1, 1)
-forwardBtn.TextSize = 18
-Instance.new("UICorner", forwardBtn).CornerRadius = UDim.new(0, 8)
-
--- Backward Button (Back VIP)
-local backBtn = Instance.new("TextButton", mainFrame)
-backBtn.Size = UDim2.new(0.8, 0, 0.25, 0)
-backBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
-backBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
-backBtn.Text = "← VIP"
-backBtn.TextColor3 = Color3.new(1, 1, 1)
-backBtn.TextSize = 18
-Instance.new("UICorner", backBtn).CornerRadius = UDim.new(0, 8)
-
--- 3. Teleport Logic
-local function teleport(distance)
-    local char = player.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        -- ينقلك لمسافة 50 ملم للأمام أو للخلف لتخطي الجدران أو الوصول للـ VIP
-        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, distance)
-    end
-end
-
-forwardBtn.MouseButton1Click:Connect(function()
-    teleport(-50) -- ينت
+-- 2. أزرار الانتقال (لون أخضر وسط)
+local function createBtn(text, pos)
+    local btn = Instance.new("TextButton", mainFrame)
+    btn.Size = UDim2.new(0.85, 0, 0.25, 0)
+    btn.Position = pos
+    btn.BackgroundColor3 = Color3
