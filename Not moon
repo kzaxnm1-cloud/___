@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- 1. واجهة البداية والشعار (NX2 v1)
+-- 1. واجهة NX2 v1
 local startFrame = Instance.new("Frame", screenGui)
 startFrame.Size = UDim2.new(0, 220, 0, 150)
 startFrame.Position = UDim2.new(0.5, -110, 0.4, -75)
@@ -57,21 +57,21 @@ local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Col
 local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0))
 local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242))
 
--- 3. البرمجة (الانتقال للفتحات بالملي)
+-- 3. برمجة الحركة الفورية (نظام الفتحات)
 startBtn.MouseButton1Click:Connect(function()
     startFrame.Visible = false
     mainFrame.Visible = true
 end)
 
--- هذا الكود يوديك للفتحات بالضبط مهما كانت سرعتك (نفس منطق السكربت اللي أعطيتني)
-local gapDistance = 88 -- المسافة الدقيقة للفتحات في الماب
+-- المسافة بين الفتحات (85 هي المسافة القياسية لماب التسونامي)
+local gapDist = 85
 
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     if hrp then
-        -- الانتقال على المحور الطولي للماب (الفتحات)
-        hrp.CFrame = hrp.CFrame + Vector3.new(0, 0, -gapDistance)
+        -- الانتقال للأمام للفتحة التالية (بناءً على محور الماب العالمي)
+        hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * gapDist
     end
     task.wait(0.5)
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
@@ -81,10 +81,8 @@ downBtn.MouseButton1Click:Connect(function()
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     if hrp then
-        -- حماية: لو وصلت عند البيت ما يرجعك برا
-        if hrp.Position.Z < -50 then
-            hrp.CFrame = hrp.CFrame + Vector3.new(0, 0, gapDistance)
-        end
+        -- الانتقال للخلف للفتحة السابقة
+        hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * -gapDist
     end
     task.wait(0.5)
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
