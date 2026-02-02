@@ -2,23 +2,41 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- الواجهة الرئيسية NX2 v1
+-- 1. واجهة البداية (START)
+local startFrame = Instance.new("Frame", screenGui)
+startFrame.Size = UDim2.new(0, 220, 0, 150)
+startFrame.Position = UDim2.new(0.5, -110, 0.4, -75)
+startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Instance.new("UICorner", startFrame).CornerRadius = UDim.new(0, 10)
+Instance.new("UIStroke", startFrame).Color = Color3.fromRGB(0, 170, 255)
+
+local logo = Instance.new("TextLabel", startFrame)
+logo.Size = UDim2.new(1, 0, 0, 50)
+logo.Text = "NX2 v1"
+logo.TextColor3 = Color3.fromRGB(0, 170, 255)
+logo.TextSize = 26
+logo.Font = Enum.Font.SourceSansBold
+logo.BackgroundTransparency = 1
+
+local startBtn = Instance.new("TextButton", startFrame)
+startBtn.Size = UDim2.new(0.85, 0, 0.35, 0)
+startBtn.Position = UDim2.new(0.075, 0, 0.5, 0)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+startBtn.Text = "START"
+startBtn.TextColor3 = Color3.new(1, 1, 1)
+startBtn.TextSize = 20
+Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
+
+-- 2. واجهة التحكم الرئيسية
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 220, 0, 320)
 mainFrame.Position = UDim2.new(0.5, -110, 0.4, -160)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.Visible = false
 mainFrame.Active = true
 mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 Instance.new("UIStroke", mainFrame).Color = Color3.fromRGB(0, 170, 255)
-
-local logo = Instance.new("TextLabel", mainFrame)
-logo.Size = UDim2.new(1, 0, 0, 40)
-logo.Text = "NX2 v1"
-logo.TextColor3 = Color3.fromRGB(0, 170, 255)
-logo.TextSize = 22
-logo.Font = Enum.Font.SourceSansBold
-logo.BackgroundTransparency = 1
 
 local function createBtn(text, pos, color)
     local btn = Instance.new("TextButton", mainFrame)
@@ -39,41 +57,29 @@ local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Col
 local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0))
 local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242))
 
--- [ نظام الزحلقة للفتحات - سرعة جبارة ] --
-local function dash(direction)
-    local char = player.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    if root then
-        -- هنا السرعة: يأخذ سرعتك الحالية ويخليها "دفع" للأمام أو الخلف
-        local speed = char.Humanoid.WalkSpeed
-        local velocity = root.CFrame.LookVector * (speed * 4 * direction)
-        
-        local bv = Instance.new("BodyVelocity")
-        bv.MaxForce = Vector3.new(100000, 0, 100000)
-        bv.Velocity = velocity
-        bv.Parent = root
-        
-        -- يمشيك مسافة الفتحة بلمح البصر
-        task.wait(0.2) 
-        bv:Destroy()
-    end
-end
+-- 3. تفعيل الأزرار (نفس الانتقال اللي تبيه)
+startBtn.MouseButton1Click:Connect(function()
+    startFrame.Visible = false
+    mainFrame.Visible = true
+end)
 
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    dash(1) -- يدفك قدام بسرعة صاروخية للفتحة
-    task.wait(0.3)
+    -- الانتقال السريع للفتحة اللي قدام
+    player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -85)
+    task.wait(0.4)
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
 downBtn.MouseButton1Click:Connect(function()
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    dash(-1) -- يدفك ورا (ريوس) بسرعة للفتحة اللي قبلها
-    task.wait(0.3)
+    -- الانتقال السريع للفتحة اللي ورا
+    player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 85)
+    task.wait(0.4)
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
--- ميزات Instant Take و Zoom
+-- ميزات Zoom و Instant Take
 local it = false
 takeBtn.MouseButton1Click:Connect(function()
     it = not it
