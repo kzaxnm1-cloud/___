@@ -1,4 +1,4 @@
--- حماية السكريبت (task.spawn لتجنب الكشف)– سكربت الهروب من التسونامي - يمشي تلقائياً للأماكن المحمية تحت
+-- حماية السكريبت (task.spawn لتجنب الكشف)– سكربت الهروب من التسونامي - يمشي تلقائياً للأماكن المحمية تحت– سكربت الهروب من التسونامي - يمشي تلقائياً للأماكن المحمية تحت
 – Escape Tsunami Auto Walk Script
 
 task.spawn(function()
@@ -71,19 +71,18 @@ startBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = true
 end)
 
--- الأماكن المحمية تحت الأرض (محدثة لماب Escape Tsunami)
+-- الممرات البرتقالية (من فوق ثم ينزل)
 local safeSpots = {
-    -- الممرات البرتقالية (القنوات تحت)
-    Vector3.new(0, -15, 0),      -- مركز الماب تحت
-    Vector3.new(-80, -15, 0),    -- قناة يسار
-    Vector3.new(80, -15, 0),     -- قناة يمين
-    Vector3.new(0, -15, -80),    -- قناة أمام
-    Vector3.new(0, -15, 80),     -- قناة خلف
-    -- أماكن إضافية محمية
-    Vector3.new(-60, -12, -60),  
-    Vector3.new(60, -12, -60),   
-    Vector3.new(-60, -12, 60),   
-    Vector3.new(60, -12, 60),    
+    -- الممرات البرتقالية - ارتفاع آمن
+    {pos = Vector3.new(0, 5, 0), name = "مركز"},      
+    {pos = Vector3.new(-80, 5, 0), name = "يسار"},    
+    {pos = Vector3.new(80, 5, 0), name = "يمين"},     
+    {pos = Vector3.new(0, 5, -80), name = "أمام"},    
+    {pos = Vector3.new(0, 5, 80), name = "خلف"},      
+    {pos = Vector3.new(-60, 5, -60), name = "زاوية 1"},  
+    {pos = Vector3.new(60, 5, -60), name = "زاوية 2"},   
+    {pos = Vector3.new(-60, 5, 60), name = "زاوية 3"},   
+    {pos = Vector3.new(60, 5, 60), name = "زاوية 4"},    
 }
 
 -- متغيرات المشي التلقائي
@@ -98,14 +97,14 @@ local function findNearestSafeSpot()
     end
     
     local playerPos = player.Character.HumanoidRootPart.Position
-    local nearest = safeSpots[1]
+    local nearest = safeSpots[1].pos
     local minDist = (playerPos - nearest).Magnitude
     
     for _, spot in ipairs(safeSpots) do
-        local dist = (playerPos - spot).Magnitude
+        local dist = (playerPos - spot.pos).Magnitude
         if dist < minDist then
             minDist = dist
-            nearest = spot
+            nearest = spot.pos
         end
     end
     
@@ -137,18 +136,19 @@ local function startAutoWalk()
             local humanoid = char.Humanoid
             local hrp = char.HumanoidRootPart
             
-            -- إذا وصلنا للهدف، نختار هدف جديد
-            if targetSpot and (hrp.Position - targetSpot).Magnitude < 5 then
+            -- إذا وصلنا للهدف (قريب أفقياً)، نختار هدف جديد
+            local horizontalDist = Vector3.new(hrp.Position.X - targetSpot.X, 0, hrp.Position.Z - targetSpot.Z).Magnitude
+            if targetSpot and horizontalDist < 8 then
                 targetSpot = findNearestSafeSpot()
             end
             
             if targetSpot then
-                -- المشي باتجاه الهدف بسرعة طبيعية
-                local direction = (targetSpot - hrp.Position).Unit
-                humanoid:MoveTo(targetSpot)
+                -- المشي باتجاه الهدف أفقياً (يوصل من فوق وينزل طبيعي)
+                local targetFlat = Vector3.new(targetSpot.X, hrp.Position.Y, targetSpot.Z)
+                humanoid:MoveTo(targetFlat)
                 
                 -- تحديث السرعة
-                speedLabel.Text = string.format("السرعة: %.1f", humanoid.WalkSpeed)
+                speedLabel.Text = string.format("المسافة: %.1f", horizontalDist)
             end
         end)
     end)
@@ -239,4 +239,4 @@ player.CharacterAdded:Connect(function(char)
 end)
 ```
 
-end)end)
+end)end)end)
