@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- 1. واجهة البداية (START UI)
+-- 1. واجهة البداية (START UI) - مطابقة تماماً للصورة
 local startFrame = Instance.new("Frame", screenGui)
 startFrame.Size = UDim2.new(0, 220, 0, 150)
 startFrame.Position = UDim2.new(0.5, -110, 0.5, -75)
@@ -14,14 +14,14 @@ startStroke.Thickness = 2
 
 local startBtn = Instance.new("TextButton", startFrame)
 startBtn.Size = UDim2.new(0.85, 0, 0.35, 0)
-startBtn.Position = UDim2.new(0.075, 0, 0.55, 0)
+startBtn.Position = UDim2.new(0.075, 0, 0.5, 0)
 startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 startBtn.Text = "START"
 startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 20
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
 
--- 2. واجهة التحكم (المطلوب ترتيبها)
+-- 2. واجهة التحكم (Main UI)
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 220, 0, 320)
 mainFrame.Position = UDim2.new(0.5, -110, 0.5, -160)
@@ -41,12 +41,68 @@ local function createBtn(text, pos, color)
     btn.BackgroundColor3 = color
     btn.Text = text
     btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.TextSize = 14
     btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 14
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
     return btn
 end
 
--- الترتيب الجديد حسب طلبك
+-- الأزرار بالترتيب اللي طلبته
 local upBtn = createBtn("Gap Up", UDim2.new(0.075, 0, 0.15, 0), Color3.fromRGB(0, 180, 0))
-local downBtn = createBtn("Gap Down", UDim2.new(0.075, 0, 0.32, 0), Color3.fromRGB
+local downBtn = createBtn("Gap Down", UDim2.new(0.075, 0, 0.32, 0), Color3.fromRGB(0, 180, 0))
+local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.49, 0), Color3.fromRGB(120, 0, 0))
+local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(100, 100, 100))
+local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.83, 0), Color3.fromRGB(88, 101, 242))
+
+-- 3. البرمجة والسرعة
+startBtn.MouseButton1Click:Connect(function()
+    startFrame.Visible = false
+    mainFrame.Visible = true
+end)
+
+-- ميزة أخذ الأغراض الفورية (المركز الثالث)
+local itEnabled = false
+takeBtn.MouseButton1Click:Connect(function()
+    itEnabled = not itEnabled
+    takeBtn.Text = itEnabled and "Instant Take: ON" or "Instant Take: OFF"
+    takeBtn.BackgroundColor3 = itEnabled and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if itEnabled then
+        for _, p in pairs(workspace:GetDescendants()) do
+            if p:IsA("ProximityPrompt") then p.HoldDuration = 0 end
+        end
+    end
+end)
+
+-- الانتقال السريع (Gap Up / Down) يعتمد على سرعتك
+upBtn.MouseButton1Click:Connect(function()
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+        local speed = player.Character.Humanoid.WalkSpeed
+        root.CFrame = root.CFrame * CFrame.new(0, 0, -(speed * 0.6)) -- انتقال فوري للفتحة
+    end
+end)
+
+downBtn.MouseButton1Click:Connect(function()
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+        local speed = player.Character.Humanoid.WalkSpeed
+        root.CFrame = root.CFrame * CFrame.new(0, 0, (speed * 0.6))
+    end
+end)
+
+-- الزوم ونسخ الديسكورد
+zoomBtn.MouseButton1Click:Connect(function()
+    local z = zoomBtn.Text == "ZOOM: OFF"
+    player.CameraMaxZoomDistance = z and 500 or 128
+    zoomBtn.Text = z and "ZOOM: ON" or "ZOOM: OFF"
+end)
+
+discordBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/syPpUv8Jf") -- رابط الديسكورد الخاص بك
+    discordBtn.Text = "تم النسخ!"
+    task.wait(2)
+    discordBtn.Text = "نسخ سيرفر ديسكورد"
+end)
