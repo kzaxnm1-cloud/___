@@ -2,49 +2,23 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- 1. واجهة البداية (START) مع شعار NX2 v1
-local startFrame = Instance.new("Frame", screenGui)
-startFrame.Size = UDim2.new(0, 220, 0, 150)
-startFrame.Position = UDim2.new(0.5, -110, 0.4, -75)
-startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Instance.new("UICorner", startFrame).CornerRadius = UDim.new(0, 10)
-Instance.new("UIStroke", startFrame).Color = Color3.fromRGB(0, 170, 255)
-
-local logo = Instance.new("TextLabel", startFrame)
-logo.Size = UDim2.new(1, 0, 0, 50)
-logo.Text = "NX2 v1"
-logo.TextColor3 = Color3.fromRGB(0, 170, 255)
-logo.TextSize = 26
-logo.Font = Enum.Font.SourceSansBold
-logo.BackgroundTransparency = 1
-
-local startBtn = Instance.new("TextButton", startFrame)
-startBtn.Size = UDim2.new(0.85, 0, 0.35, 0)
-startBtn.Position = UDim2.new(0.075, 0, 0.5, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-startBtn.Text = "START"
-startBtn.TextColor3 = Color3.new(1, 1, 1)
-startBtn.TextSize = 20
-Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
-
--- 2. واجهة التحكم الرئيسية
+-- الواجهة الرئيسية
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 220, 0, 320)
 mainFrame.Position = UDim2.new(0.5, -110, 0.4, -160)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-mainFrame.Visible = false
 mainFrame.Active = true
 mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 Instance.new("UIStroke", mainFrame).Color = Color3.fromRGB(0, 170, 255)
 
-local mainLogo = Instance.new("TextLabel", mainFrame)
-mainLogo.Size = UDim2.new(1, 0, 0, 40)
-mainLogo.Text = "NX2 v1"
-mainLogo.TextColor3 = Color3.fromRGB(0, 170, 255)
-mainLogo.TextSize = 22
-mainLogo.Font = Enum.Font.SourceSansBold
-mainLogo.BackgroundTransparency = 1
+local logo = Instance.new("TextLabel", mainFrame)
+logo.Size = UDim2.new(1, 0, 0, 40)
+logo.Text = "NX2 v1"
+logo.TextColor3 = Color3.fromRGB(0, 170, 255)
+logo.TextSize = 22
+logo.Font = Enum.Font.SourceSansBold
+logo.BackgroundTransparency = 1
 
 local function createBtn(text, pos, color)
     local btn = Instance.new("TextButton", mainFrame)
@@ -65,39 +39,45 @@ local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Col
 local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0))
 local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242))
 
--- [ برمجة الانتقال الذكي للفتحات ] --
-startBtn.MouseButton1Click:Connect(function()
-    startFrame.Visible = false
-    mainFrame.Visible = true
-end)
+-- [ نظام المشي التلقائي الصاروخي ] --
+local function autoWalkToGap(direction)
+    local char = player.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if root then
+        -- الألوان: يقلب أخضر أول ما يبدأ يمشي
+        local targetBtn = (direction == 1) and upBtn or downBtn
+        local originalColor = Color3.fromRGB(0, 100, 255)
+        targetBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 
-local gapSize = 88 -- المسافة الدقيقة بين الفتحات في ماب التسونامي
+        -- السرعة: نأخذ سرعة مشيك الحالية ونخليها "دفع"
+        local speed = char.Humanoid.WalkSpeed
+        local vel = Instance.new("BodyVelocity")
+        vel.MaxForce = Vector3.new(100000, 0, 100000)
+        -- يمشي سيدة للفتحة (على محور الماب) وبسرعة مضاعفة لسرعتك
+        vel.Velocity = root.CFrame.LookVector * (speed * 2.5 * direction)
+        vel.Parent = root
+
+        -- مدة المشي (يوقف لما يوصل للفتحة اللي بعدها بالضبط)
+        task.wait(0.4) 
+        
+        vel:Destroy()
+        targetBtn.BackgroundColor3 = originalColor -- يرجع أزرق
+    end
+end
 
 upBtn.MouseButton1Click:Connect(function()
-    upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        -- انتقال للأمام باتجاه المسار الطولي للماب فقط
-        hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -gapSize)
-    end
-    task.wait(0.5)
-    upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+    autoWalkToGap(1) -- يمشي من نفسه للفتحة اللي قدام
 end)
 
 downBtn.MouseButton1Click:Connect(function()
-    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        -- حماية البيت: إذا كان موقعك Z أكبر من -50 (يعني وصلت البيت) لا يتحرك
-        if hrp.Position.Z < -20 then 
-            downBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-            hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, gapSize)
-            task.wait(0.5)
-            downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-        else
-            downBtn.Text = "وصلت للبيت!"
-            task.wait(1)
-            downBtn.Text = "Gap Down"
-        end
+    -- حماية البيت: يرجعك بس لو لسه بعيد عن البداية
+    local hrp = player.Character.HumanoidRootPart
+    if hrp.Position.Z < -25 then
+        autoWalkToGap(-1) -- يمشي من نفسه للفتحة اللي ورا
+    else
+        downBtn.Text = "أنت بالبيت!"
+        task.wait(1)
+        downBtn.Text = "Gap Down"
     end
 end)
 
@@ -118,10 +98,10 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 
 zoomBtn.MouseButton1Click:Connect(function()
-    local active = zoomBtn.Text == "ZOOM: OFF"
-    player.CameraMaxZoomDistance = active and 500 or 128
-    zoomBtn.Text = active and "ZOOM: ON" or "ZOOM: OFF"
-    zoomBtn.BackgroundColor3 = active and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
+    local z = zoomBtn.Text == "ZOOM: OFF"
+    player.CameraMaxZoomDistance = z and 500 or 128
+    zoomBtn.Text = z and "ZOOM: ON" or "ZOOM: OFF"
+    zoomBtn.BackgroundColor3 = z and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
 end)
 
 discordBtn.MouseButton1Click:Connect(function()
