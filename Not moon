@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- الواجهة الرئيسية
+-- الواجهة الرئيسية NX2 v1
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 220, 0, 320)
 mainFrame.Position = UDim2.new(0.5, -110, 0.4, -160)
@@ -39,46 +39,38 @@ local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Col
 local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0))
 local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242))
 
--- [ نظام المشي التلقائي الصاروخي ] --
-local function autoWalkToGap(direction)
+-- [ نظام الزحلقة للفتحات - سرعة جبارة ] --
+local function dash(direction)
     local char = player.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if root then
-        -- الألوان: يقلب أخضر أول ما يبدأ يمشي
-        local targetBtn = (direction == 1) and upBtn or downBtn
-        local originalColor = Color3.fromRGB(0, 100, 255)
-        targetBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-
-        -- السرعة: نأخذ سرعة مشيك الحالية ونخليها "دفع"
+        -- هنا السرعة: يأخذ سرعتك الحالية ويخليها "دفع" للأمام أو الخلف
         local speed = char.Humanoid.WalkSpeed
-        local vel = Instance.new("BodyVelocity")
-        vel.MaxForce = Vector3.new(100000, 0, 100000)
-        -- يمشي سيدة للفتحة (على محور الماب) وبسرعة مضاعفة لسرعتك
-        vel.Velocity = root.CFrame.LookVector * (speed * 2.5 * direction)
-        vel.Parent = root
-
-        -- مدة المشي (يوقف لما يوصل للفتحة اللي بعدها بالضبط)
-        task.wait(0.4) 
+        local velocity = root.CFrame.LookVector * (speed * 4 * direction)
         
-        vel:Destroy()
-        targetBtn.BackgroundColor3 = originalColor -- يرجع أزرق
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(100000, 0, 100000)
+        bv.Velocity = velocity
+        bv.Parent = root
+        
+        -- يمشيك مسافة الفتحة بلمح البصر
+        task.wait(0.2) 
+        bv:Destroy()
     end
 end
 
 upBtn.MouseButton1Click:Connect(function()
-    autoWalkToGap(1) -- يمشي من نفسه للفتحة اللي قدام
+    upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    dash(1) -- يدفك قدام بسرعة صاروخية للفتحة
+    task.wait(0.3)
+    upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
 downBtn.MouseButton1Click:Connect(function()
-    -- حماية البيت: يرجعك بس لو لسه بعيد عن البداية
-    local hrp = player.Character.HumanoidRootPart
-    if hrp.Position.Z < -25 then
-        autoWalkToGap(-1) -- يمشي من نفسه للفتحة اللي ورا
-    else
-        downBtn.Text = "أنت بالبيت!"
-        task.wait(1)
-        downBtn.Text = "Gap Down"
-    end
+    downBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    dash(-1) -- يدفك ورا (ريوس) بسرعة للفتحة اللي قبلها
+    task.wait(0.3)
+    downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
 -- ميزات Instant Take و Zoom
@@ -98,10 +90,10 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 
 zoomBtn.MouseButton1Click:Connect(function()
-    local z = zoomBtn.Text == "ZOOM: OFF"
-    player.CameraMaxZoomDistance = z and 500 or 128
-    zoomBtn.Text = z and "ZOOM: ON" or "ZOOM: OFF"
-    zoomBtn.BackgroundColor3 = z and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
+    local active = (zoomBtn.Text == "ZOOM: OFF")
+    player.CameraMaxZoomDistance = active and 500 or 128
+    zoomBtn.Text = active and "ZOOM: ON" or "ZOOM: OFF"
+    zoomBtn.BackgroundColor3 = active and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
 end)
 
 discordBtn.MouseButton1Click:Connect(function()
