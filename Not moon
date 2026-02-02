@@ -1,7 +1,65 @@
-echo "# NX2" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/kzaxnm1-cloud/NX2.git
-git push -u origin main
+-- إعدادات الواجهة
+local library = {flags = {}}
+print("hello") -- رسالة الترحيب عند التشغيل
+
+-- تأخير بسيط لمدة ثانية كما طلبت
+task.wait(1)
+
+-- إنشاء النافذة (الشاشة السوداء في المنتصف)
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local ToggleBtn = Instance.new("TextButton")
+local StatusLabel = Instance.new("TextLabel")
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "HackInterface"
+
+-- تصميم الشاشة السوداء
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- لون أسود
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) -- في المنتصف تماماً
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Active = true
+MainFrame.Draggable = true -- تسمح لك بتحريك النافذة
+
+-- عنوان السكربت
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "تشغيل اختراق"
+Title.TextColor3 = Color3.fromRGB(255, 0, 0) -- أحمر ليعطي شكل الهاك
+Title.BackgroundTransparency = 1
+
+-- زر التشغيل والإيقاف
+ToggleBtn.Parent = MainFrame
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.4, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0.3, 0)
+ToggleBtn.Text = "ابدأ العملية"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- حالة السكربت
+StatusLabel.Parent = MainFrame
+StatusLabel.Position = UDim2.new(0, 0, 0.8, 0)
+StatusLabel.Size = UDim2.new(1, 0, 0, 20)
+StatusLabel.Text = "بانتظار الأوامر..."
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.BackgroundTransparency = 1
+
+-- وظيفة الزر
+local active = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    active = not active
+    if active then
+        ToggleBtn.Text = "إيقاف"
+        StatusLabel.Text = "تم تشغيل الاختراق"
+        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- أخضر
+        print("تم بدء السكربت بنجاح")
+    else
+        ToggleBtn.Text = "تشغيل"
+        StatusLabel.Text = "تم وقف الاختراق"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        print("تم إيقاف السكربت")
+    end
+end)
