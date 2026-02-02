@@ -56,25 +56,34 @@ local downBtn = createBtn("Gap Down", UDim2.new(0.075, 0, 0.34, 0), Color3.fromR
 local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Color3.fromRGB(120, 0, 0), mainFrame)
 local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0), mainFrame)
 local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242), mainFrame)
+local underBtn = createBtn("Under Openings", UDim2.new(0.075, 0, 0.98, 0), Color3.fromRGB(0, 100, 255), mainFrame)  -- زر جديد للفتحات تحت الأرض
 
 startBtn.MouseButton1Click:Connect(function()
     startFrame.Visible = false
     mainFrame.Visible = true
 end)
 
--- قائمة المناطق الآمنة (عدل هذه بنفسك بناءً على ما تعرفه - أضف CFrame من Console)
+-- قائمة المناطق الآمنة (عدل هذه بنفسك)
 local safeZones = {
-    CFrame.new(0, 300, 0),  -- مثال: تل مرتفع في الوسط (غير هذا بموقعك المعروف)
-    -- أضف المزيد مثل: CFrame.new(X, Y, Z) حيث Y عالي (مثل 250+)
+    CFrame.new(0, 300, 0),  -- تل مرتفع في الوسط
 }
 local currentSafeIndex = 1
 
--- الانتقال إلى المناطق الآمنة كل ضغطة (سريع وفوري - لا يرفع فقط، بل يذهب إلى الموقع المحدد)
+-- قائمة الفتحات تحت الأرض (كهوف - عدل هذه بنفسك)
+local underOpenings = {
+    CFrame.new(0, -50, 0),     -- كهف في الوسط
+    CFrame.new(100, -40, 50),  -- كهف جانبي
+    CFrame.new(-100, -60, 0),  -- كهف آخر
+    CFrame.new(0, -70, -100),  -- فتحة تحت أخرى
+}
+local currentUnderIndex = 1
+
+-- الانتقال إلى المناطق الآمنة
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         player.Character.HumanoidRootPart.CFrame = safeZones[currentSafeIndex]
-        currentSafeIndex = currentSafeIndex % #safeZones + 1  -- تدوير إذا أضفت أكثر من واحدة
+        currentSafeIndex = currentSafeIndex % #safeZones + 1
     end
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
@@ -85,6 +94,16 @@ downBtn.MouseButton1Click:Connect(function()
         player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 85)
     end
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+end)
+
+-- الانتقال إلى الفتحات تحت الأرض تلقائيًا
+underBtn.MouseButton1Click:Connect(function()
+    underBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = underOpenings[currentUnderIndex]
+        currentUnderIndex = currentUnderIndex % #underOpenings + 1  -- تدوير تلقائي
+    end
+    underBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
 -- الزوم والأغراض والديسكورد
