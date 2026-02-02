@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- 1. واجهة البداية (START UI)
+-- 1. واجهة البداية (START UI) - مثل الصورة
 local startFrame = Instance.new("Frame", screenGui)
 startFrame.Size = UDim2.new(0, 220, 0, 150)
 startFrame.Position = UDim2.new(0.5, -110, 0.5, -75)
@@ -29,9 +29,9 @@ startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 20
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
 
--- 2. واجهة التحكم (Main Menu)
+-- 2. واجهة التحكم (Main Menu) - الألوان خضراء
 local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 220, 0, 280) -- مساحة أكبر للأزرار الجديدة
+mainFrame.Size = UDim2.new(0, 220, 0, 280)
 mainFrame.Position = UDim2.new(0.5, -110, 0.5, -140)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 mainFrame.Visible = false
@@ -50,7 +50,7 @@ mainTitle.TextSize = 22
 mainTitle.Font = Enum.Font.SourceSansBold
 mainTitle.BackgroundTransparency = 1
 
--- وظيفة إنشاء الأزرار
+-- إنشاء الأزرار
 local function createBtn(text, pos, color)
     local btn = Instance.new("TextButton", mainFrame)
     btn.Size = UDim2.new(0.85, 0, 0.15, 0)
@@ -64,11 +64,10 @@ local function createBtn(text, pos, color)
     return btn
 end
 
--- الأزرار
-local forwardBtn = createBtn("Forward VIP ➔", UDim2.new(0.075, 0, 0.2, 0), Color3.fromRGB(0, 180, 0))
-local backBtn = createBtn("← Back VIP", UDim2.new(0.075, 0, 0.38, 0), Color3.fromRGB(0, 180, 0))
-local zoomBtn = createBtn("ZOOM (Max)", UDim2.new(0.075, 0, 0.56, 0), Color3.fromRGB(100, 100, 100))
-local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.74, 0), Color3.fromRGB(88, 101, 242))
+local forwardBtn = createBtn("Forward VIP ➔", UDim2.new(0.075, 0, 0.2), Color3.fromRGB(0, 180, 0))
+local backBtn = createBtn("← Back VIP", UDim2.new(0.075, 0, 0.38), Color3.fromRGB(0, 180, 0))
+local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.56), Color3.fromRGB(100, 100, 100))
+local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.74), Color3.fromRGB(88, 101, 242))
 
 -- 3. البرمجة والمنطق
 startBtn.MouseButton1Click:Connect(function()
@@ -76,20 +75,15 @@ startBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = true
 end)
 
--- وظيفة الـ ZOOM
+-- الزوم
 local zooming = false
 zoomBtn.MouseButton1Click:Connect(function()
     zooming = not zooming
-    if zooming then
-        player.CameraMaxZoomDistance = 500 -- رؤية من بعيد
-        zoomBtn.Text = "ZOOM: ON"
-    else
-        player.CameraMaxZoomDistance = 128
-        zoomBtn.Text = "ZOOM (Max)"
-    end
+    player.CameraMaxZoomDistance = zooming and 500 or 128
+    zoomBtn.Text = zooming and "ZOOM: ON" or "ZOOM: OFF"
 end)
 
--- وظيفة الديسكورد
+-- نسخ الديسكورد
 discordBtn.MouseButton1Click:Connect(function()
     setclipboard("https://discord.gg/syPpUv8Jf")
     discordBtn.Text = "تم النسخ!"
@@ -97,18 +91,28 @@ discordBtn.MouseButton1Click:Connect(function()
     discordBtn.Text = "نسخ سيرفر ديسكورد"
 end)
 
--- وظيفة الانتقال الموزونة للماب (بدون الخروج برا)
-local function tp(x, y, z)
-    local char = player.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(x, y, z)
-    end
-end
+-- الانتقال الآمن (Teleport Logic)
+local currentPos = 0 -- لتتبع مرحلة الـ VIP
 
 forwardBtn.MouseButton1Click:Connect(function()
-    tp(0, 0, -85) -- انتقال للأمام باتجاه الـ VIP داخل الماب
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        -- الانتقال للأمام بمسافة ثابتة (داخل المباني)
+        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, -110)
+        currentPos = currentPos + 1
+    end
 end)
 
 backBtn.MouseButton1Click:Connect(function()
-    tp(0, 0, 85) -- رجوع للخلف بوزن دقيق عشان ما تطلع برا الماب
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        -- يرجع ورا بشرط ما يطلع برا الماب
+        if currentPos > 0 then
+            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, 110)
+            currentPos = currentPos - 1
+        else
+            -- إذا كان عند بيته (أول الماب) ينقله لمكان ثابت آمن
+            char.HumanoidRootPart.CFrame = CFrame.new(16, 12, 10) 
+        end
+    end
 end)
