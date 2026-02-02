@@ -1,72 +1,7 @@
--- NX2 DEMO UI (تعليمي فقط)
-
-local player = game.Players.LocalPlayer
-
--- Screen
-local gui = Instance.new("ScreenGui")
-gui.Parent = player:WaitForChild("PlayerGui")
-
--- Black Background
-local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1,0,1,0)
-bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-bg.Parent = gui
-
--- Title
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1,0,0.1,0)
-title.Position = UDim2.new(0,0,0,0)
-title.Text = "NX2"
-title.TextColor3 = Color3.fromRGB(255,255,255)
-title.BackgroundTransparency = 1
-title.TextScaled = true
-title.Parent = bg
-
--- Hello Text
-local hello = Instance.new("TextLabel")
-hello.Size = UDim2.new(1,0,0.1,0)
-hello.Position = UDim2.new(0,0,0.4,0)
-hello.Text = "Hello"
-hello.TextColor3 = Color3.fromRGB(255,255,255)
-hello.BackgroundTransparency = 1
-hello.TextScaled = true
-hello.Parent = bg
-
--- Wait then loading
-task.wait(1.5)
-hello.Text = "Loading..."
-
-task.wait(1.5)
-hello.Visible = false
-
--- Button
-local btn = Instance.new("TextButton")
-btn.Size = UDim2.new(0.4,0,0.1,0)
-btn.Position = UDim2.new(0.3,0,0.45,0)
-btn.Text = "اضغط لاختراق الجدران"
-btn.BackgroundColor3 = Color3.fromRGB(30,30,30)
-btn.TextColor3 = Color3.fromRGB(255,255,255)
-btn.TextScaled = true
-btn.Parent = bg
-
--- Status
-local status = Instance.new("TextLabel")
-status.Size = UDim2.new(1,0,0.08,0)
-status.Position = UDim2.new(0,0,0.6,0)
-status.Text = ""
-status.TextColor3 = Color3.fromRGB(0,255,0)
-status.BackgroundTransparency = 1
-status.TextScaled = true
-status.Parent = bg
-
--- Toggle
-local enabled = false
-
-btn.MouseButton1Click:Connect(function()
-	enabled = not enabled
-	if enabled then
-		status.Text = "تم التفعيل"
-	else
-		status.Text = "تم وقف الاختراق"
-	end
-end)
+echo "# NX2" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/kzaxnm1-cloud/NX2.git
+git push -u origin main
