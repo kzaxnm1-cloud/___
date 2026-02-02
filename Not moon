@@ -1,242 +1,90 @@
--- حماية السكريبت (task.spawn لتجنب الكشف)– سكربت الهروب من التسونامي - يمشي تلقائياً للأماكن المحمية تحت– سكربت الهروب من التسونامي - يمشي تلقائياً للأماكن المحمية تحت
-– Escape Tsunami Auto Walk Script
+-- نسخ مباشر - بدون loadstring
+print("🌊 Loading...")
 
-task.spawn(function()
 local player = game.Players.LocalPlayer
-local RunService = game:GetService(“RunService”)
-local screenGui = Instance.new(“ScreenGui”, game.CoreGui)
-screenGui.ResetOnSpawn = false
+local RunService = game:GetService("RunService")
 
-```
--- واجهة الدخول START
-local startFrame = Instance.new("Frame", screenGui)
-startFrame.Size = UDim2.new(0, 220, 0, 150)
-startFrame.Position = UDim2.new(0.5, -110, 0.4, -75)
-startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Instance.new("UICorner", startFrame).CornerRadius = UDim.new(0, 10)
-Instance.new("UIStroke", startFrame).Color = Color3.fromRGB(0, 170, 255)
-
-local logo = Instance.new("TextLabel", startFrame)
-logo.Size = UDim2.new(1, 0, 0, 50)
-logo.Text = "Tsunami Escape v2"
-logo.TextColor3 = Color3.fromRGB(0, 170, 255)
-logo.TextSize = 22
-logo.Font = Enum.Font.SourceSansBold
-logo.BackgroundTransparency = 1
-
-local startBtn = Instance.new("TextButton", startFrame)
-startBtn.Size = UDim2.new(0.85, 0, 0.35, 0)
-startBtn.Position = UDim2.new(0.075, 0, 0.5, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-startBtn.Text = "START"
-startBtn.TextColor3 = Color3.new(1, 1, 1)
-startBtn.TextSize = 20
-Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
-
--- القائمة الرئيسية
-local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 240, 0, 340)
-mainFrame.Position = UDim2.new(0.5, -120, 0.4, -170)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-mainFrame.Visible = false
-mainFrame.Active = true
-mainFrame.Draggable = true
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
-Instance.new("UIStroke", mainFrame).Color = Color3.fromRGB(0, 170, 255)
-
-local function createBtn(text, pos, color, parent)
-    local btn = Instance.new("TextButton", parent)
-    btn.Size = UDim2.new(0.85, 0, 0.11, 0)
-    btn.Position = pos
-    btn.BackgroundColor3 = color
-    btn.Text = text
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 14
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    return btn
+-- حذف GUI قديمة
+for _, gui in pairs(game.CoreGui:GetChildren()) do
+    if gui.Name == "TsunamiGUI" then gui:Destroy() end
 end
 
--- أزرار التحكم
-local autoWalkBtn = createBtn("Auto Walk: OFF", UDim2.new(0.075, 0, 0.15, 0), Color3.fromRGB(120, 0, 0), mainFrame)
-local stopBtn = createBtn("STOP", UDim2.new(0.075, 0, 0.29, 0), Color3.fromRGB(200, 0, 0), mainFrame)
-local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.43, 0), Color3.fromRGB(120, 0, 0), mainFrame)
-local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.57, 0), Color3.fromRGB(120, 0, 0), mainFrame)
-local speedLabel = createBtn("السرعة: عادية", UDim2.new(0.075, 0, 0.71, 0), Color3.fromRGB(50, 50, 50), mainFrame)
-speedLabel.TextSize = 12
-local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.85, 0), Color3.fromRGB(88, 101, 242), mainFrame)
+local sg = Instance.new("ScreenGui", game.CoreGui)
+sg.Name = "TsunamiGUI"
 
-startBtn.MouseButton1Click:Connect(function()
-    startFrame.Visible = false
-    mainFrame.Visible = true
+-- زر البداية
+local startF = Instance.new("Frame", sg)
+startF.Size = UDim2.new(0, 200, 0, 120)
+startF.Position = UDim2.new(0.5, -100, 0.5, -60)
+startF.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Instance.new("UICorner", startF).CornerRadius = UDim.new(0, 10)
+
+local startB = Instance.new("TextButton", startF)
+startB.Size = UDim2.new(0.8, 0, 0.4, 0)
+startB.Position = UDim2.new(0.1, 0, 0.5, -10)
+startB.Text = "START"
+startB.TextSize = 20
+startB.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+Instance.new("UICorner", startB).CornerRadius = UDim.new(0, 8)
+
+-- القائمة
+local mainF = Instance.new("Frame", sg)
+mainF.Size = UDim2.new(0, 220, 0, 250)
+mainF.Position = UDim2.new(0.5, -110, 0.5, -125)
+mainF.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainF.Visible = false
+mainF.Draggable = true
+mainF.Active = true
+Instance.new("UICorner", mainF).CornerRadius = UDim.new(0, 10)
+
+local function btn(text, y, color)
+    local b = Instance.new("TextButton", mainF)
+    b.Size = UDim2.new(0.85, 0, 0, 40)
+    b.Position = UDim2.new(0.075, 0, 0, y)
+    b.Text = text
+    b.BackgroundColor3 = color
+    b.TextSize = 14
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+    return b
+end
+
+local autoB = btn("Auto Walk: OFF", 20, Color3.fromRGB(120, 0, 0))
+local stopB = btn("STOP", 75, Color3.fromRGB(200, 0, 0))
+local takeB = btn("Instant: OFF", 130, Color3.fromRGB(120, 0, 0))
+local zoomB = btn("ZOOM: OFF", 185, Color3.fromRGB(120, 0, 0))
+
+startB.MouseButton1Click:Connect(function()
+    startF.Visible = false
+    mainF.Visible = true
 end)
 
--- الممرات البرتقالية (من فوق ثم ينزل)
-local safeSpots = {
-    -- الممرات البرتقالية - ارتفاع آمن
-    {pos = Vector3.new(0, 5, 0), name = "مركز"},      
-    {pos = Vector3.new(-80, 5, 0), name = "يسار"},    
-    {pos = Vector3.new(80, 5, 0), name = "يمين"},     
-    {pos = Vector3.new(0, 5, -80), name = "أمام"},    
-    {pos = Vector3.new(0, 5, 80), name = "خلف"},      
-    {pos = Vector3.new(-60, 5, -60), name = "زاوية 1"},  
-    {pos = Vector3.new(60, 5, -60), name = "زاوية 2"},   
-    {pos = Vector3.new(-60, 5, 60), name = "زاوية 3"},   
-    {pos = Vector3.new(60, 5, 60), name = "زاوية 4"},    
+-- مواقع آمنة
+local spots = {
+    Vector3.new(0, 8, 0),
+    Vector3.new(-60, 8, 0),
+    Vector3.new(60, 8, 0),
+    Vector3.new(0, 8, -60),
+    Vector3.new(0, 8, 60),
 }
 
--- متغيرات المشي التلقائي
-local autoWalking = false
-local walkConnection = nil
-local targetSpot = nil
+local running = false
+local conn = nil
 
--- وظيفة إيجاد أقرب مكان آمن
-local function findNearestSafeSpot()
+local function nearest()
     if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-        return nil
+        return spots[1]
     end
-    
-    local playerPos = player.Character.HumanoidRootPart.Position
-    local nearest = safeSpots[1].pos
-    local minDist = (playerPos - nearest).Magnitude
-    
-    for _, spot in ipairs(safeSpots) do
-        local dist = (playerPos - spot.pos).Magnitude
-        if dist < minDist then
-            minDist = dist
-            nearest = spot.pos
-        end
+    local pos = player.Character.HumanoidRootPart.Position
+    local best = spots[1]
+    local minD = 9999
+    for _, s in ipairs(spots) do
+        local d = (pos - s).Magnitude
+        if d < minD then minD = d; best = s end
     end
-    
-    return nearest
+    return best
 end
 
--- وظيفة المشي التلقائي
-local function startAutoWalk()
-    if autoWalking then return end
-    autoWalking = true
-    autoWalkBtn.Text = "Auto Walk: ON"
-    autoWalkBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
-    
-    targetSpot = findNearestSafeSpot()
-    
-    if walkConnection then
-        walkConnection:Disconnect()
-    end
-    
-    walkConnection = RunService.Heartbeat:Connect(function()
-        task.spawn(function()
-            if not autoWalking then return end
-            
-            local char = player.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") or not char:FindFirstChild("Humanoid") then
-                return
-            end
-            
-            local humanoid = char.Humanoid
-            local hrp = char.HumanoidRootPart
-            
-            -- إذا وصلنا للهدف (قريب أفقياً)، نختار هدف جديد
-            local horizontalDist = Vector3.new(hrp.Position.X - targetSpot.X, 0, hrp.Position.Z - targetSpot.Z).Magnitude
-            if targetSpot and horizontalDist < 8 then
-                targetSpot = findNearestSafeSpot()
-            end
-            
-            if targetSpot then
-                -- المشي باتجاه الهدف أفقياً (يوصل من فوق وينزل طبيعي)
-                local targetFlat = Vector3.new(targetSpot.X, hrp.Position.Y, targetSpot.Z)
-                humanoid:MoveTo(targetFlat)
-                
-                -- تحديث السرعة
-                speedLabel.Text = string.format("المسافة: %.1f", horizontalDist)
-            end
-        end)
-    end)
-end
-
--- وظيفة إيقاف المشي
-local function stopAutoWalk()
-    autoWalking = false
-    autoWalkBtn.Text = "Auto Walk: OFF"
-    autoWalkBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
-    
-    if walkConnection then
-        walkConnection:Disconnect()
-        walkConnection = nil
-    end
-    
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid:MoveTo(player.Character.HumanoidRootPart.Position)
-    end
-end
-
--- زر Auto Walk
-autoWalkBtn.MouseButton1Click:Connect(function()
-    task.spawn(function()
-        if autoWalking then
-            stopAutoWalk()
-        else
-            startAutoWalk()
-        end
-    end)
-end)
-
--- زر STOP
-stopBtn.MouseButton1Click:Connect(function()
-    task.spawn(function()
-        stopAutoWalk()
-        stopBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-        task.wait(0.3)
-        stopBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-    end)
-end)
-
--- Instant Take
-local instantTake = false
-takeBtn.MouseButton1Click:Connect(function()
-    task.spawn(function()
-        instantTake = not instantTake
-        takeBtn.Text = instantTake and "Instant Take: ON" or "Instant Take: OFF"
-        takeBtn.BackgroundColor3 = instantTake and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
-    end)
-end)
-
-RunService.Heartbeat:Connect(function()
-    if instantTake then
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("ProximityPrompt") then
-                v.HoldDuration = 0
-            end
-        end
-    end
-end)
-
--- ZOOM
-zoomBtn.MouseButton1Click:Connect(function()
-    task.spawn(function()
-        local active = (zoomBtn.Text == "ZOOM: OFF")
-        player.CameraMaxZoomDistance = active and 1000 or 128
-        zoomBtn.Text = active and "ZOOM: ON" or "ZOOM: OFF"
-        zoomBtn.BackgroundColor3 = active and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
-    end)
-end)
-
--- Discord
-discordBtn.MouseButton1Click:Connect(function()
-    task.spawn(function()
-        setclipboard("https://discord.gg/syPpUv8Jf")
-        discordBtn.Text = "تم النسخ!"
-        task.wait(2)
-        discordBtn.Text = "نسخ سيرفر ديسكورد"
-    end)
-end)
-
--- إيقاف المشي عند موت الشخصية
-player.CharacterAdded:Connect(function(char)
-    char:WaitForChild("Humanoid").Died:Connect(function()
-        stopAutoWalk()
-    end)
-end)
-```
-
-end)end)end)
+autoB.MouseButton1Click:Connect(function()
+    running = not running
+    autoB.Text = running and "Auto Walk: ON" or "Auto Walk: OFF"
+    autoB.BackgroundColor3 = running and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
