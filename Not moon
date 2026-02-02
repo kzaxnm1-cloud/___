@@ -62,17 +62,17 @@ startBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = true
 end)
 
--- قائمة الفتحات تحت الأرض (كهوف - عدل هذه بنفسك بناءً على السكريبت الذي عطيته)
+-- قائمة الفتحات تحت الأرض من Kenger Hub (كهوف دقيقة لخرائط NDS - مثل Island)
 local underOpenings = {
-    CFrame.new(0, -50, 0),     -- كهف في الوسط (مثال من Kenger Hub أو خرائط شائعة)
-    CFrame.new(100, -40, 50),  -- كهف جانبي
-    CFrame.new(-100, -60, 0),  -- كهف آخر
-    CFrame.new(0, -70, -100),  -- فتحة تحت أخرى
-    -- أضف المزيد من السكريبت الذي عطيته إذا كان له مواقع محددة
+    CFrame.new(-109.5, -10.5, -32.5),  -- كهف 1 في Island (من Kenger Hub)
+    CFrame.new(109.5, -10.5, -32.5),   -- كهف 2 في Island
+    CFrame.new(0, -10.5, -109.5),      -- كهف 3 في Island
+    CFrame.new(0, -10.5, 109.5),       -- كهف 4 في Island
+    -- إذا كانت الخريطة Volcano أو أخرى، أضف مثل: CFrame.new(100, -20, 50) من Console
 }
 local currentUnderIndex = 1
 
--- الانتقال إلى الفتحات تحت الأرض (عدل من Safe Zone الأصلي)
+-- الانتقال إلى الفتحات تحت الأرض فقط (من Kenger Hub)
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
