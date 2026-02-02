@@ -12,14 +12,6 @@ local startStroke = Instance.new("UIStroke", startFrame)
 startStroke.Color = Color3.fromRGB(0, 170, 255)
 startStroke.Thickness = 2
 
-local startTitle = Instance.new("TextLabel", startFrame)
-startTitle.Size = UDim2.new(1, 0, 0, 60)
-startTitle.Text = "NX2 v1"
-startTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
-startTitle.TextSize = 24
-startTitle.Font = Enum.Font.SourceSansBold
-startTitle.BackgroundTransparency = 1
-
 local startBtn = Instance.new("TextButton", startFrame)
 startBtn.Size = UDim2.new(0.85, 0, 0.35, 0)
 startBtn.Position = UDim2.new(0.075, 0, 0.55, 0)
@@ -29,7 +21,7 @@ startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 20
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
 
--- 2. واجهة التحكم الاحترافية
+-- 2. واجهة التحكم (المطلوب ترتيبها)
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 220, 0, 320)
 mainFrame.Position = UDim2.new(0.5, -110, 0.5, -160)
@@ -42,15 +34,6 @@ local mainStroke = Instance.new("UIStroke", mainFrame)
 mainStroke.Color = Color3.fromRGB(0, 170, 255)
 mainStroke.Thickness = 2
 
-local mainTitle = Instance.new("TextLabel", mainFrame)
-mainTitle.Size = UDim2.new(1, 0, 0, 40)
-mainTitle.Text = "NX2 v1"
-mainTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
-mainTitle.TextSize = 22
-mainTitle.Font = Enum.Font.SourceSansBold
-mainTitle.BackgroundTransparency = 1
-
--- وظيفة إنشاء الأزرار
 local function createBtn(text, pos, color)
     local btn = Instance.new("TextButton", mainFrame)
     btn.Size = UDim2.new(0.85, 0, 0.12, 0)
@@ -64,76 +47,6 @@ local function createBtn(text, pos, color)
     return btn
 end
 
--- الأزرار مرتبة حسب طلبك
-local instantTakeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.15, 0), Color3.fromRGB(120, 0, 0))
-local forwardBtn = createBtn("Forward VIP ➔", UDim2.new(0.075, 0, 0.32, 0), Color3.fromRGB(0, 180, 0))
-local backBtn = createBtn("← Back VIP", UDim2.new(0.075, 0, 0.49, 0), Color3.fromRGB(0, 180, 0))
-local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(100, 100, 100))
-local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.83, 0), Color3.fromRGB(88, 101, 242))
-
--- 3. البرمجة المتقدمة
-startBtn.MouseButton1Click:Connect(function()
-    startFrame.Visible = false
-    mainFrame.Visible = true
-end)
-
--- ميزة أخذ الأغراض فوراً (Instant Take)
-local instantTake = false
-instantTakeBtn.MouseButton1Click:Connect(function()
-    instantTake = not instantTake
-    instantTakeBtn.Text = instantTake and "Instant Take: ON" or "Instant Take: OFF"
-    instantTakeBtn.BackgroundColor3 = instantTake and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
-    
-    -- تعديل سرعة الضغط في الماب (ProximityPrompt)
-    game:GetService("RunService").Heartbeat:Connect(function()
-        if instantTake then
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA("ProximityPrompt") then
-                    v.HoldDuration = 0 -- أخذ فوري
-                end
-            end
-        end
-    end)
-end)
-
--- الزوم
-local zooming = false
-zoomBtn.MouseButton1Click:Connect(function()
-    zooming = not zooming
-    player.CameraMaxZoomDistance = zooming and 500 or 128
-    zoomBtn.Text = zooming and "ZOOM: ON" or "ZOOM: OFF"
-end)
-
--- الديسكورد
-discordBtn.MouseButton1Click:Connect(function()
-    setclipboard("https://discord.gg/syPpUv8Jf")
-    discordBtn.Text = "تم النسخ!"
-    task.wait(2)
-    discordBtn.Text = "نسخ سيرفر ديسكورد"
-end)
-
--- الانتقال الموزون (Teleport Logic)
-local currentPos = 0
-forwardBtn.MouseButton1Click:Connect(function()
-    local char = player.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        local speed = char.Humanoid.WalkSpeed -- يعتمد على سرعتك الحالية
-        local dist = (speed > 100) and -150 or -90 -- يوزن النطة حسب سرعتك
-        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, dist)
-        currentPos = currentPos + 1
-    end
-end)
-
-backBtn.MouseButton1Click:Connect(function()
-    local char = player.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        if currentPos > 0 then
-            local speed = char.Humanoid.WalkSpeed
-            local dist = (speed > 100) and 150 or 90
-            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, dist)
-            currentPos = currentPos - 1
-        else
-            char.HumanoidRootPart.CFrame = CFrame.new(16, 12, 10) -- منطقة البيت الآمنة
-        end
-    end
-end)
+-- الترتيب الجديد حسب طلبك
+local upBtn = createBtn("Gap Up", UDim2.new(0.075, 0, 0.15, 0), Color3.fromRGB(0, 180, 0))
+local downBtn = createBtn("Gap Down", UDim2.new(0.075, 0, 0.32, 0), Color3.fromRGB
