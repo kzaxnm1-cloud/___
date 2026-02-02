@@ -1,72 +1,57 @@
--- 1. Hello Screen (Transparent + Freeze)
+-- 1. Setup
 local player = game.Players.LocalPlayer
-local welcomeGui = Instance.new("ScreenGui", game.CoreGui)
-local helloText = Instance.new("TextLabel", welcomeGui)
-helloText.Size = UDim2.new(1, 0, 1, 0)
-helloText.BackgroundTransparency = 1
-helloText.Text = "Hello.."
-helloText.TextColor3 = Color3.new(1, 1, 1)
-helloText.TextSize = 100
-helloText.Font = Enum.Font.SourceSansBold
+local character = player.Character or player.CharacterAdded:Wait()
 
--- Freeze Movement
-local char = player.Character or player.CharacterAdded:Wait()
-local hum = char:WaitForChild("Humanoid")
-hum.WalkSpeed = 0
+-- 2. Create UI (Based on your request)
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+screenGui.ResetOnSpawn = false
 
-task.wait(2)
-welcomeGui:Destroy()
-hum.WalkSpeed = 16
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 200, 0, 180)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -90)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(0, 170, 255)
+mainFrame.Active = true
+mainFrame.Draggable = true
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 
--- 2. Core Variables
-local noclip = false
-local espEnabled = false
-local runService = game:GetService("RunService")
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "NX2 v1"
+title.TextColor3 = Color3.fromRGB(0, 170, 255)
+title.TextSize = 22
+title.Font = Enum.Font.SourceSansBold
+title.BackgroundTransparency = 1
 
--- Noclip Logic
-runService.Stepped:Connect(function()
-    if noclip and player.Character then
-        for _, v in pairs(player.Character:GetDescendants()) do
-            if v:IsA("BasePart") then v.CanCollide = false end
-        end
-    end
-end)
+-- Forward Button (Next VIP)
+local forwardBtn = Instance.new("TextButton", mainFrame)
+forwardBtn.Size = UDim2.new(0.8, 0, 0.25, 0)
+forwardBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+forwardBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+forwardBtn.Text = "VIP ➔"
+forwardBtn.TextColor3 = Color3.new(1, 1, 1)
+forwardBtn.TextSize = 18
+Instance.new("UICorner", forwardBtn).CornerRadius = UDim.new(0, 8)
 
--- ESP Function (Green Highlight)
-local function applyESP(targetPlayer)
-    if targetPlayer ~= player then
-        targetPlayer.CharacterAdded:Connect(function(c)
-            if espEnabled then
-                local highlight = Instance.new("Highlight", c)
-                highlight.FillColor = Color3.new(0, 1, 0) -- Green
-                highlight.OutlineColor = Color3.new(1, 1, 1)
-            end
-        end)
-        if targetPlayer.Character and espEnabled then
-            local highlight = Instance.new("Highlight", targetPlayer.Character)
-            highlight.FillColor = Color3.new(0, 1, 0)
-        end
+-- Backward Button (Back VIP)
+local backBtn = Instance.new("TextButton", mainFrame)
+backBtn.Size = UDim2.new(0.8, 0, 0.25, 0)
+backBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+backBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+backBtn.Text = "← VIP"
+backBtn.TextColor3 = Color3.new(1, 1, 1)
+backBtn.TextSize = 18
+Instance.new("UICorner", backBtn).CornerRadius = UDim.new(0, 8)
+
+-- 3. Teleport Logic
+local function teleport(distance)
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        -- ينقلك لمسافة 50 ملم للأمام أو للخلف لتخطي الجدران أو الوصول للـ VIP
+        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.new(0, 0, distance)
     end
 end
 
--- 3. Main UI (Compact Design)
-local mainGui = Instance.new("ScreenGui", game.CoreGui)
-mainGui.ResetOnSpawn = false
-
-local frame = Instance.new("Frame", mainGui)
-frame.Size = UDim2.new(0, 180, 0, 180) -- Smaller Frame
-frame.Position = UDim2.new(0.5, -90, 0.5, -90)
-frame.BackgroundColor3 = Color3.new(0, 0, 0)
-frame.Active = true
-frame.Draggable = true
-
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "NX2 SCRIPT"
-title.TextColor3 = Color3.new(1, 1, 0)
-title.BackgroundTransparency = 1
-title.TextSize = 18
-
-local devText = Instance.new("TextLabel", frame)
-devText.Size = UDim2.new(1, 0, 0, 20)
-devText
+forwardBtn.MouseButton1Click:Connect(function()
+    teleport(-50) -- ينت
