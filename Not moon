@@ -1,90 +1,30 @@
--- نسخ مباشر - بدون loadstring
-print("🌊 Loading...")
+game.StarterGui:SetCore("SendNotification", {
+    Title = "🌊 TSUNAMI SCRIPT";
+    Text = "Loading...";
+    Duration = 3;
+})
+
+wait(0.5)
 
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
--- حذف GUI قديمة
-for _, gui in pairs(game.CoreGui:GetChildren()) do
-    if gui.Name == "TsunamiGUI" then gui:Destroy() end
+-- حذف أي GUI قديمة
+for _, gui in pairs(player.PlayerGui:GetChildren()) do
+    if gui.Name == "TsunamiESP" then gui:Destroy() end
 end
 
-local sg = Instance.new("ScreenGui", game.CoreGui)
-sg.Name = "TsunamiGUI"
+local sg = Instance.new("ScreenGui")
+sg.Name = "TsunamiESP"
+sg.Parent = player.PlayerGui
+sg.ResetOnSpawn = false
+sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- زر البداية
 local startF = Instance.new("Frame", sg)
-startF.Size = UDim2.new(0, 200, 0, 120)
-startF.Position = UDim2.new(0.5, -100, 0.5, -60)
-startF.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Instance.new("UICorner", startF).CornerRadius = UDim.new(0, 10)
-
-local startB = Instance.new("TextButton", startF)
-startB.Size = UDim2.new(0.8, 0, 0.4, 0)
-startB.Position = UDim2.new(0.1, 0, 0.5, -10)
-startB.Text = "START"
-startB.TextSize = 20
-startB.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-Instance.new("UICorner", startB).CornerRadius = UDim.new(0, 8)
-
--- القائمة
-local mainF = Instance.new("Frame", sg)
-mainF.Size = UDim2.new(0, 220, 0, 250)
-mainF.Position = UDim2.new(0.5, -110, 0.5, -125)
-mainF.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainF.Visible = false
-mainF.Draggable = true
-mainF.Active = true
-Instance.new("UICorner", mainF).CornerRadius = UDim.new(0, 10)
-
-local function btn(text, y, color)
-    local b = Instance.new("TextButton", mainF)
-    b.Size = UDim2.new(0.85, 0, 0, 40)
-    b.Position = UDim2.new(0.075, 0, 0, y)
-    b.Text = text
-    b.BackgroundColor3 = color
-    b.TextSize = 14
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
-    return b
-end
-
-local autoB = btn("Auto Walk: OFF", 20, Color3.fromRGB(120, 0, 0))
-local stopB = btn("STOP", 75, Color3.fromRGB(200, 0, 0))
-local takeB = btn("Instant: OFF", 130, Color3.fromRGB(120, 0, 0))
-local zoomB = btn("ZOOM: OFF", 185, Color3.fromRGB(120, 0, 0))
-
-startB.MouseButton1Click:Connect(function()
-    startF.Visible = false
-    mainF.Visible = true
-end)
-
--- مواقع آمنة
-local spots = {
-    Vector3.new(0, 8, 0),
-    Vector3.new(-60, 8, 0),
-    Vector3.new(60, 8, 0),
-    Vector3.new(0, 8, -60),
-    Vector3.new(0, 8, 60),
-}
-
-local running = false
-local conn = nil
-
-local function nearest()
-    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-        return spots[1]
-    end
-    local pos = player.Character.HumanoidRootPart.Position
-    local best = spots[1]
-    local minD = 9999
-    for _, s in ipairs(spots) do
-        local d = (pos - s).Magnitude
-        if d < minD then minD = d; best = s end
-    end
-    return best
-end
-
-autoB.MouseButton1Click:Connect(function()
-    running = not running
-    autoB.Text = running and "Auto Walk: ON" or "Auto Walk: OFF"
-    autoB.BackgroundColor3 = running and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(120, 0, 0)
+startF.Size = UDim2.new(0, 200, 0, 150)
+startF.Position = UDim2.new(0.5, -100, 0.5, -75)
+startF.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+startF.BorderSizePixel = 0
+startF.ZIndex = 10
+Instance.new("UICorner", startF).CornerRadius =​​​​​​​​​​​​​​​​
