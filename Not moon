@@ -2,7 +2,7 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- 1. واجهة البداية (START)
+-- واجهة الدخول START
 local startFrame = Instance.new("Frame", screenGui)
 startFrame.Size = UDim2.new(0, 220, 0, 150)
 startFrame.Position = UDim2.new(0.5, -110, 0.4, -75)
@@ -27,7 +27,7 @@ startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 20
 Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 8)
 
--- 2. واجهة التحكم الرئيسية
+-- القائمة الرئيسية
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.Size = UDim2.new(0, 220, 0, 320)
 mainFrame.Position = UDim2.new(0.5, -110, 0.4, -160)
@@ -57,15 +57,14 @@ local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Col
 local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0))
 local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242))
 
--- 3. تفعيل الأزرار (نفس الانتقال اللي تبيه)
 startBtn.MouseButton1Click:Connect(function()
     startFrame.Visible = false
     mainFrame.Visible = true
 end)
 
+-- كود الانتقال (من الرابط اللي عجبك بدون أي تعديل)
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    -- الانتقال السريع للفتحة اللي قدام
     player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -85)
     task.wait(0.4)
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
@@ -73,13 +72,12 @@ end)
 
 downBtn.MouseButton1Click:Connect(function()
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    -- الانتقال السريع للفتحة اللي ورا
     player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 85)
     task.wait(0.4)
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
--- ميزات Zoom و Instant Take
+-- الزوم والأغراض والديسكورد
 local it = false
 takeBtn.MouseButton1Click:Connect(function()
     it = not it
