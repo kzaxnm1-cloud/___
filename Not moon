@@ -1,28 +1,33 @@
--- 1. شاشة الترحيب (Hello) تملأ الشاشة لمدة ثانيتين
+-- 1. شاشة الترحيب (Hello) تملأ الشاشة لمدة ثانيتين-- 1. شاشة الترحيب (Hello) شفافة لمدة ثانيتين
 local welcomeGui = Instance.new("ScreenGui", game.CoreGui)
-local bg = Instance.new("Frame", welcomeGui)
-bg.Size = UDim2.new(1, 0, 1, 0)
-bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-
-local helloTxt = Instance.new("TextLabel", bg)
+local helloTxt = Instance.new("TextLabel", welcomeGui)
 helloTxt.Size = UDim2.new(1, 0, 1, 0)
 helloTxt.Text = "Hello"
 helloTxt.TextColor3 = Color3.fromRGB(255, 255, 255)
 helloTxt.TextSize = 100
-helloTxt.BackgroundTransparency = 1
+helloTxt.BackgroundTransparency = 1 -- خلفية شفافة تماماً
 helloTxt.Font = Enum.Font.SourceSansBold
+helloTxt.TextStrokeTransparency = 0 -- حدود سوداء خفيفة للنص ليكون واضحاً
 
-task.wait(2) -- الانتظار لمدة ثانيتين
-welcomeGui:Destroy() -- إخفاء شاشة الترحيب
+task.delay(2, function()
+    welcomeGui:Destroy()
+end)
 
--- 2. إعدادات اختراق الجدران (Noclip)
+-- 2. إعدادات اللاعب والنظام
 local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
 local noclip = false
+local runService = game:GetService("RunService")
 
-game:GetService("RunService").Stepped:Connect(function()
-    if noclip then
-        for _, part in pairs(char:GetDescendants()) do
+-- وظيفة التعامل مع الموت (إعادة ضبط الخيار)
+player.CharacterAdded:Connect(function(newChar)
+    noclip = false -- إيقاف الاختراق عند الموت
+    -- سيتم تحديث الزر في الأسفل عبر مراقبة المتغير
+end)
+
+-- حلقة التشغيل الدائمة للاختراق
+runService.Stepped:Connect(function()
+    if noclip and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
             if part:IsA("BasePart") then
                 part.CanCollide = false
             end
@@ -30,17 +35,16 @@ game:GetService("RunService").Stepped:Connect(function()
     end
 end)
 
--- 3. إنشاء واجهة NX2 السوداء في المنتصف
+-- 3. واجهة NX2
 local mainGui = Instance.new("ScreenGui", game.CoreGui)
 local frame = Instance.new("Frame", mainGui)
 frame.Size = UDim2.new(0, 220, 0, 160)
 frame.Position = UDim2.new(0.5, -110, 0.5, -80)
-frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 frame.BorderSizePixel = 2
 frame.Active = true
 frame.Draggable = true
 
--- نص NX2 بالأعلى
 local nx2Title = Instance.new("TextLabel", frame)
 nx2Title.Size = UDim2.new(1, 0, 0, 40)
 nx2Title.Text = "NX2"
@@ -48,7 +52,6 @@ nx2Title.TextColor3 = Color3.fromRGB(255, 255, 0)
 nx2Title.TextSize = 25
 nx2Title.BackgroundTransparency = 1
 
--- عنوان "تفعيل اختراق"
 local subTitle = Instance.new("TextLabel", frame)
 subTitle.Position = UDim2.new(0, 0, 0.25, 0)
 subTitle.Size = UDim2.new(1, 0, 0, 30)
@@ -57,40 +60,5 @@ subTitle.TextColor3 = Color3.fromRGB(255, 0, 0)
 subTitle.TextSize = 18
 subTitle.BackgroundTransparency = 1
 
--- زر التشغيل
 local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(0.8, 0, 0.25, 0)
-btn.Position = UDim2.new(0.1, 0, 0.5, 0)
-btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-btn.Text = "تشغيل"
-btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-btn.TextSize = 18
-
--- نص الحالة
-local status = Instance.new("TextLabel", frame)
-status.Position = UDim2.new(0, 0, 0.8, 0)
-status.Size = UDim2.new(1, 0, 0, 25)
-status.Text = "غير مفعل"
-status.TextColor3 = Color3.fromRGB(200, 200, 200)
-status.BackgroundTransparency = 1
-
--- برمجة الزر لضمان الاختراق الفعلي
-btn.MouseButton1Click:Connect(function()
-    noclip = not noclip
-    if noclip then
-        btn.Text = "إيقاف"
-        status.Text = "تم التشغيل اختراق"
-        status.TextColor3 = Color3.fromRGB(0, 255, 0)
-        print("NX2: Noclip Activated")
-    else
-        btn.Text = "تشغيل"
-        status.Text = "تم وقف اختراق"
-        status.TextColor3 = Color3.fromRGB(255, 0, 0)
-        -- إعادة التصادم عند الإيقاف
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
-        end
-    end
-end)
+btn.Size = UDim2.new(0.8, 0,end)
