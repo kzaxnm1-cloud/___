@@ -1,55 +1,96 @@
--- إعدادات الواجهة-- رسالة الترحيب
-print("hello")
-task.wait(1)
+-- 1. شاشة الترحيب (Hello) تملأ الشاشة لمدة ثانيتين
+local welcomeGui = Instance.new("ScreenGui", game.CoreGui)
+local bg = Instance.new("Frame", welcomeGui)
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 
+local helloTxt = Instance.new("TextLabel", bg)
+helloTxt.Size = UDim2.new(1, 0, 1, 0)
+helloTxt.Text = "Hello"
+helloTxt.TextColor3 = Color3.fromRGB(255, 255, 255)
+helloTxt.TextSize = 100
+helloTxt.BackgroundTransparency = 1
+helloTxt.Font = Enum.Font.SourceSansBold
+
+task.wait(2) -- الانتظار لمدة ثانيتين
+welcomeGui:Destroy() -- إخفاء شاشة الترحيب
+
+-- 2. إعدادات اختراق الجدران (Noclip)
 local player = game.Players.LocalPlayer
-local runService = game:GetService("RunService")
-local noclipConnection = nil
+local char = player.Character or player.CharacterAdded:Wait()
+local noclip = false
 
--- وظيفة اختراق الجدران
-local function startNoclip()
-    noclipConnection = runService.Stepped:Connect(function()
-        if player.Character then
-            for _, part in pairs(player.Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
+game:GetService("RunService").Stepped:Connect(function()
+    if noclip then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
             end
         end
-    end)
-end
-
-local function stopNoclip()
-    if noclipConnection then
-        noclipConnection:Disconnect()
-        noclipConnection = nil
     end
-    if player.Character then
-        for _, part in pairs(player.Character:GetDescendants()) do
+end)
+
+-- 3. إنشاء واجهة NX2 السوداء في المنتصف
+local mainGui = Instance.new("ScreenGui", game.CoreGui)
+local frame = Instance.new("Frame", mainGui)
+frame.Size = UDim2.new(0, 220, 0, 160)
+frame.Position = UDim2.new(0.5, -110, 0.5, -80)
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true
+
+-- نص NX2 بالأعلى
+local nx2Title = Instance.new("TextLabel", frame)
+nx2Title.Size = UDim2.new(1, 0, 0, 40)
+nx2Title.Text = "NX2"
+nx2Title.TextColor3 = Color3.fromRGB(255, 255, 0)
+nx2Title.TextSize = 25
+nx2Title.BackgroundTransparency = 1
+
+-- عنوان "تفعيل اختراق"
+local subTitle = Instance.new("TextLabel", frame)
+subTitle.Position = UDim2.new(0, 0, 0.25, 0)
+subTitle.Size = UDim2.new(1, 0, 0, 30)
+subTitle.Text = "تفعيل اختراق"
+subTitle.TextColor3 = Color3.fromRGB(255, 0, 0)
+subTitle.TextSize = 18
+subTitle.BackgroundTransparency = 1
+
+-- زر التشغيل
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.8, 0, 0.25, 0)
+btn.Position = UDim2.new(0.1, 0, 0.5, 0)
+btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+btn.Text = "تشغيل"
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.TextSize = 18
+
+-- نص الحالة
+local status = Instance.new("TextLabel", frame)
+status.Position = UDim2.new(0, 0, 0.8, 0)
+status.Size = UDim2.new(1, 0, 0, 25)
+status.Text = "غير مفعل"
+status.TextColor3 = Color3.fromRGB(200, 200, 200)
+status.BackgroundTransparency = 1
+
+-- برمجة الزر لضمان الاختراق الفعلي
+btn.MouseButton1Click:Connect(function()
+    noclip = not noclip
+    if noclip then
+        btn.Text = "إيقاف"
+        status.Text = "تم التشغيل اختراق"
+        status.TextColor3 = Color3.fromRGB(0, 255, 0)
+        print("NX2: Noclip Activated")
+    else
+        btn.Text = "تشغيل"
+        status.Text = "تم وقف اختراق"
+        status.TextColor3 = Color3.fromRGB(255, 0, 0)
+        -- إعادة التصادم عند الإيقاف
+        for _, part in pairs(char:GetDescendants()) do
             if part:IsA("BasePart") then
                 part.CanCollide = true
             end
         end
     end
-end
-
--- إنشاء الواجهة
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-MainFrame.Position = UDim2.new(0.5, -110, 0.5, -85)
-MainFrame.Size = UDim2.new(0, 220, 0, 170)
-MainFrame.Active = true
-MainFrame.Draggable = true
-
--- إضافة نص NX2 بالأعلى
-local NX2Label = Instance.new("TextLabel", MainFrame)
-NX2Label.Size = UDim2.new(1, 0, 0, 30)
-NX2Label.Text = "NX2"
-NX2Label.TextColor3 = Color3.fromRGB(255, 255, 0) -- لون أصفر للتمييز
-NX2Label.BackgroundTransparency = 1
-NX2Label.TextSize = 22
-NX2Label.Font = Enum.Font.SourceSansBold
-
--- عنوان السكربت الأصلي
-local Title =end)
+end)
