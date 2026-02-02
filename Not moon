@@ -38,8 +38,8 @@ mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 Instance.new("UIStroke", mainFrame).Color = Color3.fromRGB(0, 170, 255)
 
-local function createBtn(text, pos, color)
-    local btn = Instance.new("TextButton", mainFrame)
+local function createBtn(text, pos, color, parent)
+    local btn = Instance.new("TextButton", parent)
     btn.Size = UDim2.new(0.85, 0, 0.12, 0)
     btn.Position = pos
     btn.BackgroundColor3 = color
@@ -51,29 +51,44 @@ local function createBtn(text, pos, color)
     return btn
 end
 
-local upBtn = createBtn("Gap Up", UDim2.new(0.075, 0, 0.18, 0), Color3.fromRGB(0, 100, 255))
-local downBtn = createBtn("Gap Down", UDim2.new(0.075, 0, 0.34, 0), Color3.fromRGB(0, 100, 255))
-local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Color3.fromRGB(120, 0, 0))
-local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0))
-local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242))
+local upBtn = createBtn("Safe Zone", UDim2.new(0.075, 0, 0.18, 0), Color3.fromRGB(0, 100, 255), mainFrame)
+local downBtn = createBtn("Gap Down", UDim2.new(0.075, 0, 0.34, 0), Color3.fromRGB(0, 100, 255), mainFrame)
+local takeBtn = createBtn("Instant Take: OFF", UDim2.new(0.075, 0, 0.50, 0), Color3.fromRGB(120, 0, 0), mainFrame)
+local zoomBtn = createBtn("ZOOM: OFF", UDim2.new(0.075, 0, 0.66, 0), Color3.fromRGB(120, 0, 0), mainFrame)
+local discordBtn = createBtn("نسخ سيرفر ديسكورد", UDim2.new(0.075, 0, 0.82, 0), Color3.fromRGB(88, 101, 242), mainFrame)
 
 startBtn.MouseButton1Click:Connect(function()
     startFrame.Visible = false
     mainFrame.Visible = true
 end)
 
--- كود الانتقال (من الرابط اللي عجبك بدون أي تعديل)
+-- قائمة المناطق الآمنة في ماب التسونامي (بناءً على Natural Disaster Survival - يمكن تعديلها حسب الخريطة الدقيقة)
+local safeZones = {
+    CFrame.new(0, 300, 0),     -- تل مرتفع في الوسط
+    CFrame.new(200, 250, 0),   -- تل جانبي
+    CFrame.new(0, 350, 200),   -- جبل آخر
+    CFrame.new(-200, 280, 0),  -- تل آخر
+    CFrame.new(0, 320, -200),  -- منطقة عالية أخرى
+    -- أضف المزيد إذا لزم الأمر، مثل CFrame.new(X, Y, Z) حيث Y عالي
+}
+local currentSafeIndex = 1
+
+-- الانتقال إلى المناطق الآمنة كل ضغطة (تدوير بين المناطق - سريع وفوري)
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -85)
-    task.wait(0.4)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = safeZones[currentSafeIndex]
+        currentSafeIndex = currentSafeIndex % #safeZones + 1
+    end
+    -- إزالة التأخير لجعلها أسرع (اللون يتغير فورًا)
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
 downBtn.MouseButton1Click:Connect(function()
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 85)
-    task.wait(0.4)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 85)
+    end
     downBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
@@ -88,7 +103,9 @@ end)
 game:GetService("RunService").Heartbeat:Connect(function()
     if it then
         for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("ProximityPrompt") then v.HoldDuration = 0 end
+            if v:IsA("ProximityPrompt") then
+                v.HoldDuration = 0
+            end
         end
     end
 end)
