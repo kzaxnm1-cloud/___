@@ -62,25 +62,20 @@ startBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = true
 end)
 
--- قائمة المناطق الآمنة في ماب التسونامي (بناءً على Natural Disaster Survival - يمكن تعديلها حسب الخريطة الدقيقة)
+-- قائمة المناطق الآمنة (عدل هذه بنفسك بناءً على ما تعرفه - أضف CFrame من Console)
 local safeZones = {
-    CFrame.new(0, 300, 0),     -- تل مرتفع في الوسط
-    CFrame.new(200, 250, 0),   -- تل جانبي
-    CFrame.new(0, 350, 200),   -- جبل آخر
-    CFrame.new(-200, 280, 0),  -- تل آخر
-    CFrame.new(0, 320, -200),  -- منطقة عالية أخرى
-    -- أضف المزيد إذا لزم الأمر، مثل CFrame.new(X, Y, Z) حيث Y عالي
+    CFrame.new(0, 300, 0),  -- مثال: تل مرتفع في الوسط (غير هذا بموقعك المعروف)
+    -- أضف المزيد مثل: CFrame.new(X, Y, Z) حيث Y عالي (مثل 250+)
 }
 local currentSafeIndex = 1
 
--- الانتقال إلى المناطق الآمنة كل ضغطة (تدوير بين المناطق - سريع وفوري)
+-- الانتقال إلى المناطق الآمنة كل ضغطة (سريع وفوري - لا يرفع فقط، بل يذهب إلى الموقع المحدد)
 upBtn.MouseButton1Click:Connect(function()
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         player.Character.HumanoidRootPart.CFrame = safeZones[currentSafeIndex]
-        currentSafeIndex = currentSafeIndex % #safeZones + 1
+        currentSafeIndex = currentSafeIndex % #safeZones + 1  -- تدوير إذا أضفت أكثر من واحدة
     end
-    -- إزالة التأخير لجعلها أسرع (اللون يتغير فورًا)
     upBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 end)
 
