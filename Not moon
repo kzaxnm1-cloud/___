@@ -2,60 +2,25 @@ local player = game:GetService("Players").LocalPlayer
 local cg = game:GetService("CoreGui")
 local rs = game:GetService("RunService")
 
--- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_ULTIMATE") then cg.NX2_ULTIMATE:Destroy() end
+-- تنظيف النسخ السابقة
+if cg:FindFirstChild("NX2_CLEAN") then cg.NX2_CLEAN:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_ULTIMATE"
+sg.Name = "NX2_CLEAN"
 sg.ResetOnSpawn = false
 
--- [ 1. شاشة الدخول السوداء الصغيرة ] --
-local loaderBg = Instance.new("Frame", sg)
-loaderBg.Size = UDim2.new(1, 0, 1, 0)
-loaderBg.BackgroundColor3 = Color3.new(0, 0, 0)
-loaderBg.ZIndex = 100
-
-local loaderMain = Instance.new("Frame", loaderBg)
-loaderMain.Size = UDim2.new(0, 250, 0, 280)
-loaderMain.Position = UDim2.new(0.5, -125, 0.5, -140)
-loaderMain.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Instance.new("UICorner", loaderMain)
-
-local lTitle = Instance.new("TextLabel", loaderMain)
-lTitle.Size = UDim2.new(1, 0, 0.2, 0)
-lTitle.Text = "NX2 v1 !"
-lTitle.TextColor3 = Color3.new(1, 1, 1)
-lTitle.TextSize = 25
-lTitle.Font = Enum.Font.SourceSansBold
-lTitle.BackgroundTransparency = 1
-
-local lImg = Instance.new("ImageLabel", loaderMain)
-lImg.Size = UDim2.new(0, 120, 0, 120)
-lImg.Position = UDim2.new(0.5, -60, 0.25, 0)
-lImg.Image = "rbxassetid://18911065261"
-lImg.BackgroundTransparency = 1
-Instance.new("UICorner", lImg)
-
-local startBtn = Instance.new("TextButton", loaderMain)
-startBtn.Size = UDim2.new(0.8, 0, 0, 40)
-startBtn.Position = UDim2.new(0.1, 0, 0.8, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0) -- زر أخضر
-startBtn.Text = "START"
-startBtn.TextColor3 = Color3.new(1, 1, 1)
-startBtn.TextSize = 22
-Instance.new("UICorner", startBtn)
-
--- [ 2. المنيو الرئيسي ] --
+-- [ 1. المنيو الرئيسي ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 260, 0, 300)
-main.Position = UDim2.new(0.5, -130, 0.5, -150)
-main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-main.Visible = false
+main.Size = UDim2.new(0, 260, 0, 280)
+main.Position = UDim2.new(0.5, -130, 0.5, -140)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 main.Draggable = true
 Instance.new("UICorner", main)
-Instance.new("UIStroke", main).Color = Color3.new(1, 0, 0)
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.new(1, 0, 0) -- إطار أحمر فخم
+stroke.Thickness = 2
 
--- زر الإخفاء (الشرطة) فوق يمين
+-- زر الإخفاء (الشرطة _)
 local hideBtn = Instance.new("TextButton", main)
 hideBtn.Size = UDim2.new(0, 30, 0, 30)
 hideBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -64,6 +29,7 @@ hideBtn.TextColor3 = Color3.new(1, 1, 1)
 hideBtn.TextSize = 30
 hideBtn.BackgroundTransparency = 1
 
+-- الشعار NX2 !
 local logo = Instance.new("TextLabel", main)
 logo.Size = UDim2.new(1, 0, 0.25, 0)
 logo.Text = "NX2 !"
@@ -72,40 +38,39 @@ logo.TextSize = 35
 logo.Font = Enum.Font.SourceSansBold
 logo.BackgroundTransparency = 1
 
-local function btn(t, y, c)
-    local b = Instance.new("TextButton", main)
-    b.Size = UDim2.new(0.9, 0, 0, 45)
-    b.Position = UDim2.new(0.05, 0, 0, y)
-    b.BackgroundColor3 = c or Color3.fromRGB(30, 30, 30)
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.Text = t
-    b.TextSize = 18
-    Instance.new("UICorner", b)
-    return b
+-- وظيفة صنع الأزرار بشكل مرتب
+local function createButton(name, yPos, color)
+    local btn = Instance.new("TextButton", main)
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
+    btn.Position = UDim2.new(0.05, 0, 0, yPos)
+    btn.BackgroundColor3 = color or Color3.fromRGB(30, 30, 30)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextSize = 18
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = name
+    Instance.new("UICorner", btn)
+    return btn
 end
 
-local noclipB = btn("Noclip: OFF", 85)
-local discB = btn("Discord Link", 145)
-local cleanB = btn("Clean Up UI", 205, Color3.fromRGB(150, 80, 0))
+local noclipBtn = createButton("Noclip: OFF", 80)
+local discordBtn = createButton("Discord Link", 140)
+local cleanBtn = createButton("Clean Up UI", 200, Color3.fromRGB(130, 0, 0))
 
--- [ 3. الأيقونة الدائرية (عند الإخفاء) ] --
+-- [ 2. الأيقونة الدائرية (تظهر عند الإخفاء) ] --
 local mini = Instance.new("ImageButton", sg)
-mini.Size = UDim2.new(0, 60, 0, 60) -- حجم صغير مثل الصورة
-mini.Position = UDim2.new(0.9, 0, 0.1, 0)
+mini.Size = UDim2.new(0, 60, 0, 60)
+mini.Position = UDim2.new(0.9, -10, 0.1, 0)
 mini.Visible = false
-mini.Image = "rbxassetid://18911065261"
+mini.Image = "rbxassetid://18911065261" -- صورة السكربت
 mini.BackgroundColor3 = Color3.new(0,0,0)
-Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0) -- دائرية
+Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
 local mStroke = Instance.new("UIStroke", mini)
 mStroke.Color = Color3.new(1, 0, 0)
 mStroke.Thickness = 2
 
--- [ 4. البرمجة ] --
-startBtn.MouseButton1Click:Connect(function()
-    loaderBg:Destroy()
-    main.Visible = true
-end)
+-- [ 3. البرمجة والوظائف ] --
 
+-- إخفاء وإظهار
 hideBtn.MouseButton1Click:Connect(function()
     main.Visible = false
     mini.Visible = true
@@ -116,25 +81,31 @@ mini.MouseButton1Click:Connect(function()
     mini.Visible = false
 end)
 
+-- Noclip
 local nOn = false
-noclipB.MouseButton1Click:Connect(function()
+noclipBtn.MouseButton1Click:Connect(function()
     nOn = not nOn
-    noclipB.Text = nOn and "Noclip: ON" or "Noclip: OFF"
-    noclipB.TextColor3 = nOn and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
+    noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF"
+    noclipBtn.TextColor3 = nOn and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
 end)
 
 rs.Stepped:Connect(function()
     if nOn and player.Character then
-        for _, v in pairs(player.Character:GetDescendants()) do
-            if v:IsA("BasePart") then v.CanCollide = false end
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
         end
     end
 end)
 
-discB.MouseButton1Click:Connect(function()
+-- ديسكورد
+discordBtn.MouseButton1Click:Connect(function()
     setclipboard("https://discord.gg/syPpUv8Jf")
-    discB.Text = "Copied!"
-    task.wait(1); discB.Text = "Discord Link"
+    discordBtn.Text = "Copied!"
+    task.wait(1)
+    discordBtn.Text = "Discord Link"
 end)
 
-cleanB.MouseButton1Click:Connect(function() sg:Destroy() end)
+-- تنظيف
+cleanBtn.MouseButton1Click:Connect(function()
+    sg:Destroy()
+end)
