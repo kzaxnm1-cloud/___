@@ -1,96 +1,101 @@
 local player = game:GetService("Players").LocalPlayer
-local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
+local rs = game:GetService("RunService")
+local camera = workspace.CurrentCamera
+local mouse = player:GetMouse()
 
--- تنظيف أي نسخة سابقة
-if cg:FindFirstChild("NX2_FINAL_EDITION") then cg.NX2_FINAL_EDITION:Destroy() end
+-- [ 1. نظام التحقق من الماب ] --
+-- رقم ماب كراشوت الرسمي (تأكد من الرقم إذا تغير)
+local Crashout_ID = 15302708304 -- هذا الرقم لماب كراشوت
 
-local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_FINAL_EDITION"
-sg.ResetOnSpawn = false
-
--- [ 1. شاشة الترحيب واللغة ] --
-local welcome = Instance.new("Frame", sg)
-welcome.Size = UDim2.new(1, 0, 1, 0); welcome.BackgroundColor3 = Color3.fromRGB(101, 67, 33); welcome.ZIndex = 100
-local wText = Instance.new("TextLabel", welcome)
-wText.Size = UDim2.new(1, 0, 0.2, 0); wText.Position = UDim2.new(0, 0, 0.4, 0); wText.TextColor3 = Color3.new(1, 1, 1); wText.TextSize = 40; wText.Font = Enum.Font.Code; wText.Text = ""; wText.BackgroundTransparency = 1; wText.ZIndex = 101
-
-local langFrame = Instance.new("Frame", sg)
-langFrame.Size = UDim2.new(0, 400, 0, 200); langFrame.Position = UDim2.new(0.5, -200, 0.5, -100); langFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); langFrame.Visible = false; langFrame.ZIndex = 500
-Instance.new("UICorner", langFrame); Instance.new("UIStroke", langFrame).Color = Color3.new(1, 1, 1)
-
-local arBtn = Instance.new("TextButton", langFrame); arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0); arBtn.Text = "العربية"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); arBtn.TextColor3 = Color3.new(1, 1, 1); arBtn.TextSize = 25; arBtn.ZIndex = 501; Instance.new("UICorner", arBtn)
-local enBtn = Instance.new("TextButton", langFrame); enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0); enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1, 1, 1); enBtn.TextSize = 25; enBtn.ZIndex = 501; Instance.new("UICorner", enBtn)
-
--- [ 2. المنيو الرئيسي NX2 ] --
-local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 340, 0, 520); main.Position = UDim2.new(0.5, -170, 0.5, -260); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
-Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
-local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.12, 0); logo.Text = "NX2 v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
-
-local function makeBtn(t, y, parent)
-    local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 40); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 16; b.Text = t; Instance.new("UICorner", b); return b
+if game.PlaceId ~= Crashout_ID then
+    -- إذا الماب مو كراشوت، تطلع شاشة المنع
+    if cg:FindFirstChild("NX2_PROTECT") then cg.NX2_PROTECT:Destroy() end
+    local sg = Instance.new("ScreenGui", cg)
+    sg.Name = "NX2_PROTECT"
+    
+    local frame = Instance.new("Frame", sg)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.new(0, 0, 0)
+    frame.ZIndex = 1000
+    
+    local txt = Instance.new("TextLabel", frame)
+    txt.Size = UDim2.new(1, 0, 0.3, 0)
+    txt.Position = UDim2.new(0, 0, 0.35, 0)
+    txt.TextColor3 = Color3.new(1, 0, 0)
+    txt.TextSize = 40
+    txt.Font = Enum.Font.SourceSansBold
+    txt.Text = "SYSTEM: BANNED\nممنوع السكربت بذا الماب فقط كراشوت"
+    
+    task.wait(5)
+    player:Kick("NX2 Security: This script is only for Crashout.")
+    return -- يوقف تشغيل باقي السكربت
 end
 
-local aimB = makeBtn("Aimbot: OFF", 70, main)
-local espB = makeBtn("ESP: OFF", 115, main)
-local speedB = makeBtn("Speed Glitch: OFF", 160, main)
-local jumpB = makeBtn("High Jump: OFF", 205, main)
-local noclipB = makeBtn("Noclip: OFF", 250, main)
-local discB = makeBtn("Discord", 350, main)
-local hideB = makeBtn("Hide Menu", 420, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
+-- [ 2. تشغيل السكربت إذا كان الماب كراشوت ] --
+if cg:FindFirstChild("NX2_CLEAN") then cg.NX2_CLEAN:Destroy() end
+local sg = Instance.new("ScreenGui", cg)
+sg.Name = "NX2_CLEAN"
+sg.ResetOnSpawn = false
 
--- [ 3. منطق التشغيل ] --
-local isAr = false
-local sOn, jOn, nOn = false, false, false
+-- المنيو الرئيسي NX2
+local main = Instance.new("Frame", sg); main.Size = UDim2.new(0, 280, 0, 420); main.Position = UDim2.new(0.5, -140, 0.5, -210); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = true; main.Draggable = true
+Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
+local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NX2 v1 - CRASHOUT"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 22; logo.BackgroundTransparency = 1
 
-task.spawn(function()
-    local t = "Welcome is script NX2 v1"
-    for i = 1, #t do wText.Text = string.sub(t, 1, i); task.wait(0.03) end
-    task.wait(0.5); langFrame.Visible = true
-end)
+local showBtn = Instance.new("TextButton", sg); showBtn.Size = UDim2.new(0, 80, 0, 30); showBtn.Position = UDim2.new(0.5, -40, 0, 5); showBtn.Text = "Show NX2"; showBtn.Visible = false; Instance.new("UICorner", showBtn)
 
-arBtn.MouseButton1Click:Connect(function()
-    isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "قلتش السرعة: قفل"
-    jumpB.Text = "نطة عالية: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
-end)
-enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
+local function makeBtn(t, y)
+    local b = Instance.new("TextButton", main); b.Size = UDim2.new(0.9, 0, 0, 40); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(35, 35, 35); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 16; b.Text = t; Instance.new("UICorner", b); return b
+end
 
--- [ 4. تفعيل الوظائف ] --
-speedB.MouseButton1Click:Connect(function()
-    sOn = not sOn
-    if sOn then
-        pcall(function()
-            game:GetService("ReplicatedStorage").Events.Purchase:FireServer("Purple Drink")
-        end)
-    end
-    speedB.Text = sOn and (isAr and "قلتش السرعة: تشغيل" or "Speed Glitch: ON") or (isAr and "قلتش السرعة: قفل" or "Speed Glitch: OFF")
-end)
+local aimB = makeBtn("Aimbot: OFF", 70)
+local espB = makeBtn("ESP: OFF", 120)
+local speedB = makeBtn("Speed: OFF", 170)
+local jumpB = makeBtn("NX2 Jump: OFF", 220)
+local noclipB = makeBtn("Noclip: OFF", 270)
+local hideB = makeBtn("Hide Menu", 360); hideB.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
 
-jumpB.MouseButton1Click:Connect(function()
-    jOn = not jOn
-    jumpB.Text = jOn and (isAr and "نطة عالية: تشغيل" or "High Jump: ON") or (isAr and "نطة عالية: قفل" or "High Jump: OFF")
-end)
+-- [ 3. البرمجة ] --
+local aimOn, espOn, sOn, jOn, nOn = false, false, false, false, false
 
-noclipB.MouseButton1Click:Connect(function()
-    nOn = not nOn
-    noclipB.Text = nOn and (isAr and "الاختراق: تشغيل" or "Noclip: ON") or (isAr and "الاختراق: قفل" or "Noclip: OFF")
-end)
+speedB.MouseButton1Click:Connect(function() sOn = not sOn; speedB.Text = sOn and "Speed: ON" or "Speed: OFF" end)
+jumpB.MouseButton1Click:Connect(function() jOn = not jOn; jumpB.Text = jOn and "NX2 Jump: ON" or "NX2 Jump: OFF" end)
+aimB.MouseButton1Click:Connect(function() aimOn = not aimOn; aimB.Text = aimOn and "Aimbot: ON" or "Aimbot: OFF" end)
 
--- [ 5. المحرك الفيزيائي ] --
-rs.Stepped:Connect(function()
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        local hum = player.Character.Humanoid
-        if sOn then hum.WalkSpeed = 30 else hum.WalkSpeed = 16 end
-        if jOn then hum.JumpPower = 115 else hum.JumpPower = 50 end
-        if nOn then
-            for _, v in pairs(player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
+espB.MouseButton1Click:Connect(function()
+    espOn = not espOn
+    espB.Text = espOn and "ESP: ON" or "ESP: OFF"
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player and p.Character then
+            if espOn then
+                local h = Instance.new("Highlight", p.Character); h.Name = "NX2_ESP"; h.FillColor = Color3.new(1, 0, 0)
+            else
+                if p.Character:FindFirstChild("NX2_ESP") then p.Character.NX2_ESP:Destroy() end
             end
         end
     end
 end)
 
-discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = isAr and "تم النسخ!" or "Copied!" end)
-hideB.MouseButton1Click:Connect(function() main.Visible = false end)
+rs.RenderStepped:Connect(function()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        local hum = player.Character.Humanoid
+        if sOn then hum.WalkSpeed = 45 end
+        if jOn then hum.JumpPower = 125 end
+        
+        if aimOn and mouse.Target then
+            local target = nil
+            local dist = 500
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if p ~= player and p.Character and p.Character:FindFirstChild("Head") then
+                    local d = (p.Character.Head.Position - player.Character.Head.Position).Magnitude
+                    if d < dist then dist = d; target = p.Character.Head end
+                end
+            end
+            if target then camera.CFrame = CFrame.new(camera.CFrame.Position, target.Position) end
+        end
+    end
+end)
+
+hideB.MouseButton1Click:Connect(function() main.Visible = false; showBtn.Visible = true end)
+showBtn.MouseButton1Click:Connect(function() main.Visible = true; showBtn.Visible = false end)
