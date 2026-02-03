@@ -4,22 +4,23 @@ local rs = game:GetService("RunService")
 local vu = game:GetService("VirtualUser")
 
 -- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_ULTIMATE_V1") then cg.NX2_ULTIMATE_V1:Destroy() end
+if cg:FindFirstChild("NX2_ULTIMATE_TRANSPARENT") then cg.NX2_ULTIMATE_TRANSPARENT:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_ULTIMATE_V1"
+sg.Name = "NX2_ULTIMATE_TRANSPARENT"
 sg.ResetOnSpawn = false
 
--- [ 1. شاشة الدخول (Loader) ] --
+-- [ 1. شاشة الدخول - شفافة بـ 3.5 ثانية تحميل ] --
 local loaderBg = Instance.new("Frame", sg)
 loaderBg.Size = UDim2.new(1, 0, 1, 0)
-loaderBg.BackgroundColor3 = Color3.new(0, 0, 0)
+loaderBg.BackgroundTransparency = 1 -- شفافة تماماً عشان تشوف الماب
 loaderBg.ZIndex = 100
 
 local loaderMain = Instance.new("ImageLabel", loaderBg)
 loaderMain.Size = UDim2.new(0, 280, 0, 300)
 loaderMain.Position = UDim2.new(0.5, -140, 0.5, -150)
 loaderMain.Image = "rbxassetid://18911065261"
+loaderMain.BackgroundTransparency = 0.4 -- شفافية المربع نفسه
 loaderMain.ScaleType = Enum.ScaleType.Stretch
 Instance.new("UICorner", loaderMain)
 
@@ -40,12 +41,12 @@ startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 25
 Instance.new("UICorner", startBtn)
 
--- [ 2. المنيو الرئيسي ] --
+-- [ 2. المنيو الرئيسي - شفافية 0.5 عشان تشوف اللعب ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 250, 0, 420) -- طولنا المنيو للأوامر الجديدة
+main.Size = UDim2.new(0, 250, 0, 420)
 main.Position = UDim2.new(0.5, -125, 0.5, -210)
 main.BackgroundColor3 = Color3.new(0, 0, 0)
-main.BackgroundTransparency = 0.3
+main.BackgroundTransparency = 0.5 -- الحين شفافية قوية تشوف اللي وراه
 main.Visible = false
 main.Draggable = true
 Instance.new("UICorner", main)
@@ -59,12 +60,13 @@ hideBtn.Text = "_"
 hideBtn.TextColor3 = Color3.new(1, 1, 1)
 hideBtn.BackgroundTransparency = 1
 
--- الأيقونة الدائرية
+-- الأيقونة الدائرية (صورتك)
 local mini = Instance.new("ImageButton", sg)
 mini.Size = UDim2.new(0, 65, 0, 65)
 mini.Position = UDim2.new(0.9, -10, 0.1, 0)
 mini.Visible = false
 mini.Image = "rbxassetid://18911065261"
+mini.BackgroundTransparency = 0.2
 Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
 
 -- وظيفة صنع الأزرار
@@ -73,6 +75,7 @@ local function createBtn(t, y, c)
     b.Size = UDim2.new(0.9, 0, 0, 35)
     b.Position = UDim2.new(0.05, 0, 0, y)
     b.BackgroundColor3 = c or Color3.fromRGB(45, 45, 45)
+    b.BackgroundTransparency = 0.2 -- حتى الأزرار شفافة شوي
     b.TextColor3 = Color3.new(1, 1, 1)
     b.Text = t
     b.TextSize = 16
@@ -81,7 +84,7 @@ local function createBtn(t, y, c)
     return b
 end
 
--- [ 3. الأوامر ] --
+-- الأوامر
 local collectBtn = createBtn("Auto Collect: OFF", 70, Color3.fromRGB(0, 120, 0))
 local afkBtn = createBtn("AFK Mode: OFF", 115)
 local noclipBtn = createBtn("Noclip: OFF", 160)
@@ -89,14 +92,13 @@ local zoomBtn = createBtn("Infinite Zoom: OFF", 205)
 local discordBtn = createBtn("Join Discord", 250, Color3.fromRGB(88, 101, 242))
 local cleanBtn = createBtn("Clean Up UI", 360, Color3.fromRGB(150, 0, 0))
 
--- [ 4. البرمجة ] --
+-- [ 3. البرمجة ] --
 
--- تفعيل التحميل (3.5 ثانية)
 startBtn.MouseButton1Click:Connect(function()
     startBtn.Active = false
     for i = 1, 10 do
         startBtn.Text = "Loading" .. string.rep(".", i % 4)
-        task.wait(0.35)
+        task.wait(0.35) -- تحميل 3.5 ثانية
     end
     loaderBg:Destroy()
     main.Visible = true
@@ -105,16 +107,13 @@ end)
 hideBtn.MouseButton1Click:Connect(function() main.Visible = false; mini.Visible = true end)
 mini.MouseButton1Click:Connect(function() main.Visible = true; mini.Visible = false end)
 
--- Auto Collect (تجميع الفلوس من التايكون)
+-- وظيفة التجميع التلقائي (Auto Collect)
 local autoCollect = false
 collectBtn.MouseButton1Click:Connect(function()
     autoCollect = not autoCollect
     collectBtn.Text = autoCollect and "Auto Collect: ON" or "Auto Collect: OFF"
-    collectBtn.TextColor3 = autoCollect and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
-    
     task.spawn(function()
         while autoCollect do
-            -- يبحث عن القطع النقدية أو الأغراض القابلة للتجميع في الماب
             for _, v in pairs(game.Workspace:GetDescendants()) do
                 if autoCollect and (v.Name == "Part" or v.Name == "Coin") and v:FindFirstChild("TouchInterest") then
                     firetouchinterest(player.Character.HumanoidRootPart, v, 0)
@@ -126,12 +125,11 @@ collectBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- AFK Mode (منع الطرد)
+-- وظيفة AFK لمنع الطرد
 local afkOn = false
 afkBtn.MouseButton1Click:Connect(function()
     afkOn = not afkOn
     afkBtn.Text = afkOn and "AFK Mode: ON" or "AFK Mode: OFF"
-    afkBtn.TextColor3 = afkOn and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
 end)
 
 player.Idled:Connect(function()
@@ -142,7 +140,7 @@ player.Idled:Connect(function()
     end
 end)
 
--- باقي الأوامر (Noclip, Zoom, Discord)
+-- باقي الأوامر
 local nOn = false
 noclipBtn.MouseButton1Click:Connect(function()
     nOn = not nOn
