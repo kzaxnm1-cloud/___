@@ -1,58 +1,45 @@
 local player = game:GetService("Players").LocalPlayer
-local camera = workspace.CurrentCamera
 local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
--- تنظيف السكربتات القديمة
-if cg:FindFirstChild("NXT_LEGACY_FINAL") then cg.NXT_LEGACY_FINAL:Destroy() end
+-- تنظيف القديم
+if cg:FindFirstChild("NXT_V1_REAL_POTION") then cg.NXT_V1_REAL_POTION:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_LEGACY_FINAL"
+sg.Name = "NXT_V1_REAL_POTION"
 sg.ResetOnSpawn = false
-sg.DisplayOrder = 9999
 
--- [ 1. شاشة الترحيب البنية ] --
+-- [ شاشة الترحيب واللغات ] --
 local welcome = Instance.new("Frame", sg)
 welcome.Size = UDim2.new(1, 0, 1, 0); welcome.BackgroundColor3 = Color3.fromRGB(101, 67, 33); welcome.ZIndex = 100
 local wText = Instance.new("TextLabel", welcome)
-wText.Size = UDim2.new(1, 0, 0.2, 0); wText.Position = UDim2.new(0, 0, 0.4, 0)
-wText.TextColor3 = Color3.new(1, 1, 1); wText.TextSize = 40; wText.Font = Enum.Font.Code; wText.BackgroundTransparency = 1; wText.Text = ""; wText.ZIndex = 101
+wText.Size = UDim2.new(1, 0, 0.2, 0); wText.Position = UDim2.new(0, 0, 0.4, 0); wText.TextColor3 = Color3.new(1, 1, 1); wText.TextSize = 40; wText.Font = Enum.Font.Code; wText.Text = ""; wText.BackgroundTransparency = 1; wText.ZIndex = 101
 
--- [ 2. واجهة اختيار اللغة ] --
 local langFrame = Instance.new("Frame", sg)
-langFrame.Size = UDim2.new(0, 400, 0, 200); langFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
-langFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); langFrame.Visible = false; langFrame.ZIndex = 500
+langFrame.Size = UDim2.new(0, 400, 0, 200); langFrame.Position = UDim2.new(0.5, -200, 0.5, -100); langFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); langFrame.Visible = false; langFrame.ZIndex = 500
 Instance.new("UICorner", langFrame); Instance.new("UIStroke", langFrame).Color = Color3.new(1, 1, 1)
 
 local arBtn = Instance.new("TextButton", langFrame); arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0); arBtn.Text = "العربية"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); arBtn.TextColor3 = Color3.new(1, 1, 1); arBtn.TextSize = 25; arBtn.ZIndex = 501; Instance.new("UICorner", arBtn)
 local enBtn = Instance.new("TextButton", langFrame); enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0); enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1, 1, 1); enBtn.TextSize = 25; enBtn.ZIndex = 501; Instance.new("UICorner", enBtn)
 
--- [ 3. المنيو الرئيسي NXT v1 ] --
+-- [ المنيو الرئيسي ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 340, 0, 500); main.Position = UDim2.new(0.5, -170, 0.5, -250)
-main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
+main.Size = UDim2.new(0, 340, 0, 500); main.Position = UDim2.new(0.5, -170, 0.5, -250); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
 Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
-local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 35; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
+local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 35; logo.BackgroundTransparency = 1
 
--- [ الأزرار ] --
 local function makeBtn(t, y, parent)
     local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 18; b.Text = t; Instance.new("UICorner", b); return b
 end
 
-local aimB = makeBtn("Aimbot: OFF", 80, main)
-local espB = makeBtn("ESP: OFF", 135, main)
-local speedB = makeBtn("Purple Potion: OFF", 190, main)
+local speedB = makeBtn("Purple Potion Glitch: OFF", 190, main)
 local jumpB = makeBtn("High Jump: OFF", 245, main)
-local noclipB = makeBtn("Noclip: OFF", 300, main)
 local discB = makeBtn("Discord", 355, main)
-local hideB = makeBtn("Hide Menu", 430, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
--- [ تأثير الشاشة البنفسجية ] --
-local purpleFX = Instance.new("Frame", sg); purpleFX.Size = UDim2.new(1, 0, 1, 0); purpleFX.BackgroundColor3 = Color3.fromRGB(150, 0, 255); purpleFX.BackgroundTransparency = 1; purpleFX.ZIndex = 0
-local grad = Instance.new("UIGradient", purpleFX); grad.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.5, 0.7), NumberSequenceKeypoint.new(1, 1)})
-
--- [ منطق التشغيل ] --
+-- [ منطق القلتش ] --
 local isAr = false
+local speedGlitch = false
+
 task.spawn(function()
     local t = "Welcome is script NXT v1"
     for i = 1, #t do wText.Text = string.sub(t, 1, i); task.wait(0.05) end
@@ -61,47 +48,32 @@ end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    speedB.Text = "قلتش المشروب: قفل"; jumpB.Text = "نطة عالية: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
+    speedB.Text = "قلتش المشروب: قفل"; jumpB.Text = "نطة عالية: قفل"
 end)
+
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
--- [ الميزات ] --
-local sOn, jOn = false, false
-
 speedB.MouseButton1Click:Connect(function()
-    sOn = not sOn
-    speedB.Text = sOn and (isAr and "قلتش المشروب: تشغيل" or "Purple Potion: ON") or (isAr and "قلتش المشروب: قفل" or "Purple Potion: OFF")
-    purpleFX.BackgroundTransparency = sOn and 0.85 or 1
+    speedGlitch = not speedGlitch
+    speedB.Text = speedGlitch and (isAr and "قلتش المشروب: تشغيل" or "Purple Potion: ON") or (isAr and "قلتش المشروب: قفل" or "Purple Potion: OFF")
 end)
 
-jumpB.MouseButton1Click:Connect(function()
-    jOn = not jOn
-    jumpB.Text = jOn and (isAr and "نطة عالية: تشغيل" or "High Jump: ON") or (isAr and "نطة عالية: قفل" or "High Jump: OFF")
-end)
-
--- [ التحديث الفيزيائي ] --
+-- [ القلتش الفيزيائي اللانهائي ] --
 rs.Heartbeat:Connect(function()
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
+    if player.Character and player.Character:FindFirstChild("Humanoid") and speedGlitch then
         local hum = player.Character.Humanoid
-        if sOn then
-            hum.WalkSpeed = 60 -- سرعة المشروب البنفسجي
-            camera.FieldOfView = 100
-        else
-            hum.WalkSpeed = 16
-            camera.FieldOfView = 70
-        end
-        if jOn then
-            hum.JumpPower = 120 -- نطة للمباني بدون تبنيد
-        else
-            hum.JumpPower = 50
+        -- هذا القلتش يثبت السرعة على 65 (سرعة المشروب) ويمنع اللعبة من إنقاصها
+        if hum.WalkSpeed < 65 then
+            hum.WalkSpeed = 65
         end
     end
 end)
 
-discB.MouseButton1Click:Connect(function() 
-    setclipboard("https://discord.gg/syPpUv8Jf")
-    local old = discB.Text; discB.Text = isAr and "تم النسخ!" or "Copied!"
-    task.wait(1.5); discB.Text = old 
+jumpB.MouseButton1Click:Connect(function()
+    local hum = player.Character:FindFirstChild("Humanoid")
+    if hum then
+        hum.JumpPower = 110 -- نطة قوية للمباني وآمنة من الباند
+    end
 end)
 
-hideB.MouseButton1Click:Connect(function() main.Visible = false end)
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = "Copied!"; task.wait(1); discB.Text = "Discord" end)
