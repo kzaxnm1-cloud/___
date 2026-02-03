@@ -1,8 +1,149 @@
+local player = game:GetService("Players").LocalPlayer
+local camera = workspace.CurrentCamera
+local rs = game:GetService("RunService")
+local cg = game:GetService("CoreGui")
 
-echo "# ___" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/kzaxnm1-cloud/___.git
-git push -u origin main
+-- تنظيف النسخ القديمة
+if cg:FindFirstChild("NXT_V1_SPEED_BOOST") then cg.NXT_V1_SPEED_BOOST:Destroy() end
+
+local sg = Instance.new("ScreenGui", cg)
+sg.Name = "NXT_V1_SPEED_BOOST"
+sg.ResetOnSpawn = false
+sg.DisplayOrder = 9999
+
+-- [ 1. شاشة الترحيب البنية ] --
+local welcome = Instance.new("Frame", sg)
+welcome.Size = UDim2.new(1, 0, 1, 0)
+welcome.BackgroundColor3 = Color3.fromRGB(101, 67, 33)
+welcome.ZIndex = 100
+
+local wText = Instance.new("TextLabel", welcome)
+wText.Size = UDim2.new(1, 0, 0.2, 0); wText.Position = UDim2.new(0, 0, 0.4, 0)
+wText.TextColor3 = Color3.new(1, 1, 1); wText.TextSize = 40; wText.Font = Enum.Font.Code
+wText.BackgroundTransparency = 1; wText.Text = ""; wText.ZIndex = 101
+
+-- [ 2. واجهة اختيار اللغة ] --
+local langFrame = Instance.new("Frame", sg)
+langFrame.Size = UDim2.new(0, 400, 0, 200); langFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
+langFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); langFrame.Visible = false; langFrame.ZIndex = 200
+Instance.new("UICorner", langFrame)
+Instance.new("UIStroke", langFrame).Color = Color3.new(1,1,1)
+
+local arBtn = Instance.new("TextButton", langFrame)
+arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
+arBtn.Text = "العربية"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); arBtn.TextColor3 = Color3.new(1,1,1); arBtn.TextSize = 25; Instance.new("UICorner", arBtn)
+
+local enBtn = Instance.new("TextButton", langFrame)
+enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0)
+enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1,1,1); enBtn.TextSize = 25; Instance.new("UICorner", enBtn)
+
+-- [ 3. المنيو الرئيسي ] --
+local main = Instance.new("Frame", sg)
+main.Size = UDim2.new(0, 340, 0, 500); main.Position = UDim2.new(0.5, -170, 0.5, -250)
+main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); main.Visible = false; main.Draggable = true
+Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
+
+local logo = Instance.new("TextLabel", main)
+logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 35; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
+
+-- [ شريط الإخفاء العلوي ] --
+local topBar = Instance.new("Frame", sg)
+topBar.Size = UDim2.new(0, 400, 0, 45); topBar.Position = UDim2.new(0.5, -200, 0, 5)
+topBar.BackgroundColor3 = Color3.new(0, 0, 0); topBar.Visible = false; Instance.new("UICorner", topBar)
+local topTxt = Instance.new("TextLabel", topBar); topTxt.Size = UDim2.new(1,0,1,0); topTxt.Text = "NXT v1"; topTxt.TextColor3 = Color3.new(1,1,0); topTxt.TextSize = 25; topTxt.BackgroundTransparency = 1
+local topOpen = Instance.new("TextButton", topBar); topOpen.Size = UDim2.new(1,0,1,0); topOpen.BackgroundTransparency = 1; topOpen.Text = ""
+
+-- [ زر النار FIRE ] --
+local fire = Instance.new("TextButton", sg)
+fire.Size = UDim2.new(0, 110, 0, 110); fire.Position = UDim2.new(0.8, 0, 0.5, 0)
+fire.BackgroundColor3 = Color3.new(0,0,0); fire.Text = "FIRE\nNXT v1"; fire.TextColor3 = Color3.new(1,1,1); fire.Visible = false; fire.Draggable = true; Instance.new("UICorner", fire).CornerRadius = UDim.new(1,0); Instance.new("UIStroke", fire).Color = Color3.new(1,0,0)
+
+-- [ أزرار القائمة ] --
+local function makeBtn(t, y, parent)
+    local b = Instance.new("TextButton", parent)
+    b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(30,30,30); b.TextColor3 = Color3.new(1,1,1); b.TextSize = 18; b.Text = t; Instance.new("UICorner", b); return b
+end
+
+local aimB = makeBtn("Aimbot: OFF", 80, main)
+local espB = makeBtn("ESP: OFF", 135, main)
+local speedB = makeBtn("Speed: OFF", 190, main)
+local jumpB = makeBtn("Jump: OFF", 245, main)
+local noclipB = makeBtn("Noclip: OFF", 300, main)
+local discB = makeBtn("Discord", 355, main)
+local hideB = makeBtn("Hide Menu", 430, main)
+hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
+
+-- [ منطق التشغيل ] --
+local isAr = false
+task.spawn(function()
+    local t = "Welcome is script NXT v1"
+    for i = 1, #t do wText.Text = string.sub(t, 1, i) task.wait(0.05) end
+    task.wait(0.5); langFrame.Visible = true
+end)
+
+arBtn.MouseButton1Click:Connect(function()
+    isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
+    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "السرعة: قفل"; jumpB.Text = "النطة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
+end)
+enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
+
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); local old = discB.Text; discB.Text = isAr and "تم النسخ!" or "Copied!"; task.wait(1.5); discB.Text = old end)
+hideB.MouseButton1Click:Connect(function() main.Visible = false; topBar.Visible = true end)
+topOpen.MouseButton1Click:Connect(function() topBar.Visible = false; main.Visible = true end)
+
+-- [ تفعيل الميزات ] --
+local sOn, jOn, nOn, espOn = false, false, false, false
+aimB.MouseButton1Click:Connect(function() fire.Visible = not fire.Visible; aimB.Text = fire.Visible and (isAr and "الأيم بوت: تشغيل" or "Aimbot: ON") or (isAr and "الأيم بوت: قفل" or "Aimbot: OFF") end)
+espB.MouseButton1Click:Connect(function() espOn = not espOn; espB.Text = espOn and (isAr and "كشف اللاعبين: تشغيل" or "ESP: ON") or (isAr and "كشف اللاعبين: قفل" or "ESP: OFF") end)
+speedB.MouseButton1Click:Connect(function() sOn = not sOn; speedB.Text = sOn and (isAr and "السرعة: تشغيل" or "Speed: ON") or (isAr and "السرعة: قفل" or "Speed: OFF") end)
+jumpB.MouseButton1Click:Connect(function() jOn = not jOn; jumpB.Text = jOn and (isAr and "النطة: تشغيل" or "Jump: ON") or (isAr and "النطة: قفل" or "Jump: OFF") end)
+noclipB.MouseButton1Click:Connect(function() nOn = not nOn; noclipB.Text = nOn and (isAr and "الاختراق: تشغيل" or "Noclip: ON") or (isAr and "الاختراق: قفل" or "Noclip: OFF") end)
+
+-- [ نظام التحديث (السرعة والنطة الجديدة) ] --
+rs.Heartbeat:Connect(function()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = player.Character.HumanoidRootPart
+        local hum = player.Character.Humanoid
+        -- السرعة الجديدة (8.5 قوة دفع)
+        if sOn and hum.MoveDirection.Magnitude > 0 then
+            hrp.Velocity = Vector3.new(hum.MoveDirection.X * 135, hrp.Velocity.Y, hum.MoveDirection.Z * 135)
+        end
+        -- النطة الجديدة (عالية جداً)
+        if jOn then
+            hum.JumpPower = 150
+        else
+            hum.JumpPower = 50
+        end
+        -- الاختراق
+        if nOn then
+            for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
+        end
+    end
+end)
+
+-- [ ESP ] --
+local espItems = {}
+rs.RenderStepped:Connect(function()
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player then
+            if not espItems[p] then 
+                espItems[p] = {box = Drawing.new("Square"), name = Drawing.new("Text"), tracer = Drawing.new("Line")}
+                espItems[p].box.Color = Color3.new(0,1,0); espItems[p].box.Thickness = 2; espItems[p].box.Filled = false
+                espItems[p].name.Color = Color3.new(1,1,1); espItems[p].name.Size = 18; espItems[p].name.Center = true; espItems[p].name.Outline = true
+                espItems[p].tracer.Color = Color3.new(1,0,0); espItems[p].tracer.Thickness = 1
+            end
+            local d = espItems[p]; local char = p.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and espOn then
+                local pos, vis = camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
+                if vis then
+                    d.box.Size = Vector2.new(2000/pos.Z, 3000/pos.Z); d.box.Position = Vector2.new(pos.X-d.box.Size.X/2, pos.Y-d.box.Size.Y/2); d.box.Visible = true
+                    d.name.Position = Vector2.new(pos.X, pos.Y - (d.box.Size.Y/2)-20); d.name.Text = p.Name; d.name.Visible = true
+                    if fire.Visible then
+                        d.tracer.From = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2); d.tracer.To = Vector2.new(pos.X, pos.Y); d.tracer.Visible = true
+                    else d.tracer.Visible = false end
+                else d.box.Visible = false; d.name.Visible = false; d.tracer.Visible = false end
+            else d.box.Visible = false; d.name.Visible = false; d.tracer.Visible = false end
+        end
+    end
+end)
