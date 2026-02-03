@@ -1,13 +1,12 @@
 local player = game:GetService("Players").LocalPlayer
-local camera = workspace.CurrentCamera
 local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
--- تنظيف السكربت القديم
-if cg:FindFirstChild("NXT_V1_SAFE") then cg.NXT_V1_SAFE:Destroy() end
+-- تنظيف النسخ القديمة
+if cg:FindFirstChild("NXT_V1_AUTO_BUY") then cg.NXT_V1_AUTO_BUY:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_V1_SAFE"
+sg.Name = "NXT_V1_AUTO_BUY"
 sg.ResetOnSpawn = false
 
 -- [ 1. شاشة الترحيب واللغة ] --
@@ -25,25 +24,34 @@ local enBtn = Instance.new("TextButton", langFrame); enBtn.Size = UDim2.new(0.4,
 
 -- [ 2. المنيو الرئيسي NXT v1 ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 340, 0, 520); main.Position = UDim2.new(0.5, -170, 0.5, -260); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
+main.Size = UDim2.new(0, 340, 0, 450); main.Position = UDim2.new(0.5, -170, 0.5, -225); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
 Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
-local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.12, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
+local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
 
 local function makeBtn(t, y, parent)
-    local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 40); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 16; b.Text = t; Instance.new("UICorner", b); return b
+    local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 18; b.Text = t; Instance.new("UICorner", b); return b
 end
 
-local aimB = makeBtn("Aimbot: OFF", 70, main)
-local espB = makeBtn("ESP: OFF", 115, main)
-local speedB = makeBtn("Legit Speed: OFF", 160, main)
-local jumpB = makeBtn("Legit Jump: OFF", 205, main)
-local noclipB = makeBtn("Noclip: OFF", 250, main)
-local discB = makeBtn("Discord", 350, main)
-local hideB = makeBtn("Hide Menu", 420, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
+local speedB = makeBtn("Auto Drink Glitch: OFF", 80, main)
+local jumpB = makeBtn("High Jump: OFF", 135, main)
+local noclipB = makeBtn("Noclip: OFF", 190, main)
+local discB = makeBtn("Discord", 245, main)
+local hideB = makeBtn("Hide Menu", 380, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
--- [ 3. التفعيل ] --
+-- [ 3. رسالة التنبيه السفلى ] --
+local notice = Instance.new("TextLabel", sg)
+notice.Size = UDim2.new(1, 0, 0.05, 0); notice.Position = UDim2.new(0, 0, 0.9, 0); notice.BackgroundTransparency = 1; notice.TextColor3 = Color3.new(1, 0, 0); notice.TextSize = 22; notice.Text = ""; notice.Visible = false; notice.Font = Enum.Font.SourceSansBold
+
+local function showNotice(ar, en)
+    notice.Text = isAr and ar or en
+    notice.Visible = true
+    task.wait(3)
+    notice.Visible = false
+end
+
+-- [ 4. منطق التشغيل والشراء ] --
 local isAr = false
-local sOn, jOn, nOn = false, false, false
+local sOn = false
 
 task.spawn(function()
     local t = "Welcome is script NXT v1"
@@ -53,52 +61,49 @@ end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "سرعة آمنة: قفل"
-    jumpB.Text = "نطة آمنة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
+    speedB.Text = "قلتش المشروب التلقائي: قفل"; jumpB.Text = "نطة عالية: قفل"; noclipB.Text = "الاختراق: قفل"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
 speedB.MouseButton1Click:Connect(function()
-    sOn = not sOn
-    speedB.Text = sOn and (isAr and "سرعة آمنة: تشغيل" or "Legit Speed: ON") or (isAr and "سرعة آمنة: قفل" or "Legit Speed: OFF")
+    -- فحص الفلوس (نبحث عن الـ Leaderstats أو الفلوس في اللاعب)
+    local money = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Money") or player:FindFirstChild("Cash")
+    
+    if money and money.Value >= 250 then
+        sOn = not sOn
+        if sOn then
+            -- محاكاة عملية الشراء (تعتمد على اسم الريموت في ماب كراشوت)
+            local buyRemote = game:GetService("ReplicatedStorage"):FindFirstChild("BuyDrink") or game:GetService("ReplicatedStorage"):FindFirstChild("PurchaseItem")
+            if buyRemote then
+                buyRemote:FireServer("PurpleDrink") -- اسم المشروب في داتا الماب
+            end
+            speedB.Text = isAr and "قلتش المشروب: تشغيل" or "Auto Drink: ON"
+        else
+            speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Drink: OFF"
+        end
+    else
+        sOn = false
+        speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Drink: OFF"
+        showNotice("لا يوجد فلوس كافية (250 مطلوب)", "Not enough money (250 required)")
+    end
 end)
 
-jumpB.MouseButton1Click:Connect(function()
-    jOn = not jOn
-    jumpB.Text = jOn and (isAr and "نطة آمنة: تشغيل" or "Legit Jump: ON") or (isAr and "نطة آمنة: قفل" or "Legit Jump: OFF")
-end)
-
-noclipB.MouseButton1Click:Connect(function()
-    nOn = not nOn
-    noclipB.Text = nOn and (isAr and "الاختراق: تشغيل" or "Noclip: ON") or (isAr and "الاختراق: قفل" or "Noclip: OFF")
-end)
-
--- [ 4. المحرك الفيزيائي الآمن ] --
-rs.Stepped:Connect(function()
+-- [ المحرك الفيزيائي ] --
+rs.RenderStepped:Connect(function()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         local hum = player.Character.Humanoid
-        
-        -- سرعة 32 (سرعة آمنة جداً ومستحيل تنكشف بسهولة)
         if sOn then
-            hum.WalkSpeed = 32 
+            hum.WalkSpeed = 35 -- سرعة المشروب الآمنة
         else
             hum.WalkSpeed = 16
-        end
-        
-        -- نطة 90 (مناسبة للمباني وما تلفت النظر)
-        if jOn then
-            hum.JumpPower = 90
-        else
-            hum.JumpPower = 50
-        end
-        
-        if nOn then
-            for _, v in pairs(player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
-            end
         end
     end
 end)
 
-discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = "Copied!"; task.wait(1); discB.Text = "Discord" end)
+jumpB.MouseButton1Click:Connect(function()
+    local hum = player.Character:FindFirstChild("Humanoid")
+    if hum then hum.JumpPower = 115 end
+end)
+
 hideB.MouseButton1Click:Connect(function() main.Visible = false end)
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
