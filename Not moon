@@ -2,22 +2,23 @@ local player = game:GetService("Players").LocalPlayer
 local cg = game:GetService("CoreGui")
 local rs = game:GetService("RunService")
 
--- تنظيف النسخ السابقة
-if cg:FindFirstChild("NX2_CLEAN") then cg.NX2_CLEAN:Destroy() end
+-- تنظيف أي سكربت قديم
+if cg:FindFirstChild("NX2_VISIBLE") then cg.NX2_CLEAN:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_CLEAN"
+sg.Name = "NX2_VISIBLE"
 sg.ResetOnSpawn = false
 
--- [ 1. المنيو الرئيسي ] --
+-- [ 1. المنيو الرئيسي - شفاف عشان تشوف اللعب ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 260, 0, 280)
-main.Position = UDim2.new(0.5, -130, 0.5, -140)
-main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+main.Size = UDim2.new(0, 240, 0, 260)
+main.Position = UDim2.new(0.5, -120, 0.5, -130)
+main.BackgroundColor3 = Color3.new(0, 0, 0)
+main.BackgroundTransparency = 0.3 -- شفافية عشان تشوف الماب خلف المنيو
 main.Draggable = true
 Instance.new("UICorner", main)
 local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.new(1, 0, 0) -- إطار أحمر فخم
+stroke.Color = Color3.new(1, 0, 0)
 stroke.Thickness = 2
 
 -- زر الإخفاء (الشرطة _)
@@ -29,21 +30,22 @@ hideBtn.TextColor3 = Color3.new(1, 1, 1)
 hideBtn.TextSize = 30
 hideBtn.BackgroundTransparency = 1
 
--- الشعار NX2 !
+-- الشعار NX2 ! باللون الأحمر
 local logo = Instance.new("TextLabel", main)
-logo.Size = UDim2.new(1, 0, 0.25, 0)
+logo.Size = UDim2.new(1, 0, 0.3, 0)
 logo.Text = "NX2 !"
 logo.TextColor3 = Color3.new(1, 0, 0)
 logo.TextSize = 35
 logo.Font = Enum.Font.SourceSansBold
 logo.BackgroundTransparency = 1
 
--- وظيفة صنع الأزرار بشكل مرتب
+-- وظيفة الأزرار
 local function createButton(name, yPos, color)
     local btn = Instance.new("TextButton", main)
-    btn.Size = UDim2.new(0.9, 0, 0, 45)
-    btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = color or Color3.fromRGB(30, 30, 30)
+    btn.Size = UDim2.new(0.85, 0, 0, 40)
+    btn.Position = UDim2.new(0.075, 0, 0, yPos)
+    btn.BackgroundColor3 = color or Color3.fromRGB(40, 40, 40)
+    btn.BackgroundTransparency = 0.1
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.TextSize = 18
     btn.Font = Enum.Font.SourceSansBold
@@ -52,25 +54,23 @@ local function createButton(name, yPos, color)
     return btn
 end
 
-local noclipBtn = createButton("Noclip: OFF", 80)
-local discordBtn = createButton("Discord Link", 140)
-local cleanBtn = createButton("Clean Up UI", 200, Color3.fromRGB(130, 0, 0))
+local noclipBtn = createButton("Noclip: OFF", 85)
+local discordBtn = createButton("Discord Link", 135)
+local cleanBtn = createButton("Clean Up UI", 185, Color3.fromRGB(150, 0, 0))
 
--- [ 2. الأيقونة الدائرية (تظهر عند الإخفاء) ] --
+-- [ 2. الأيقونة الدائرية عند الإخفاء ] --
 local mini = Instance.new("ImageButton", sg)
-mini.Size = UDim2.new(0, 60, 0, 60)
+mini.Size = UDim2.new(0, 55, 0, 55)
 mini.Position = UDim2.new(0.9, -10, 0.1, 0)
 mini.Visible = false
-mini.Image = "rbxassetid://18911065261" -- صورة السكربت
-mini.BackgroundColor3 = Color3.new(0,0,0)
+mini.Image = "rbxassetid://18911065261"
+mini.BackgroundColor3 = Color3.new(0, 0, 0)
 Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
 local mStroke = Instance.new("UIStroke", mini)
 mStroke.Color = Color3.new(1, 0, 0)
 mStroke.Thickness = 2
 
--- [ 3. البرمجة والوظائف ] --
-
--- إخفاء وإظهار
+-- [ 3. الأوامر ] --
 hideBtn.MouseButton1Click:Connect(function()
     main.Visible = false
     mini.Visible = true
@@ -81,7 +81,6 @@ mini.MouseButton1Click:Connect(function()
     mini.Visible = false
 end)
 
--- Noclip
 local nOn = false
 noclipBtn.MouseButton1Click:Connect(function()
     nOn = not nOn
@@ -91,13 +90,12 @@ end)
 
 rs.Stepped:Connect(function()
     if nOn and player.Character then
-        for _, part in pairs(player.Character:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = false end
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
 end)
 
--- ديسكورد
 discordBtn.MouseButton1Click:Connect(function()
     setclipboard("https://discord.gg/syPpUv8Jf")
     discordBtn.Text = "Copied!"
@@ -105,7 +103,4 @@ discordBtn.MouseButton1Click:Connect(function()
     discordBtn.Text = "Discord Link"
 end)
 
--- تنظيف
-cleanBtn.MouseButton1Click:Connect(function()
-    sg:Destroy()
-end)
+cleanBtn.MouseButton1Click:Connect(function() sg:Destroy() end)
