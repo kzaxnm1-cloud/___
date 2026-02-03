@@ -4,99 +4,129 @@ local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
 -- تنظيف النسخ القديمة
-if cg:FindFirstChild("NXT_V1_BOTTOM_HIDE") then cg.NXT_V1_BOTTOM_HIDE:Destroy() end
+if cg:FindFirstChild("NXT_V1_LEGACY") then cg.NXT_V1_LEGACY:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_V1_BOTTOM_HIDE"
+sg.Name = "NXT_V1_LEGACY"
 sg.ResetOnSpawn = false
+sg.DisplayOrder = 999
 
--- [ 1. شاشة الترحيب ] --
+-- [ 1. شاشة الترحيب البنية ] --
 local welcome = Instance.new("Frame", sg)
 welcome.Size = UDim2.new(1, 0, 1, 0)
 welcome.BackgroundColor3 = Color3.fromRGB(101, 67, 33)
 welcome.ZIndex = 1000
 
-local wTitle = Instance.new("TextLabel", welcome)
-wTitle.Size = UDim2.new(1, 0, 0.2, 0); wTitle.Position = UDim2.new(0, 0, 0.4, 0)
-wTitle.Text = "Welcome is script NXT v1"; wTitle.TextColor3 = Color3.new(1, 1, 1); wTitle.TextSize = 40; wTitle.BackgroundTransparency = 1
+local wText = Instance.new("TextLabel", welcome)
+wText.Size = UDim2.new(1, 0, 0.2, 0)
+wText.Position = UDim2.new(0, 0, 0.4, 0)
+wText.TextColor3 = Color3.new(1, 1, 1)
+wText.TextSize = 40
+wText.Font = Enum.Font.Code
+wText.BackgroundTransparency = 1
+wText.Text = ""
+wText.ZIndex = 1001
 
-local wDisc = Instance.new("TextLabel", welcome)
-wDisc.Size = UDim2.new(1, 0, 0.1, 0); wDisc.Position = UDim2.new(0, 0, 0.55, 0)
-wDisc.Text = "discord = https://discord.gg/syPpUv8Jf"; wDisc.TextColor3 = Color3.new(0.9, 0.9, 0.9); wDisc.TextSize = 20; wDisc.BackgroundTransparency = 1
+-- وظيفة كتابة الكيبورد (حرف حرف)
+local function typeWrite(label, text)
+    for i = 1, #text do
+        label.Text = string.sub(text, 1, i)
+        task.wait(0.05)
+    end
+end
 
--- [ 2. اختيار اللغة ] --
-local lang = Instance.new("Frame", sg)
-lang.Size = UDim2.new(0, 400, 0, 200); lang.Position = UDim2.new(0.5, -200, 0.4, -100)
-lang.BackgroundColor3 = Color3.fromRGB(20, 20, 20); lang.Visible = false; lang.ZIndex = 900
-Instance.new("UICorner", lang)
+-- [ 2. واجهة اختيار اللغة ] --
+local langFrame = Instance.new("Frame", sg)
+langFrame.Size = UDim2.new(0, 350, 0, 180)
+langFrame.Position = UDim2.new(0.5, -175, 0.4, -90)
+langFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+langFrame.Visible = false
+langFrame.ZIndex = 2000
+Instance.new("UICorner", langFrame)
+Instance.new("UIStroke", langFrame).Color = Color3.new(1, 1, 1)
 
-local arBtn = Instance.new("TextButton", lang)
+local arBtn = Instance.new("TextButton", langFrame)
 arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
 arBtn.Text = "عربي"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255); arBtn.TextColor3 = Color3.new(1,1,1); arBtn.TextSize = 25
 
-local enBtn = Instance.new("TextButton", lang)
+local enBtn = Instance.new("TextButton", langFrame)
 enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0)
-enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1,1,1); enBtn.TextSize = 25
+enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50); enBtn.TextColor3 = Color3.new(1,1,1); enBtn.TextSize = 25
 
--- [ 3. المنيو الرئيسي ] --
+-- [ 3. المنيو الرئيسي (القديم) ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 320, 0, 500); main.Position = UDim2.new(0.5, -160, 0.5, -250)
-main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); main.Visible = false; main.Draggable = true
+main.Size = UDim2.new(0, 340, 0, 480); main.Position = UDim2.new(0.5, -170, 0.5, -240)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
 Instance.new("UICorner", main)
 Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
 
 local logo = Instance.new("TextLabel", main)
-logo.Size = UDim2.new(1, 0, 0.12, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
+logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 35; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
 
--- [ 4. شريط الإخفاء العلوي ] --
+-- [ شريط الإخفاء العلوي ] --
 local topBar = Instance.new("Frame", sg)
-topBar.Size = UDim2.new(0, 350, 0, 40); topBar.Position = UDim2.new(0.5, -175, 0, 5)
+topBar.Size = UDim2.new(0, 400, 0, 45); topBar.Position = UDim2.new(0.5, -200, 0, 5)
 topBar.BackgroundColor3 = Color3.new(0, 0, 0); topBar.Visible = false
 Instance.new("UICorner", topBar)
-local topTxt = Instance.new("TextLabel", topBar); topTxt.Size = UDim2.new(1,0,1,0); topTxt.Text = "NXT v1"; topTxt.TextColor3 = Color3.new(1,1,0); topTxt.TextSize = 22; topTxt.BackgroundTransparency = 1
+local topTxt = Instance.new("TextLabel", topBar); topTxt.Size = UDim2.new(1,0,1,0); topTxt.Text = "NXT v1"; topTxt.TextColor3 = Color3.new(1,1,0); topTxt.TextSize = 25; topTxt.BackgroundTransparency = 1
 local topOpen = Instance.new("TextButton", topBar); topOpen.Size = UDim2.new(1,0,1,0); topOpen.BackgroundTransparency = 1; topOpen.Text = ""
 
--- [ 5. زر النار FIRE NXT v1 ] --
+-- [ زر النار FIRE ] --
 local fire = Instance.new("TextButton", sg)
-fire.Size = UDim2.new(0, 100, 0, 100); fire.Position = UDim2.new(0.8, 0, 0.5, 0)
+fire.Size = UDim2.new(0, 110, 0, 110); fire.Position = UDim2.new(0.8, 0, 0.5, 0)
 fire.BackgroundColor3 = Color3.new(0,0,0); fire.Text = "FIRE\nNXT v1"; fire.TextColor3 = Color3.new(1,1,1); fire.Visible = false; fire.Draggable = true
 Instance.new("UICorner", fire).CornerRadius = UDim.new(1,0)
 Instance.new("UIStroke", fire).Color = Color3.new(1,0,0)
 
--- [ الأزرار ] --
+-- [ أزرار القائمة ] --
 local function makeBtn(t, y, parent)
     local b = Instance.new("TextButton", parent)
     b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y)
-    b.BackgroundColor3 = Color3.fromRGB(30,30,30); b.TextColor3 = Color3.new(1,1,1); b.TextSize = 18; Instance.new("UICorner", b); return b
+    b.BackgroundColor3 = Color3.fromRGB(35,35,35); b.TextColor3 = Color3.new(1,1,1); b.TextSize = 18; Instance.new("UICorner", b); return b
 end
 
-local aimB = makeBtn("Aimbot: OFF", 70, main)
-local espB = makeBtn("ESP: OFF", 125, main)
-local speedB = makeBtn("Speed: OFF", 180, main)
-local jumpB = makeBtn("Jump: OFF", 235, main)
-local noclipB = makeBtn("Noclip: OFF", 290, main)
-local discB = makeBtn("Discord Link", 345, main)
+local aimB = makeBtn("Aimbot: OFF", 80, main)
+local espB = makeBtn("ESP: OFF", 135, main)
+local speedB = makeBtn("Speed: OFF", 190, main)
+local jumpB = makeBtn("Jump: OFF", 245, main)
+local noclipB = makeBtn("Noclip: OFF", 300, main)
+local discB = makeBtn("Discord", 355, main)
+local hideB = makeBtn("Hide Menu", 420, main)
+hideB.BackgroundColor3 = Color3.fromRGB(60, 20, 20)
 
--- زر إخفاء القائمة (مفصول في الأسفل تماماً)
-local hideB = makeBtn("Hide Menu", 440, main)
-hideB.BackgroundColor3 = Color3.fromRGB(60, 0, 0) -- لون مميز (أحمر غامق)
-
--- [ التشغيل واللغة ] --
-task.wait(3); welcome:Destroy(); lang.Visible = true
+-- [ تشغيل السكربت ] --
+task.spawn(function()
+    typeWrite(wText, "Welcome is script NXT v1")
+    task.wait(1)
+    langFrame.Visible = true
+end)
 
 local isAr = false
 arBtn.MouseButton1Click:Connect(function()
-    isAr = true; lang:Destroy(); main.Visible = true
+    isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
     aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "السرعة: قفل"
-    jumpB.Text = "النطة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "نسخ رابط الديسكورد"
-    hideB.Text = "إخفاء القائمة"
+    jumpB.Text = "النطة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
 end)
-enBtn.MouseButton1Click:Connect(function() lang:Destroy(); main.Visible = true end)
+
+enBtn.MouseButton1Click:Connect(function()
+    isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
+end)
+
+-- وظيفة النسخ مع رسالة تم النسخ
+discB.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/syPpUv8Jf")
+    local oldText = discB.Text
+    discB.Text = isAr and "تم النسخ!" or "Copied!"
+    discB.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    task.wait(2)
+    discB.Text = oldText
+    discB.BackgroundColor3 = Color3.fromRGB(35,35,35)
+end)
 
 hideB.MouseButton1Click:Connect(function() main.Visible = false; topBar.Visible = true end)
 topOpen.MouseButton1Click:Connect(function() topBar.Visible = false; main.Visible = true end)
 
--- [ الميزات ] --
+-- [ ميزات كراشوت ] --
 local sOn, jOn, nOn, espOn = false, false, false, false
 aimB.MouseButton1Click:Connect(function()
     fire.Visible = not fire.Visible
@@ -122,8 +152,6 @@ noclipB.MouseButton1Click:Connect(function()
     nOn = not nOn
     noclipB.Text = nOn and (isAr and "الاختراق: تشغيل" or "Noclip: ON") or (isAr and "الاختراق: قفل" or "Noclip: OFF")
 end)
-
-discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
 
 -- [ ESP و Tracers ] --
 local espItems = {}
