@@ -3,10 +3,10 @@ local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
 -- تنظيف السكربت القديم
-if cg:FindFirstChild("NXT_V1_CRASHOUT") then cg.NXT_V1_CRASHOUT:Destroy() end
+if cg:FindFirstChild("NXT_V1_FORCE") then cg.NXT_V1_FORCE:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_V1_CRASHOUT"
+sg.Name = "NXT_V1_FORCE"
 sg.ResetOnSpawn = false
 
 -- [ 1. شاشة الترحيب واللغة ] --
@@ -24,7 +24,7 @@ local enBtn = Instance.new("TextButton", langFrame); enBtn.Size = UDim2.new(0.4,
 
 -- [ 2. المنيو الرئيسي ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 340, 0, 450); main.Position = UDim2.new(0.5, -170, 0.5, -225); main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); main.Visible = false; main.Draggable = true
+main.Size = UDim2.new(0, 340, 0, 450); main.Position = UDim2.new(0.5, -170, 0.5, -225); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
 Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
 local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1
 
@@ -32,22 +32,12 @@ local function makeBtn(t, y, parent)
     local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 18; b.Text = t; Instance.new("UICorner", b); return b
 end
 
-local speedB = makeBtn("Auto Buy Drink: OFF", 80, main)
-local jumpB = makeBtn("Nxt Jump: OFF", 135, main)
+local speedB = makeBtn("Buy Purple Drink: OFF", 80, main)
+local jumpB = makeBtn("High Jump: OFF", 135, main)
 local discB = makeBtn("Discord", 190, main)
 local hideB = makeBtn("Hide Menu", 380, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
-local notice = Instance.new("TextLabel", sg)
-notice.Size = UDim2.new(1, 0, 0.05, 0); notice.Position = UDim2.new(0, 0, 0.85, 0); notice.BackgroundTransparency = 1; notice.TextColor3 = Color3.new(1, 1, 1); notice.TextSize = 22; notice.Text = ""; notice.Visible = false; notice.ZIndex = 1000
-
--- [ 3. فحص الفلوس في كراشوت ] --
-local function getCrashoutMoney()
-    local cash = player:FindFirstChild("Cash") or player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Cash") or player:FindFirstChild("Money")
-    if cash then return cash.Value end
-    return 0
-end
-
--- [ 4. منطق التشغيل ] --
+-- [ 3. منطق التشغيل ] --
 local isAr = false
 local sOn = false
 
@@ -59,34 +49,26 @@ end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    speedB.Text = "شراء المشروب تلقائياً: قفل"; jumpB.Text = "نطة NXT: قفل"; hideB.Text = "إخفاء القائمة"
+    speedB.Text = "شراء المشروب: قفل"; jumpB.Text = "نطة عالية: قفل"; hideB.Text = "إخفاء القائمة"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
 speedB.MouseButton1Click:Connect(function()
-    local cash = getCrashoutMoney()
-    
-    if cash >= 250 then
-        sOn = not sOn
-        if sOn then
-            -- أمر الشراء لماب كراشوت (يحاول شراء المشروب البنفسجي)
-            pcall(function()
-                game:GetService("ReplicatedStorage").Events.Purchase:FireServer("Purple Drink")
-            end)
-            speedB.Text = isAr and "شراء المشروب: تشغيل" or "Auto Buy: ON"
-            notice.Text = isAr and "تم شراء المشروب وتفعيل القلتش" or "Drink Bought & Glitch Active"
-            notice.TextColor3 = Color3.new(0, 1, 0)
-        else
-            speedB.Text = isAr and "شراء المشروب: قفل" or "Auto Buy: OFF"
-            notice.Text = ""
-        end
+    sOn = not sOn
+    if sOn then
+        -- محاولة شراء المشروب بدون فحص الرصيد
+        pcall(function()
+            -- أسماء شائعة للريموت في ماب كراشوت
+            local remotes = {game:GetService("ReplicatedStorage"):FindFirstChild("Purchase"), game:GetService("ReplicatedStorage"):FindFirstChild("BuyItem"), game:GetService("ReplicatedStorage"):FindFirstChild("Events")}
+            for _, r in pairs(remotes) do
+                if r:IsA("RemoteEvent") then r:FireServer("Purple Drink") 
+                elseif r:IsA("Folder") and r:FindFirstChild("Purchase") then r.Purchase:FireServer("Purple Drink") end
+            end
+        end)
+        speedB.Text = isAr and "شراء المشروب: تشغيل" or "Buy Drink: ON"
     else
-        sOn = false
-        speedB.Text = isAr and "شراء المشروب: قفل" or "Auto Buy: OFF"
-        notice.Text = isAr and "رصيدك غير كافي (تحتاج 250)" or "Not enough Cash (250 required)"
-        notice.TextColor3 = Color3.new(1, 0, 0)
+        speedB.Text = isAr and "شراء المشروب: قفل" or "Buy Drink: OFF"
     end
-    notice.Visible = true; task.wait(3); notice.Visible = false
 end)
 
 jumpB.MouseButton1Click:Connect(function()
@@ -94,11 +76,12 @@ jumpB.MouseButton1Click:Connect(function()
     if hum then hum.JumpPower = 115 end
 end)
 
+-- [ المحرك الفيزيائي ] --
 rs.RenderStepped:Connect(function()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         local hum = player.Character.Humanoid
         if sOn then
-            hum.WalkSpeed = 30 -- سرعة آمنة ومستقرة
+            hum.WalkSpeed = 30 -- سرعة المشروب الثابتة
         else
             hum.WalkSpeed = 16
         end
