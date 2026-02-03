@@ -4,10 +4,10 @@ local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
 -- تنظيف السكربت القديم
-if cg:FindFirstChild("NXT_V1_REBORN") then cg.NXT_V1_REBORN:Destroy() end
+if cg:FindFirstChild("NXT_V1_SAFE") then cg.NXT_V1_SAFE:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_V1_REBORN"
+sg.Name = "NXT_V1_SAFE"
 sg.ResetOnSpawn = false
 
 -- [ 1. شاشة الترحيب واللغة ] --
@@ -33,16 +33,15 @@ local function makeBtn(t, y, parent)
     local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 40); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 16; b.Text = t; Instance.new("UICorner", b); return b
 end
 
--- الأوامر المسترجعة
 local aimB = makeBtn("Aimbot: OFF", 70, main)
 local espB = makeBtn("ESP: OFF", 115, main)
-local speedB = makeBtn("Speed Glitch: OFF", 160, main)
-local jumpB = makeBtn("High Jump: OFF", 205, main)
+local speedB = makeBtn("Legit Speed: OFF", 160, main)
+local jumpB = makeBtn("Legit Jump: OFF", 205, main)
 local noclipB = makeBtn("Noclip: OFF", 250, main)
 local discB = makeBtn("Discord", 350, main)
 local hideB = makeBtn("Hide Menu", 420, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
--- [ 3. منطق التشغيل ] --
+-- [ 3. التفعيل ] --
 local isAr = false
 local sOn, jOn, nOn = false, false, false
 
@@ -54,20 +53,19 @@ end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "قلتش السرعة: قفل"
-    jumpB.Text = "نطة عالية: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
+    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "سرعة آمنة: قفل"
+    jumpB.Text = "نطة آمنة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
--- [ 4. تفعيل القلتشات والأوامر ] --
 speedB.MouseButton1Click:Connect(function()
     sOn = not sOn
-    speedB.Text = sOn and (isAr and "قلتش السرعة: تشغيل" or "Speed Glitch: ON") or (isAr and "قلتش السرعة: قفل" or "Speed Glitch: OFF")
+    speedB.Text = sOn and (isAr and "سرعة آمنة: تشغيل" or "Legit Speed: ON") or (isAr and "سرعة آمنة: قفل" or "Legit Speed: OFF")
 end)
 
 jumpB.MouseButton1Click:Connect(function()
     jOn = not jOn
-    jumpB.Text = jOn and (isAr and "نطة عالية: تشغيل" or "High Jump: ON") or (isAr and "نطة عالية: قفل" or "High Jump: OFF")
+    jumpB.Text = jOn and (isAr and "نطة آمنة: تشغيل" or "Legit Jump: ON") or (isAr and "نطة آمنة: قفل" or "Legit Jump: OFF")
 end)
 
 noclipB.MouseButton1Click:Connect(function()
@@ -75,29 +73,25 @@ noclipB.MouseButton1Click:Connect(function()
     noclipB.Text = nOn and (isAr and "الاختراق: تشغيل" or "Noclip: ON") or (isAr and "الاختراق: قفل" or "Noclip: OFF")
 end)
 
--- [ التحديث الفيزيائي ] --
+-- [ 4. المحرك الفيزيائي الآمن ] --
 rs.Stepped:Connect(function()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         local hum = player.Character.Humanoid
-        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
         
-        -- السرعة المخففة (45) - موزونة وممتازة للمشروب
+        -- سرعة 32 (سرعة آمنة جداً ومستحيل تنكشف بسهولة)
         if sOn then
-            hum.WalkSpeed = 45
-            camera.FieldOfView = 90
+            hum.WalkSpeed = 32 
         else
             hum.WalkSpeed = 16
-            camera.FieldOfView = 70
         end
         
-        -- النطة اللي عجبتك
+        -- نطة 90 (مناسبة للمباني وما تلفت النظر)
         if jOn then
-            hum.JumpPower = 115
+            hum.JumpPower = 90
         else
             hum.JumpPower = 50
         end
         
-        -- أمر النوكليب (الاختراق)
         if nOn then
             for _, v in pairs(player.Character:GetDescendants()) do
                 if v:IsA("BasePart") then v.CanCollide = false end
@@ -106,5 +100,5 @@ rs.Stepped:Connect(function()
     end
 end)
 
-discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = isAr and "تم النسخ!" or "Copied!"; task.wait(1); discB.Text = isAr and "رابط الديسكورد" or "Discord" end)
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = "Copied!"; task.wait(1); discB.Text = "Discord" end)
 hideB.MouseButton1Click:Connect(function() main.Visible = false end)
