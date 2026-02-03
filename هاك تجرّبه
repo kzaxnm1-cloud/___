@@ -12,7 +12,7 @@ local safePoints = {
 }
 local currentIndex = 0 -- الموضع الحالي
 
--- [ 1. تشغيل السكربت بدون تحقق ] --
+-- [ 1. تشغيل السكربت بدون قيود الماب ] --
 if cg:FindFirstChild("NX2_CLEAN") then cg.NX2_CLEAN:Destroy() end
 local sg = Instance.new("ScreenGui", cg)
 sg.Name = "NX2_CLEAN"
