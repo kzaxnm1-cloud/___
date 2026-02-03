@@ -1,307 +1,217 @@
--- NX2 — تعديل: شاشة بنية تغطي الشاشة كاملة وتكتب مركزيًا:
--- "Welcome is Script NX2" ثم سطر آخر "discord https://discord.gg/syPpUv8Jf"
--- الكتابة تتم بطيئة (typewriter) خلال ~2 ثانية كاملة، بعدها تختفي الشاشة وتظهر شاشة START.
--- بقية السلوك كما سبق: عند الضغط START يظهر تحميل 1.5s ثم تفتح الواجهة وتُفعّل السرعة والقفز تلقائيًا.
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
-local Camera = workspace.CurrentCamera
+local player = game:GetService("Players").LocalPlayer
+local mouse = player:GetMouse()
+local rs = game:GetService("RunService")
+local cg = game:GetService("CoreGui")
+local uis = game:GetService("UserInputService")
 
-local player = Players.LocalPlayer
+-- تنظيف النسخ القديمة
+if cg:FindFirstChild("NX2_ULTIMATE_HUB") then cg.NX2_ULTIMATE_HUB:Destroy() end
 
--- تنظيف أي واجهة قديمة
-if CoreGui:FindFirstChild("NX2_Carshoot") then
-    pcall(function() CoreGui.NX2_Carshoot:Destroy() end)
-end
-
--- إنشاء ScreenGui
-local sg = Instance.new("ScreenGui", CoreGui)
-sg.Name = "NX2_Carshoot"
+local sg = Instance.new("ScreenGui", cg)
+sg.Name = "NX2_ULTIMATE_HUB"
 sg.ResetOnSpawn = false
-sg.DisplayOrder = 9999
 
--- خيارات تلقائية
-local AUTO_WALKSPEED = 5.5
-local AUTO_JUMPPOWER = 7
+-- [ 1. شاشة الترحيب (بني - 3 ثواني) ] --
+local welcomeFrame = Instance.new("Frame", sg)
+welcomeFrame.Size = UDim2.new(1, 0, 1, 0)
+welcomeFrame.BackgroundColor3 = Color3.fromRGB(101, 67, 33) -- بني
+welcomeFrame.ZIndex = 100
 
--- تخزين Defaults (لإرجاعها عند cleanup)
-local defaultWalkSpeed = 16
-local defaultJumpPower = 50
-local function cacheDefaults()
-    if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
-        local hum = player.Character:FindFirstChildOfClass("Humanoid")
-        defaultWalkSpeed = hum.WalkSpeed or defaultWalkSpeed
-        if hum.JumpPower and hum.UseJumpPower then
-            defaultJumpPower = hum.JumpPower or defaultJumpPower
-        else
-            defaultJumpPower = hum.JumpPower or hum.JumpHeight or defaultJumpPower
-        end
-    end
-end
-cacheDefaults()
+local welcomeText = Instance.new("TextLabel", welcomeFrame)
+welcomeText.Size = UDim2.new(1, 0, 0.2, 0)
+welcomeText.Position = UDim2.new(0, 0, 0.4, 0)
+welcomeText.Text = "Welcome is script NX2"
+welcomeText.TextColor3 = Color3.new(1, 1, 1)
+welcomeText.TextSize = 40
+welcomeText.Font = Enum.Font.SourceSansBold
+welcomeText.BackgroundTransparency = 1
 
--- حالات/قوائم تنظيف
-local connections = {}
-local espGuis = {}
+local welcomeDisc = Instance.new("TextLabel", welcomeFrame)
+welcomeDisc.Size = UDim2.new(1, 0, 0.1, 0)
+welcomeDisc.Position = UDim2.new(0, 0, 0.55, 0)
+welcomeDisc.Text = "discord = https://discord.gg/syPpUv8Jf"
+welcomeDisc.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+welcomeDisc.TextSize = 20
+welcomeDisc.BackgroundTransparency = 1
 
--- ---------------- شاشة بنية كاملة + كتابة بطيئة مركزة ----------------
-local splash = Instance.new("Frame", sg)
-splash.Name = "FullSplash"
-splash.Size = UDim2.new(1, 0, 1, 0) -- تغطي الشاشة كاملة
-splash.Position = UDim2.new(0, 0, 0, 0)
-splash.BackgroundColor3 = Color3.fromRGB(95, 57, 30) -- بني كامل
-splash.ZIndex = 20000
+-- [ 2. شاشة اختيار اللغة ] --
+local langFrame = Instance.new("Frame", sg)
+langFrame.Size = UDim2.new(0, 300, 0, 150)
+langFrame.Position = UDim2.new(0.5, -150, 0.4, -75)
+langFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+langFrame.Visible = false
+langFrame.ZIndex = 110
+Instance.new("UICorner", langFrame)
 
-local splashText = Instance.new("TextLabel", splash)
-splashText.Name = "SplashText"
-splashText.Size = UDim2.new(0.8, 0, 0.2, 0)
-splashText.Position = UDim2.new(0.1, 0, 0.4, 0) -- مركزي تقريبًا عموديًا
-splashText.BackgroundTransparency = 1
-splashText.Text = ""
-splashText.TextColor3 = Color3.fromRGB(255, 255, 255)
-splashText.Font = Enum.Font.SourceSansBold
-splashText.TextSize = 28
-splashText.TextWrapped = true
-splashText.TextXAlignment = Enum.TextXAlignment.Center
-splashText.TextYAlignment = Enum.TextYAlignment.Center
-splashText.ZIndex = 20001
+local arBtn = Instance.new("TextButton", langFrame)
+arBtn.Size = UDim2.new(0.4, 0, 0.4, 0)
+arBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
+arBtn.Text = "عربي"
+arBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+arBtn.TextColor3 = Color3.new(1, 1, 1)
 
--- النص الكامل: السطر الأول ثم السطر الثاني مع رابط الديسكورد
-local fullText = "Welcome is Script NX2\n\ndiscord https://discord.gg/syPpUv8Jf"
+local enBtn = Instance.new("TextButton", langFrame)
+enBtn.Size = UDim2.new(0.4, 0, 0.4, 0)
+enBtn.Position = UDim2.new(0.55, 0, 0.3, 0)
+enBtn.Text = "English"
+enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+enBtn.TextColor3 = Color3.new(1, 1, 1)
 
--- كتابة بطيئة (typewriter) لمدة ~2 ثانية كاملة
-task.spawn(function()
-    local totalTime = 2.0
-    local chars = #fullText
-    local interval = totalTime / math.max(1, chars)
-    local out = ""
-    for i = 1, chars do
-        out = string.sub(fullText, 1, i)
-        splashText.Text = out
-        task.wait(interval)
-    end
-    -- تبقى الشاشة لحظة قصيرة بعد اكتمال الكتابة ثم ��ُحذف لتُظهر START
-    task.wait(0.2)
-    if splash and splash.Parent then
-        pcall(function() splash:Destroy() end)
-    end
-end)
-
--- ------------ واجهة START (تظهر بعد splash) ------------
+-- [ 3. واجهة START ] --
 local startFrame = Instance.new("Frame", sg)
-startFrame.Name = "StartFrame"
-startFrame.Size = UDim2.new(0, 320, 0, 160)
-startFrame.Position = UDim2.new(0.5, -160, 0.45, -80)
+startFrame.Size = UDim2.new(0, 250, 0, 150)
+startFrame.Position = UDim2.new(0.5, -125, 0.4, -75)
 startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-startFrame.ZIndex = 19000
+startFrame.Visible = false
 Instance.new("UICorner", startFrame)
-local startStroke = Instance.new("UIStroke", startFrame)
-startStroke.Color = Color3.fromRGB(0, 170, 255)
 
-local startTitle = Instance.new("TextLabel", startFrame)
-startTitle.Size = UDim2.new(1, 0, 0, 48)
-startTitle.Position = UDim2.new(0, 0, 0, 8)
-startTitle.BackgroundTransparency = 1
-startTitle.Text = "NX2"
-startTitle.TextColor3 = Color3.fromRGB(255, 255, 0)
-startTitle.Font = Enum.Font.SourceSansBold
-startTitle.TextScaled = true
-startTitle.ZIndex = 19001
+local sTitle = Instance.new("TextLabel", startFrame)
+sTitle.Size = UDim2.new(1, 0, 0.4, 0)
+sTitle.Text = "NX2"
+sTitle.TextColor3 = Color3.new(1, 1, 0)
+sTitle.TextSize = 35
+sTitle.BackgroundTransparency = 1
 
-local sBtn = Instance.new("TextButton", startFrame)
-sBtn.Size = UDim2.new(0.6, 0, 0, 48)
-sBtn.Position = UDim2.new(0.2, 0, 0.55, 0)
-sBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
-sBtn.Text = "START"
-sBtn.TextColor3 = Color3.new(1, 1, 1)
-sBtn.TextSize = 22
-sBtn.Font = Enum.Font.SourceSansBold
-sBtn.ZIndex = 19002
-Instance.new("UICorner", sBtn)
+local startBtn = Instance.new("TextButton", startFrame)
+startBtn.Size = UDim2.new(0.8, 0, 0.35, 0)
+startBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+startBtn.Text = "START"
+startBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", startBtn)
 
--- ------------ الشريط العلوي NX2 فقط ------------
-local topBar = Instance.new("Frame", sg)
-topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1,0,0,34)
-topBar.Position = UDim2.new(0,0,0,0)
-topBar.BackgroundColor3 = Color3.fromRGB(0,0,0)
-topBar.ZIndex = 20010
-local topLabel = Instance.new("TextLabel", topBar)
-topLabel.Size = UDim2.new(0,160,1,0)
-topLabel.Position = UDim2.new(0,8,0,0)
-topLabel.BackgroundTransparency = 1
-topLabel.Text = "NX2"
-topLabel.TextColor3 = Color3.fromRGB(255,255,0)
-topLabel.Font = Enum.Font.SourceSansBold
-topLabel.TextScaled = true
-topLabel.ZIndex = 20011
-
--- ------------ واجهة الأوامر (تُعرض بعد START) ------------
+-- [ 4. القائمة الرئيسية ] --
 local main = Instance.new("Frame", sg)
-main.Name = "MainFrame"
-main.Size = UDim2.new(0, 380, 0, 460)
-main.Position = UDim2.new(0.5, -190, 0.55, -230)
+main.Size = UDim2.new(0, 360, 0, 440)
+main.Position = UDim2.new(0.5, -180, 0.5, -220)
 main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 main.Visible = false
-main.ZIndex = 18000
+main.Draggable = true
 Instance.new("UICorner", main)
-local mainStroke = Instance.new("UIStroke", main)
-mainStroke.Color = Color3.fromRGB(255,255,0)
 
-local p1 = Instance.new("Frame", main); p1.Size = UDim2.new(1,0,1,-100); p1.Position = UDim2.new(0,0,0,100); p1.BackgroundTransparency = 1
+-- [ 5. شريط الإخفاء العلوي ] --
+local topBar = Instance.new("Frame", sg)
+topBar.Size = UDim2.new(0, 400, 0, 45)
+topBar.Position = UDim2.new(0.5, -200, 0, 5)
+topBar.BackgroundColor3 = Color3.new(0, 0, 0)
+topBar.Visible = false
+Instance.new("UICorner", topBar)
+
+local topLabel = Instance.new("TextLabel", topBar)
+topLabel.Size = UDim2.new(1, 0, 1, 0)
+topLabel.Text = "NX2"
+topLabel.TextColor3 = Color3.new(1, 1, 0) -- أصفر
+topLabel.TextSize = 25
+topLabel.Font = Enum.Font.SourceSansBold
+topLabel.BackgroundTransparency = 1
+
+local topBtn = Instance.new("TextButton", topBar)
+topBtn.Size = UDim2.new(1, 0, 1, 0)
+topBtn.BackgroundTransparency = 1
+topBtn.Text = ""
+
+-- [ 6. زر النار FIRE NX2 ] --
+local fire = Instance.new("TextButton", sg)
+fire.Size = UDim2.new(0, 100, 0, 100)
+fire.Position = UDim2.new(0.8, 0, 0.6, 0)
+fire.BackgroundColor3 = Color3.new(0, 0, 0)
+fire.Text = "FIRE\nNX2"
+fire.TextColor3 = Color3.new(1, 1, 1)
+fire.TextSize = 22
+fire.Font = Enum.Font.SourceSansBold
+fire.Visible = false
+fire.Draggable = true
+Instance.new("UICorner", fire).CornerRadius = UDim.new(1, 0)
+Instance.new("UIStroke", fire).Color = Color3.new(1, 0, 0)
+
+-- [ الصفحات والوظائف ] --
+local p1 = Instance.new("Frame", main); p1.Size = UDim2.new(1,0,1,-80); p1.Position = UDim2.new(0,0,0,80); p1.BackgroundTransparency = 1
 local p2 = Instance.new("Frame", main); p2.Size = p1.Size; p2.Position = p1.Position; p2.BackgroundTransparency = 1; p2.Visible = false
+local p3 = Instance.new("Frame", main); p3.Size = p1.Size; p3.Position = p1.Position; p3.BackgroundTransparency = 1; p3.Visible = false
 
-local function tab(t, x)
+local function createTab(t, x)
     local b = Instance.new("TextButton", main)
-    b.Size = UDim2.new(0.5,0,0,40); b.Position = UDim2.new(x,0,0,40); b.Text = t
-    b.BackgroundColor3 = Color3.fromRGB(30,30,30); b.TextColor3 = Color3.new(1,1,1)
-    return b
+    b.Size = UDim2.new(0.33, 0, 0, 40); b.Position = UDim2.new(x, 0, 0, 40)
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1)
+    b.Text = t; return b
 end
-local b1 = tab("اللعب", 0); local b2 = tab("الشخصية", 0.5)
-b1.MouseButton1Click:Connect(function() p1.Visible = true; p2.Visible = false end)
-b2.MouseButton1Click:Connect(function() p1.Visible = false; p2.Visible = true end)
 
-local function btn(t, y, p)
+local t1 = createTab("Game", 0)
+local t2 = createTab("Char", 0.33)
+local t3 = createTab("Discord", 0.66)
+
+t1.MouseButton1Click:Connect(function() p1.Visible=true; p2.Visible=false; p3.Visible=false end)
+t2.MouseButton1Click:Connect(function() p1.Visible=false; p2.Visible=true; p3.Visible=false end)
+t3.MouseButton1Click:Connect(function() p1.Visible=false; p2.Visible=false; p3.Visible=true end)
+
+local function quickBtn(txt, y, p)
     local b = Instance.new("TextButton", p)
-    b.Size = UDim2.new(0.9,0,0,36); b.Position = UDim2.new(0.05,0,y,0)
-    b.BackgroundColor3 = Color3.fromRGB(40,40,40); b.Text = t; b.TextColor3 = Color3.new(1,1,1)
-    Instance.new("UICorner", b)
-    return b
+    b.Size = UDim2.new(0.9, 0, 0, 40); b.Position = UDim2.new(0.05, 0, y, 0)
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.new(1, 1, 1); b.Text = txt
+    Instance.new("UICorner", b); return b
 end
 
--- أزرار الأوامر (مثل السابق)
-local aim = btn("Aimbot: OFF", 0.05, p1)
-local aimAlt = btn("Aimbot Circle 2: OFF", 0.13, p1)
-local copyDisc = btn("سيرفر ديسكورد ل سكربتات زياده!", 0.21, p1)
+local aimB = quickBtn("Aimbot: OFF", 0.05, p1)
+local espB = quickBtn("ESP: OFF", 0.2, p1)
+local speedB = quickBtn("Speed: OFF", 0.05, p2)
+local jumpB = quickBtn("Jump: OFF", 0.2, p2)
+local noclipB = quickBtn("Noclip: OFF", 0.35, p2)
+local hideB = quickBtn("Hide Menu", 0.6, p2)
+local copyD = quickBtn("Copy Discord Link", 0.4, p3)
 
-local speedBtn = btn("Speed: OFF", 0.05, p2)
-local jumpBtn = btn("Jump: OFF", 0.2, p2)
-local noclip = btn("Noclip (الاختراق): OFF", 0.35, p2)
-local hideBtn = btn("إخفاء القائمة", 0.55, p2)
-local removeScriptBtn = btn("إغلاق السكربت نهائياً", 0.9, p2)
-
--- ------------ دوائر FIRE وESP وخط الأيم (كما قبل) ------------
-local fire1 = Instance.new("TextButton", sg)
-fire1.Name = "FireCircle1"
-fire1.Size = UDim2.new(0, 120, 0, 120)
-fire1.Position = UDim2.new(0.75, 0, 0.55, 0)
-fire1.BackgroundColor3 = Color3.new(0,0,0)
-fire1.Text = "FIRE\nNX2"
-fire1.TextColor3 = Color3.new(1,1,1)
-fire1.Font = Enum.Font.SourceSansBold
-fire1.Visible = false
-fire1.Draggable = true
-fire1.TextScaled = true
-Instance.new("UICorner", fire1).CornerRadius = UDim.new(1, 0)
-Instance.new("UIStroke", fire1).Color = Color3.new(1,0,0)
-
-local fire2 = Instance.new("TextButton", sg)
-fire2.Name = "FireCircle2"
-fire2.Size = UDim2.new(0, 80, 0, 80)
-fire2.Position = UDim2.new(0.85, 0, 0.65, 0)
-fire2.BackgroundColor3 = Color3.fromRGB(10,10,10)
-fire2.Text = "F2"
-fire2.TextColor3 = Color3.fromRGB(0,255,127)
-fire2.Font = Enum.Font.SourceSansBold
-fire2.Visible = false
-fire2.Draggable = true
-fire2.TextScaled = true
-Instance.new("UICorner", fire2).CornerRadius = UDim.new(1, 0)
-Instance.new("UIStroke", fire2).Color = Color3.fromRGB(0,255,127)
-
--- دالة تطبيق السرعة/القفز
-local function applySpeedJumpToHumanoid(hum)
-    if not hum then return end
-    pcall(function()
-        hum.WalkSpeed = AUTO_WALKSPEED
-        if hum.JumpPower and hum.UseJumpPower then
-            hum.JumpPower = AUTO_JUMPPOWER
-        else
-            hum.JumpPower = AUTO_JUMPPOWER
-        end
-    end)
-end
-
--- إعادة القيم عند cleanup
-local function restoreCharacterParts(ch)
-    if not ch then return end
-    for _, v in pairs(ch:GetDescendants()) do
-        if v:IsA("BasePart") then
-            pcall(function() v.CanCollide = true end)
-        end
-    end
-    local hum = ch:FindFirstChildOfClass("Humanoid")
-    if hum then
-        pcall(function()
-            hum.WalkSpeed = defaultWalkSpeed
-            if hum.JumpPower and hum.UseJumpPower then
-                hum.JumpPower = defaultJumpPower
-            else
-                hum.JumpPower = defaultJumpPower
-            end
-        end)
-    end
-end
-
--- تفعيل السرعة والقفز تلقائيًا عند فتح الواجهة
-local function enableAutoSpeedJump()
-    -- اضبط النصوص وأفعل الحالات
-    speedBtn.Text = "Speed: ON ("..tostring(AUTO_WALKSPEED)..")"
-    jumpBtn.Text = "Jump: ON ("..tostring(AUTO_JUMPPOWER)..")"
-    if player.Character then
-        local hum = player.Character:FindFirstChildOfClass("Humanoid")
-        applySpeedJumpToHumanoid(hum)
-    end
-end
-
--- زر START: تحميل 1.5s ثم فتح الواجهة وتفعيل السرعة/القفز
-sBtn.MouseButton1Click:Connect(function()
-    -- تحميل متحرك لمدة 1.5 ثانية
-    local patterns = {"START", "START.", "START..", "START..."}
-    local totalLoad = 1.5
-    local interval = 0.25
-    local elapsed = 0
-    while elapsed < totalLoad do
-        for i = 1, #patterns do
-            sBtn.Text = patterns[i]
-            task.wait(interval)
-            elapsed = elapsed + interval
-            if elapsed >= totalLoad then break end
-        end
-    end
-
-    if startFrame and startFrame.Parent then pcall(function() startFrame:Destroy() end) end
-    main.Visible = true
-    enableAutoSpeedJump()
+-- [ منطق الترجمة ] --
+local isArabic = false
+arBtn.MouseButton1Click:Connect(function()
+    isArabic = true; langFrame.Visible = false; startFrame.Visible = true
+    t1.Text = "اللعب"; t2.Text = "الشخصية"; t3.Text = "ديسكورد"
+    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"
+    speedB.Text = "السرعة: قفل"; jumpB.Text = "النطة: قفل"
+    noclipB.Text = "الاختراق: قفل"; hideB.Text = "إخفاء القائمة"; copyD.Text = "نسخ رابط الديسكورد"
+end)
+enBtn.MouseButton1Click:Connect(function()
+    isArabic = false; langFrame.Visible = false; startFrame.Visible = true
 end)
 
--- إعادة تطبيق القيم عند إعادة توليد الشخصية
-local charAddedConn = player.CharacterAdded:Connect(function(ch)
-    task.wait(0.5)
-    cacheDefaults()
-    if main.Visible then
-        local hum = ch:FindFirstChildOfClass("Humanoid")
-        applySpeedJumpToHumanoid(hum)
+-- [ تشغيل START ] --
+startBtn.MouseButton1Click:Connect(function()
+    startBtn.Text = "..."; task.wait(1.5)
+    startFrame:Destroy(); main.Visible = true
+end)
+
+-- [ نظام الإخفاء ] --
+hideB.MouseButton1Click:Connect(function() main.Visible = false; topBar.Visible = true end)
+topBtn.MouseButton1Click:Connect(function() topBar.Visible = false; main.Visible = true end)
+
+-- [ البرمجة والوظائف ] --
+local sOn, jOn, nOn, espOn = false, false, false, false
+
+aimB.MouseButton1Click:Connect(function()
+    fire.Visible = not fire.Visible
+    if isArabic then aimB.Text = fire.Visible and "الأيم بوت: تشغيل" or "الأيم بوت: قفل"
+    else aimB.Text = fire.Visible and "Aimbot: ON" or "Aimbot: OFF" end
+end)
+
+speedB.MouseButton1Click:Connect(function() sOn = not sOn end)
+jumpB.MouseButton1Click:Connect(function() jOn = not jOn end)
+noclipB.MouseButton1Click:Connect(function() nOn = not nOn end)
+copyD.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
+
+-- نظام ESP (كشف اللاعبين)
+espB.MouseButton1Click:Connect(function()
+    espOn = not espOn
+    if isArabic then espB.Text = espOn and "كشف اللاعبين: تشغيل" or "كشف اللاعبين: قفل"
+    else espB.Text = espOn and "ESP: ON" or "ESP: OFF" end
+end)
+
+rs.Heartbeat:Connect(function()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = player.Character.HumanoidRootPart
+        local hum = player.Character.Humanoid
+        if sOn and hum.MoveDirection.Magnitude > 0 then hrp.Velocity = Vector3.new(hum.MoveDirection.X * 45, hrp.Velocity.Y, hum.MoveDirection.Z * 45) end
+        if jOn then hum.JumpPower = 100 end
+        if nOn then for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
     end
 end)
-table.insert(connections, charAddedConn)
 
--- تنظيف نهائي
-local function cleanup()
-    for _, c in ipairs(connections) do
-        if c and c.Connected then pcall(function() c:Disconnect() end) end
-    end
-    connections = {}
-    for pl, gui in pairs(espGuis) do
-        if gui and gui.Parent then pcall(function() gui:Destroy() end) end
-    end
-    espGuis = {}
-    if sg and sg.Parent then pcall(function() sg:Destroy() end) end
-    -- إعادة القيم إن لزم
-    if player.Character then restoreCharacterParts(player.Character) end
-    print("NX2: cleaned up.")
-end
-
-removeScriptBtn.MouseButton1Click:Connect(cleanup)
-
-print("NX2 loaded. Full brown splash with centered typing then START -> load -> main UI. Auto Speed="..tostring(AUTO_WALKSPEED)..", Jump="..tostring(AUTO_JUMPPOWER))
+-- مؤقت شاشة الترحيب
+task.delay(3, function() welcomeFrame:Destroy(); langFrame.Visible = true end)
