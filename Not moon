@@ -1,78 +1,60 @@
 local player = game:GetService("Players").LocalPlayer
 local cg = game:GetService("CoreGui")
 local rs = game:GetService("RunService")
-local vu = game:GetService("VirtualUser")
 
--- حذف النسخ القديمة لضمان عدم التعليق
-if cg:FindFirstChild("NX2_STABLE_V1") then cg.NX2_STABLE_V1:Destroy() end
+-- حذف النسخ القديمة لضمان التشغيل
+if cg:FindFirstChild("NX2_FINAL_FIX") then cg.NX2_FINAL_FIX:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_STABLE_V1"
+sg.Name = "NX2_FINAL_FIX"
 sg.ResetOnSpawn = false
 
--- وظيفة التحريك (Drag) محسنة لتعمل على الجوال والكمبيوتر
-local function makeDraggable(frame)
-    local dragging, dragInput, dragStart, startPos
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-        end
-    end)
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-    frame.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
-    end)
-end
-
--- [ 1. شاشة الدخول ] --
+-- [ 1. شاشة الدخول - بالصورة والتحميل ] --
 local loaderFrame = Instance.new("Frame", sg)
 loaderFrame.Size = UDim2.new(1, 0, 1, 0)
 loaderFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-loaderFrame.BackgroundTransparency = 0.5 -- شفافة شوي عشان تشوف اللعبة
+loaderFrame.BackgroundTransparency = 0.4
 loaderFrame.ZIndex = 100
 
-local loaderMain = Instance.new("Frame", loaderFrame)
-loaderMain.Size = UDim2.new(0, 300, 0, 200)
-loaderMain.Position = UDim2.new(0.5, -150, 0.5, -100)
-loaderMain.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+local loaderMain = Instance.new("ImageLabel", loaderFrame)
+loaderMain.Size = UDim2.new(0, 300, 0, 320)
+loaderMain.Position = UDim2.new(0.5, -150, 0.5, -160)
+loaderMain.Image = "rbxassetid://18911065261"
+loaderMain.ScaleType = Enum.ScaleType.Stretch
 Instance.new("UICorner", loaderMain)
 
 local title = Instance.new("TextLabel", loaderMain)
-title.Size = UDim2.new(1, 0, 0.5, 0)
+title.Size = UDim2.new(1, 0, 0.4, 0)
 title.Text = "NX2 v1 !"
-title.TextColor3 = Color3.new(1, 1, 0) -- أصفر
+title.TextColor3 = Color3.new(1, 1, 0)
 title.TextSize = 35
 title.Font = Enum.Font.SourceSansBold
 title.BackgroundTransparency = 1
 
 local startBtn = Instance.new("TextButton", loaderMain)
 startBtn.Size = UDim2.new(0.8, 0, 0, 50)
-startBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+startBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 startBtn.Text = "START"
 startBtn.TextColor3 = Color3.new(1, 1, 1)
-startBtn.TextSize = 24
+startBtn.TextSize = 25
 Instance.new("UICorner", startBtn)
 
--- [ 2. المنيو الرئيسي ] --
+-- [ 2. المنيو الرئيسي - أسود شفاف حواف حمراء ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 250, 0, 400)
-main.Position = UDim2.new(0.5, -125, 0.5, -200)
+main.Size = UDim2.new(0, 250, 0, 420)
+main.Position = UDim2.new(0.5, -125, 0.5, -210)
 main.BackgroundColor3 = Color3.new(0, 0, 0)
 main.BackgroundTransparency = 0.2
 main.Visible = false
+main.Active = true
+main.Draggable = true -- تفعيل السحب المباشر
 Instance.new("UICorner", main)
 local stroke = Instance.new("UIStroke", main)
 stroke.Color = Color3.new(1, 0, 0)
-makeDraggable(main)
+stroke.Thickness = 2
 
+-- زر الإخفاء (_)
 local hideBtn = Instance.new("TextButton", main)
 hideBtn.Size = UDim2.new(0, 30, 0, 30)
 hideBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -80,15 +62,16 @@ hideBtn.Text = "_"
 hideBtn.TextColor3 = Color3.new(1, 1, 1)
 hideBtn.BackgroundTransparency = 1
 
--- الأيقونة الدائرية
-local mini = Instance.new("TextButton", sg)
-mini.Size = UDim2.new(0, 60, 0, 60)
+-- الأيقونة الدائرية (صورتك)
+local mini = Instance.new("ImageButton", sg)
+mini.Size = UDim2.new(0, 70, 0, 70)
 mini.Position = UDim2.new(0.9, -10, 0.1, 0)
 mini.Visible = false
-mini.Text = "NX2"
-mini.BackgroundColor3 = Color3.new(1, 0, 0)
+mini.Image = "rbxassetid://18911065261"
+mini.Draggable = true
 Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
-makeDraggable(mini)
+local mStroke = Instance.new("UIStroke", mini)
+mStroke.Color = Color3.new(1, 0, 0)
 
 -- وظيفة صنع الأزرار
 local function createBtn(t, y, c)
@@ -99,22 +82,28 @@ local function createBtn(t, y, c)
     b.TextColor3 = Color3.new(1, 1, 1)
     b.Text = t
     b.Font = Enum.Font.SourceSansBold
+    b.TextSize = 18
     Instance.new("UICorner", b)
     return b
 end
 
-local collectBtn = createBtn("Auto Collect: OFF", 60, Color3.fromRGB(0, 80, 0))
-local afkBtn = createBtn("AFK Mode: OFF", 110)
-local noclipBtn = createBtn("Noclip: OFF", 160)
-local zoomBtn = createBtn("Infinite Zoom: OFF", 210)
-local discordBtn = createBtn("Join Discord", 260, Color3.fromRGB(88, 101, 242))
-local cleanBtn = createBtn("Clean Up UI", 340, Color3.fromRGB(150, 0, 0))
+local collectBtn = createBtn("Auto Collect: OFF", 80, Color3.fromRGB(0, 100, 0))
+local afkBtn = createBtn("AFK Mode: OFF", 135)
+local noclipBtn = createBtn("Noclip: OFF", 190)
+local zoomBtn = createBtn("Infinite Zoom: OFF", 245)
+local discordBtn = createBtn("Join Discord", 300, Color3.fromRGB(88, 101, 242))
+local cleanBtn = createBtn("Clean Up UI", 370, Color3.fromRGB(150, 0, 0))
 
--- [ 3. الوظائف ] --
+-- [ 3. البرمجة والوظائف ] --
 
 startBtn.MouseButton1Click:Connect(function()
-    startBtn.Text = "Loading..."
-    task.wait(3.5)
+    startBtn.Active = false
+    local t = 0
+    while t < 3.5 do
+        t = t + 0.5
+        startBtn.Text = "Loading" .. string.rep(".", (t*2)%4)
+        task.wait(0.5)
+    end
     loaderFrame:Destroy()
     main.Visible = true
 end)
@@ -122,31 +111,50 @@ end)
 hideBtn.MouseButton1Click:Connect(function() main.Visible = false; mini.Visible = true end)
 mini.MouseButton1Click:Connect(function() main.Visible = true; mini.Visible = false end)
 
--- Auto Collect
+-- زر التجميع بضغطة واحدة (Auto Collect)
 local autoCollect = false
 collectBtn.MouseButton1Click:Connect(function()
     autoCollect = not autoCollect
     collectBtn.Text = autoCollect and "Auto Collect: ON" or "Auto Collect: OFF"
+    collectBtn.TextColor3 = autoCollect and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
+    
     task.spawn(function()
         while autoCollect do
-            for _, v in pairs(game.Workspace:GetDescendants()) do
-                if autoCollect and (v.Name == "Coin" or v.Name == "Part") and v:FindFirstChild("TouchInterest") then
-                    firetouchinterest(player.Character.HumanoidRootPart, v, 0)
-                    firetouchinterest(player.Character.HumanoidRootPart, v, 1)
+            pcall(function()
+                for _, v in pairs(game.Workspace:GetDescendants()) do
+                    if autoCollect and (v.Name == "Coin" or v.Name == "Part") and v:FindFirstChild("TouchInterest") then
+                        firetouchinterest(player.Character.HumanoidRootPart, v, 0)
+                        firetouchinterest(player.Character.HumanoidRootPart, v, 1)
+                    end
                 end
-            end
-            task.wait(0.5)
+            end)
+            task.wait(0.3)
         end
     end)
 end)
 
--- Noclip
+-- AFK Mode
+local afkOn = false
+afkBtn.MouseButton1Click:Connect(function()
+    afkOn = not afkOn
+    afkBtn.Text = afkOn and "AFK Mode: ON" or "AFK Mode: OFF"
+end)
+player.Idled:Connect(function()
+    if afkOn then game:GetService("VirtualUser"):CaptureController(); game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end
+end)
+
+-- Noclip & Zoom
 local nOn = false
 noclipBtn.MouseButton1Click:Connect(function() nOn = not nOn; noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF" end)
 rs.Stepped:Connect(function()
     if nOn and player.Character then
         for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
     end
+end)
+
+zoomBtn.MouseButton1Click:Connect(function()
+    player.CameraMaxZoomDistance = (player.CameraMaxZoomDistance == 70) and 500 or 70
+    zoomBtn.Text = (player.CameraMaxZoomDistance == 500) and "Infinite Zoom: ON" or "Infinite Zoom: OFF"
 end)
 
 discordBtn.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
