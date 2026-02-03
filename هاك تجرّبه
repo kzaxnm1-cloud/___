@@ -38,3 +38,59 @@ local speedB = makeBtn("Speed Glitch: OFF", 160, main)
 local jumpB = makeBtn("High Jump: OFF", 205, main)
 local noclipB = makeBtn("Noclip: OFF", 250, main)
 local discB = makeBtn("Discord", 350, main)
+local hideB = makeBtn("Hide Menu", 420, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
+
+-- [ 3. منطق التشغيل ] --
+local isAr = false
+local sOn, jOn, nOn = false, false, false
+
+task.spawn(function()
+    local t = "Welcome is script NX2 v1"
+    for i = 1, #t do wText.Text = string.sub(t, 1, i); task.wait(0.03) end
+    task.wait(0.5); langFrame.Visible = true
+end)
+
+arBtn.MouseButton1Click:Connect(function()
+    isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
+    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "قلتش السرعة: قفل"
+    jumpB.Text = "نطة عالية: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
+end)
+enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
+
+-- [ 4. تفعيل الوظائف ] --
+speedB.MouseButton1Click:Connect(function()
+    sOn = not sOn
+    if sOn then
+        pcall(function()
+            game:GetService("ReplicatedStorage").Events.Purchase:FireServer("Purple Drink")
+        end)
+    end
+    speedB.Text = sOn and (isAr and "قلتش السرعة: تشغيل" or "Speed Glitch: ON") or (isAr and "قلتش السرعة: قفل" or "Speed Glitch: OFF")
+end)
+
+jumpB.MouseButton1Click:Connect(function()
+    jOn = not jOn
+    jumpB.Text = jOn and (isAr and "نطة عالية: تشغيل" or "High Jump: ON") or (isAr and "نطة عالية: قفل" or "High Jump: OFF")
+end)
+
+noclipB.MouseButton1Click:Connect(function()
+    nOn = not nOn
+    noclipB.Text = nOn and (isAr and "الاختراق: تشغيل" or "Noclip: ON") or (isAr and "الاختراق: قفل" or "Noclip: OFF")
+end)
+
+-- [ 5. المحرك الفيزيائي ] --
+rs.Stepped:Connect(function()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        local hum = player.Character.Humanoid
+        if sOn then hum.WalkSpeed = 30 else hum.WalkSpeed = 16 end
+        if jOn then hum.JumpPower = 115 else hum.JumpPower = 50 end
+        if nOn then
+            for _, v in pairs(player.Character:GetDescendants()) do
+                if v:IsA("BasePart") then v.CanCollide = false end
+            end
+        end
+    end
+end)
+
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = isAr and "تم النسخ!" or "Copied!" end)
+hideB.MouseButton1Click:Connect(function() main.Visible = false end)
