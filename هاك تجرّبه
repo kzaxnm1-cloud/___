@@ -2,11 +2,11 @@ local player = game:GetService("Players").LocalPlayer
 local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
--- تنظيف النسخ القديمة
-if cg:FindFirstChild("NXT_V1_ULTIMATE") then cg.NXT_V1_ULTIMATE:Destroy() end
+-- تنظيف السكربت القديم
+if cg:FindFirstChild("NXT_V1_CRASHOUT") then cg.NXT_V1_CRASHOUT:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_V1_ULTIMATE"
+sg.Name = "NXT_V1_CRASHOUT"
 sg.ResetOnSpawn = false
 
 -- [ 1. شاشة الترحيب واللغة ] --
@@ -32,30 +32,19 @@ local function makeBtn(t, y, parent)
     local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 18; b.Text = t; Instance.new("UICorner", b); return b
 end
 
-local speedB = makeBtn("Auto Potion: OFF", 80, main)
-local jumpB = makeBtn("High Jump: OFF", 135, main)
+local speedB = makeBtn("Auto Buy Drink: OFF", 80, main)
+local jumpB = makeBtn("Nxt Jump: OFF", 135, main)
 local discB = makeBtn("Discord", 190, main)
 local hideB = makeBtn("Hide Menu", 380, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
 local notice = Instance.new("TextLabel", sg)
 notice.Size = UDim2.new(1, 0, 0.05, 0); notice.Position = UDim2.new(0, 0, 0.85, 0); notice.BackgroundTransparency = 1; notice.TextColor3 = Color3.new(1, 1, 1); notice.TextSize = 22; notice.Text = ""; notice.Visible = false; notice.ZIndex = 1000
 
--- [ 3. وظيفة جلب الفلوس ] --
-local function getMoney()
-    local m = 0
-    local stats = player:FindFirstChild("leaderstats") or player:FindFirstChild("Data")
-    if stats then
-        for _, v in pairs(stats:GetChildren()) do
-            if v:IsA("NumberValue") or v:IsA("IntValue") then m = v.Value break end
-        end
-    end
-    -- إذا ما لقى بالليدر بورد يشيك في اللاعب نفسه
-    if m == 0 then
-        for _, v in pairs(player:GetChildren()) do
-            if string.find(v.Name:lower(), "cash") or string.find(v.Name:lower(), "money") then m = v.Value break end
-        end
-    end
-    return m
+-- [ 3. فحص الفلوس في كراشوت ] --
+local function getCrashoutMoney()
+    local cash = player:FindFirstChild("Cash") or player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Cash") or player:FindFirstChild("Money")
+    if cash then return cash.Value end
+    return 0
 end
 
 -- [ 4. منطق التشغيل ] --
@@ -70,27 +59,31 @@ end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    speedB.Text = "قلتش المشروب: قفل"; jumpB.Text = "نطة عالية: قفل"; hideB.Text = "إخفاء القائمة"
+    speedB.Text = "شراء المشروب تلقائياً: قفل"; jumpB.Text = "نطة NXT: قفل"; hideB.Text = "إخفاء القائمة"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
 speedB.MouseButton1Click:Connect(function()
-    local currentMoney = getMoney()
+    local cash = getCrashoutMoney()
     
-    if currentMoney >= 250 and currentMoney <= 100000 then
+    if cash >= 250 then
         sOn = not sOn
         if sOn then
-            speedB.Text = isAr and "قلتش المشروب: تشغيل" or "Auto Potion: ON"
-            notice.Text = isAr and "تم تفعيل القلتش وسحب 250" or "Glitch Active! 250 Deducted"
+            -- أمر الشراء لماب كراشوت (يحاول شراء المشروب البنفسجي)
+            pcall(function()
+                game:GetService("ReplicatedStorage").Events.Purchase:FireServer("Purple Drink")
+            end)
+            speedB.Text = isAr and "شراء المشروب: تشغيل" or "Auto Buy: ON"
+            notice.Text = isAr and "تم شراء المشروب وتفعيل القلتش" or "Drink Bought & Glitch Active"
             notice.TextColor3 = Color3.new(0, 1, 0)
         else
-            speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Potion: OFF"
+            speedB.Text = isAr and "شراء المشروب: قفل" or "Auto Buy: OFF"
             notice.Text = ""
         end
     else
         sOn = false
-        speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Potion: OFF"
-        notice.Text = isAr and "رصيدك غير كافي (مسموح من 250 إلى 100ألف)" or "Balance Out of Range (250 - 100k)"
+        speedB.Text = isAr and "شراء المشروب: قفل" or "Auto Buy: OFF"
+        notice.Text = isAr and "رصيدك غير كافي (تحتاج 250)" or "Not enough Cash (250 required)"
         notice.TextColor3 = Color3.new(1, 0, 0)
     end
     notice.Visible = true; task.wait(3); notice.Visible = false
@@ -105,7 +98,7 @@ rs.RenderStepped:Connect(function()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         local hum = player.Character.Humanoid
         if sOn then
-            hum.WalkSpeed = 30 -- سرعة آمنة جداً ومستقرة
+            hum.WalkSpeed = 30 -- سرعة آمنة ومستقرة
         else
             hum.WalkSpeed = 16
         end
