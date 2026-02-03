@@ -4,46 +4,47 @@ local rs = game:GetService("RunService")
 local vu = game:GetService("VirtualUser")
 
 -- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_FINAL_YELLOW") then cg.NX2_FINAL_YELLOW:Destroy() end
+if cg:FindFirstChild("NX2_ULTIMATE_V1") then cg.NX2_ULTIMATE_V1:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_FINAL_YELLOW"
+sg.Name = "NX2_ULTIMATE_V1"
 sg.ResetOnSpawn = false
 
--- [ 1. شاشة الدخول ] --
+-- [ 1. شاشة الدخول الفخمة بالصورة ] --
 local loaderFrame = Instance.new("Frame", sg)
 loaderFrame.Size = UDim2.new(1, 0, 1, 0)
-loaderFrame.BackgroundColor3 = Color3.new(0, 0, 0)
 loaderFrame.BackgroundTransparency = 0.5
+loaderFrame.BackgroundColor3 = Color3.new(0, 0, 0)
 loaderFrame.ZIndex = 100
 
-local loaderMain = Instance.new("Frame", loaderFrame)
-loaderMain.Size = UDim2.new(0, 280, 0, 200)
-loaderMain.Position = UDim2.new(0.5, -140, 0.5, -100)
-loaderMain.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+local loaderMain = Instance.new("ImageLabel", loaderFrame)
+loaderMain.Size = UDim2.new(0, 300, 0, 320)
+loaderMain.Position = UDim2.new(0.5, -150, 0.5, -160)
+loaderMain.Image = "rbxassetid://18911065261" -- صورتك
+loaderMain.ScaleType = Enum.ScaleType.Stretch
 Instance.new("UICorner", loaderMain)
 
 local title = Instance.new("TextLabel", loaderMain)
-title.Size = UDim2.new(1, 0, 0.5, 0)
+title.Size = UDim2.new(1, 0, 0.4, 0)
 title.Text = "NX2 v1 !"
-title.TextColor3 = Color3.new(1, 1, 0) -- أصفر
-title.TextSize = 35
+title.TextColor3 = Color3.fromRGB(255, 255, 0) -- أصفر
+title.TextSize = 40
 title.Font = Enum.Font.SourceSansBold
 title.BackgroundTransparency = 1
 
 local startBtn = Instance.new("TextButton", loaderMain)
-startBtn.Size = UDim2.new(0.8, 0, 0, 50)
-startBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+startBtn.Size = UDim2.new(0.8, 0, 0, 55)
+startBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 startBtn.Text = "START"
 startBtn.TextColor3 = Color3.new(1, 1, 1)
-startBtn.TextSize = 24
+startBtn.TextSize = 28
 Instance.new("UICorner", startBtn)
 
--- [ 2. المنيو الرئيسي ] --
+-- [ 2. المنيو الرئيسي (القديم الفخم) ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 250, 0, 420)
-main.Position = UDim2.new(0.5, -125, 0.5, -210)
+main.Size = UDim2.new(0, 250, 0, 430)
+main.Position = UDim2.new(0.5, -125, 0.5, -215)
 main.BackgroundColor3 = Color3.new(0, 0, 0)
 main.BackgroundTransparency = 0.2
 main.Visible = false
@@ -51,9 +52,10 @@ main.Active = true
 main.Draggable = true
 Instance.new("UICorner", main)
 local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.new(1, 0, 0)
+stroke.Color = Color3.new(1, 0, 0) -- حواف حمراء
 stroke.Thickness = 2
 
+-- زر الإخفاء (_)
 local hideBtn = Instance.new("TextButton", main)
 hideBtn.Size = UDim2.new(0, 30, 0, 30)
 hideBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -61,45 +63,51 @@ hideBtn.Text = "_"
 hideBtn.TextColor3 = Color3.new(1, 1, 1)
 hideBtn.BackgroundTransparency = 1
 
--- [ 3. الدائرة السوداء الجديدة ] --
+-- الأيقونة الدائرية (سودة + NX2 أصفر)
 local mini = Instance.new("TextButton", sg)
-mini.Size = UDim2.new(0, 65, 0, 65)
-mini.Position = UDim2.new(0.9, -10, 0.1, 0)
+mini.Size = UDim2.new(0, 70, 0, 70)
+mini.Position = UDim2.new(0.9, -15, 0.1, 0)
 mini.Visible = false
-mini.BackgroundColor3 = Color3.new(0, 0, 0) -- سودة
+mini.BackgroundColor3 = Color3.new(0, 0, 0)
 mini.Text = "NX2"
-mini.TextColor3 = Color3.new(1, 1, 0) -- الاسم بلون أصفر
-mini.TextSize = 20
+mini.TextColor3 = Color3.new(1, 1, 0)
+mini.TextSize = 22
 mini.Font = Enum.Font.SourceSansBold
 mini.Draggable = true
 Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
 local mStroke = Instance.new("UIStroke", mini)
-mStroke.Color = Color3.new(1, 0, 0) -- حواف حمراء عشان التناسق
+mStroke.Color = Color3.new(1, 0, 0)
 
 -- وظيفة صنع الأزرار
 local function createBtn(t, y, c)
     local b = Instance.new("TextButton", main)
     b.Size = UDim2.new(0.9, 0, 0, 40)
     b.Position = UDim2.new(0.05, 0, 0, y)
-    b.BackgroundColor3 = c or Color3.fromRGB(45, 45, 45)
+    b.BackgroundColor3 = c or Color3.fromRGB(35, 35, 35)
     b.TextColor3 = Color3.new(1, 1, 1)
     b.Text = t
     b.Font = Enum.Font.SourceSansBold
+    b.TextSize = 17
     Instance.new("UICorner", b)
     return b
 end
 
+-- الأوامر (كلها OFF في البداية)
 local collectBtn = createBtn("Auto Collect: OFF", 70, Color3.fromRGB(0, 100, 0))
-local afkBtn = createBtn("AFK Mode: OFF", 125)
-local noclipBtn = createBtn("Noclip: OFF", 180)
-local zoomBtn = createBtn("Infinite Zoom: OFF", 235)
-local discordBtn = createBtn("Join Discord", 290, Color3.fromRGB(88, 101, 242))
-local cleanBtn = createBtn("Clean Up UI", 365, Color3.fromRGB(150, 0, 0))
+local noclipBtn = createBtn("Noclip: OFF", 125)
+local afkBtn = createBtn("AFK Mode: OFF", 180)
+local zoomBtn = createBtn("Max Zoom: OFF", 235)
+local discordBtn = createBtn("Discord", 290, Color3.fromRGB(88, 101, 242))
+local cleanBtn = createBtn("Clean Up", 370, Color3.fromRGB(150, 0, 0))
 
--- [ 4. البرمجة ] --
+-- [ 3. البرمجة والوظائف ] --
+
 startBtn.MouseButton1Click:Connect(function()
-    startBtn.Text = "Loading..."
-    task.wait(3.5)
+    startBtn.Active = false
+    for i = 1, 10 do
+        startBtn.Text = "Loading" .. string.rep(".", i % 4)
+        task.wait(0.35)
+    end
     loaderFrame:Destroy()
     main.Visible = true
 end)
@@ -107,24 +115,42 @@ end)
 hideBtn.MouseButton1Click:Connect(function() main.Visible = false; mini.Visible = true end)
 mini.MouseButton1Click:Connect(function() main.Visible = true; mini.Visible = false end)
 
--- Auto Collect
+-- نظام تجميع الأغراض (Auto Collect) - بضغطة وحدة
 local autoCollect = false
 collectBtn.MouseButton1Click:Connect(function()
     autoCollect = not autoCollect
     collectBtn.Text = autoCollect and "Auto Collect: ON" or "Auto Collect: OFF"
+    collectBtn.TextColor3 = autoCollect and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
+    
     task.spawn(function()
         while autoCollect do
             pcall(function()
                 for _, v in pairs(game.Workspace:GetDescendants()) do
-                    if autoCollect and (v.Name == "Coin" or v.Name == "Part") and v:FindFirstChild("TouchInterest") then
+                    if autoCollect and v:IsA("BasePart") and (v.Name:find("Coin") or v.Name:find("Money") or v.Name:find("Part")) and v:FindFirstChild("TouchInterest") then
                         firetouchinterest(player.Character.HumanoidRootPart, v, 0)
                         firetouchinterest(player.Character.HumanoidRootPart, v, 1)
                     end
                 end
             end)
-            task.wait(0.3)
+            task.wait(0.2)
         end
     end)
+end)
+
+-- اختراق (Noclip)
+local nOn = false
+noclipBtn.MouseButton1Click:Connect(function()
+    nOn = not nOn
+    noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF"
+    noclipBtn.TextColor3 = nOn and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
+end)
+
+rs.Stepped:Connect(function()
+    if nOn and player.Character then
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
+        end
+    end
 end)
 
 -- AFK Mode
@@ -137,18 +163,12 @@ player.Idled:Connect(function()
     if afkOn then vu:Button2Down(Vector2.new(), workspace.CurrentCamera.CFrame); task.wait(1); vu:Button2Up(Vector2.new(), workspace.CurrentCamera.CFrame) end
 end)
 
--- Noclip
-local nOn = false
-noclipBtn.MouseButton1Click:Connect(function() nOn = not nOn; noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF" end)
-rs.Stepped:Connect(function()
-    if nOn and player.Character then
-        for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
-    end
-end)
-
+-- Zoom (Max Zoom 10,000)
+local zOn = false
 zoomBtn.MouseButton1Click:Connect(function()
-    player.CameraMaxZoomDistance = (player.CameraMaxZoomDistance == 70) and 500 or 70
-    zoomBtn.Text = (player.CameraMaxZoomDistance == 500) and "Infinite Zoom: ON" or "Infinite Zoom: OFF"
+    zOn = not zOn
+    player.CameraMaxZoomDistance = zOn and 10000 or 70
+    zoomBtn.Text = zOn and "Max Zoom: ON" or "Max Zoom: OFF"
 end)
 
 discordBtn.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
