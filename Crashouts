@@ -3,34 +3,67 @@ local mouse = player:GetMouse()
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.ResetOnSpawn = false
 
--- إعدادات
-local aimbotEnabled = false
-local noclipEnabled = false
-local espEnabled = false
-local lockFovCenter = false -- خيار تثبيت الدائرة
-local fovRadius = 100
-local speedActive = false
+-- إعدادات الحالة
+local aimbotEnabled, noclipEnabled, espEnabled, speedActive = false, false, false, false
+local fovRadius, jumpPower = 100, 3.5
 
--- [ القائمة الرئيسية ] --
+-- [ 1. واجهة التحميل الذكية ] --
+local startFrame = Instance.new("Frame", screenGui)
+startFrame.Size = UDim2.new(0, 220, 0, 150)
+startFrame.Position = UDim2.new(0.5, -110, 0.4, -75)
+startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Instance.new("UICorner", startFrame)
+
+local nameLabel = Instance.new("TextLabel", startFrame)
+nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+nameLabel.Text = "NX2"
+nameLabel.TextColor3 = Color3.fromRGB(255, 255, 0) -- أصفر
+nameLabel.TextSize = 30
+nameLabel.Font = Enum.Font.SourceSansBold
+nameLabel.BackgroundTransparency = 1
+
+local startBtn = Instance.new("TextButton", startFrame)
+startBtn.Size = UDim2.new(0.8, 0, 0.3, 0)
+startBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0) -- أخضر
+startBtn.Text = "START"
+startBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", startBtn)
+
+-- [ 2. شريط التعليق العلوي (عند الإخفاء) ] --
+local topBar = Instance.new("Frame", screenGui)
+topBar.Size = UDim2.size(0, 120, 0, 30)
+topBar.Position = UDim2.new(0.5, -60, 0, 10)
+topBar.BackgroundColor3 = Color3.new(0,0,0)
+topBar.Visible = false
+Instance.new("UICorner", topBar)
+
+local barLabel = Instance.new("TextLabel", topBar)
+barLabel.Size = UDim2.new(1, 0, 1, 0)
+barLabel.Text = "NX2"
+barLabel.TextColor3 = Color3.new(1, 1, 0)
+barLabel.BackgroundTransparency = 1
+
+local barBtn = Instance.new("TextButton", topBar)
+barBtn.Size = UDim2.new(1, 0, 1, 0)
+barBtn.BackgroundTransparency = 1
+barBtn.Text = ""
+
+-- [ 3. القائمة الرئيسية ] --
 local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 380, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -190, 0.5, -150)
+mainFrame.Size = UDim2.new(0, 350, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-mainFrame.Active = true
+mainFrame.Visible = false
 mainFrame.Draggable = true
 Instance.new("UICorner", mainFrame)
 Instance.new("UIStroke", mainFrame).Color = Color3.fromRGB(0, 170, 255)
 
--- الشعار العلوي
-local logoLabel = Instance.new("TextLabel", mainFrame)
-logoLabel.Size = UDim2.new(1, 0, 0, 30)
-logoLabel.Text = "NX2 v1 - PREMIUM"
-logoLabel.TextColor3 = Color3.fromRGB(0, 170, 255)
-logoLabel.Font = Enum.Font.SourceSansBold
-logoLabel.TextSize = 18
-logoLabel.BackgroundTransparency = 1
+-- تبديل الصفحات (لعب / شخصية)
+local tabFrame = Instance.new("Frame", mainFrame)
+tabFrame.Size = UDim2.new(1, 0, 0, 40)
+tabFrame.BackgroundTransparency = 1
 
--- التبويبات
 local gamePage = Instance.new("Frame", mainFrame)
 gamePage.Size = UDim2.new(1, 0, 1, -40)
 gamePage.Position = UDim2.new(0, 0, 0, 40)
@@ -42,139 +75,116 @@ charPage.Position = UDim2.new(0, 0, 0, 40)
 charPage.BackgroundTransparency = 1
 charPage.Visible = false
 
--- أزرار التبديل
-local btnGame = Instance.new("TextButton", mainFrame)
-btnGame.Size = UDim2.new(0.5, 0, 0, 30)
-btnGame.Position = UDim2.new(0, 0, 0, 30)
-btnGame.Text = "اللعب"
-btnGame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-btnGame.TextColor3 = Color3.new(1,1,1)
+-- أزرار التبويب
+local function createTab(txt, xPos)
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(0.5, 0, 1, 0)
+    btn.Position = UDim2.new(xPos, 0, 0, 0)
+    btn.Text = txt
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    return btn
+end
+local t1 = createTab("اللعب", 0)
+local t2 = createTab("الشخصية", 0.5)
 
-local btnChar = Instance.new("TextButton", mainFrame)
-btnChar.Size = UDim2.new(0.5, 0, 0, 30)
-btnChar.Position = UDim2.new(0.5, 0, 0, 30)
-btnChar.Text = "الشخصية"
-btnChar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-btnChar.TextColor3 = Color3.new(1,1,1)
+t1.MouseButton1Click:Connect(function() gamePage.Visible = true; charPage.Visible = false end)
+t2.MouseButton1Click:Connect(function() gamePage.Visible = false; charPage.Visible = true end)
 
-btnGame.MouseButton1Click:Connect(function() gamePage.Visible = true; charPage.Visible = false end)
-btnChar.MouseButton1Click:Connect(function() gamePage.Visible = false; charPage.Visible = true end)
+-- [ محتوى الأزرار ] --
+local function quickBtn(txt, pos, parent)
+    local b = Instance.new("TextButton", parent)
+    b.Size = UDim2.new(0.9, 0, 0, 35)
+    b.Position = pos
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    b.TextColor3 = Color3.new(1,1,1)
+    b.Text = txt
+    Instance.new("UICorner", b)
+    return b
+end
 
--- [ محتوى اللعب ] --
-local aimBtn = Instance.new("TextButton", gamePage)
-aimBtn.Size = UDim2.new(0.9, 0, 0, 30)
-aimBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
-aimBtn.Text = "Aimbot: OFF"
-aimBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+-- صفحة اللعب
+local aimBtn = quickBtn("Aimbot: OFF", UDim2.new(0.05, 0, 0.05, 0), gamePage)
+local espBtn = quickBtn("ESP: OFF", UDim2.new(0.05, 0, 0.18, 0), gamePage)
+local fovInp = Instance.new("TextBox", gamePage)
+fovInp.Size = UDim2.new(0.9, 0, 0, 35)
+fovInp.Position = UDim2.new(0.05, 0, 0.31, 0)
+fovInp.PlaceholderText = "حجم الدائرة"
+fovInp.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+Instance.new("UICorner", fovInp)
 
-local lockFovBtn = Instance.new("TextButton", gamePage)
-lockFovBtn.Size = UDim2.new(0.9, 0, 0, 30)
-lockFovBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
-lockFovBtn.Text = "تثبيت الدائرة بالمنتصف: OFF"
+-- صفحة الشخصية
+local speedBtn = quickBtn("Speed: 5 (OFF)", UDim2.new(0.05, 0, 0.05, 0), charPage)
+local jumpBtn = quickBtn("Jump: 3.5 (OFF)", UDim2.new(0.05, 0, 0.18, 0), charPage)
+local noclipBtn = quickBtn("Noclip: OFF", UDim2.new(0.05, 0, 0.31, 0), charPage)
+local zoomBtn = quickBtn("Zoom: OFF", UDim2.new(0.05, 0, 0.44, 0), charPage)
+local hideBtn = quickBtn("إخفاء القائمة", UDim2.new(0.05, 0, 0.6, 0), charPage)
+local discBtn = quickBtn("نسخ ديسكورد", UDim2.new(0.05, 0, 0.73, 0), charPage)
 
-local fovInput = Instance.new("TextBox", gamePage)
-fovInput.Size = UDim2.new(0.9, 0, 0, 30)
-fovInput.Position = UDim2.new(0.05, 0, 0.35, 0)
-fovInput.PlaceholderText = "حجم الدائرة"
-fovInput.BackgroundColor3 = Color3.fromRGB(0, 100, 0) -- لون أخضر
-
--- [ محتوى الشخصية ] --
-local noclipBtn = Instance.new("TextButton", charPage)
-noclipBtn.Size = UDim2.new(0.9, 0, 0, 30)
-noclipBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
-noclipBtn.Text = "Noclip (اختراق): OFF"
-
-local speedBtn = Instance.new("TextButton", charPage)
-speedBtn.Size = UDim2.new(0.9, 0, 0, 30)
-speedBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
-speedBtn.Text = "Speed: 5 (OFF)"
-
--- [ زر النار الأسود NX2 ] --
-local fireBtn = Instance.new("TextButton", screenGui)
-fireBtn.Size = UDim2.new(0, 70, 0, 70)
-fireBtn.Position = UDim2.new(0.8, 0, 0.7, 0)
-fireBtn.BackgroundColor3 = Color3.new(0,0,0)
-fireBtn.Text = "FIRE\nNX2"
-fireBtn.TextColor3 = Color3.new(1,1,1)
-fireBtn.Font = Enum.Font.SourceSansBold
-fireBtn.Visible = false
-Instance.new("UICorner", fireBtn).CornerRadius = UDim.new(1, 0)
-
--- [ برمجة السرعة الثابتة ] --
-speedBtn.MouseButton1Click:Connect(function()
-    speedActive = not speedActive
-    speedBtn.Text = speedActive and "Speed: 5 (ON)" or "Speed: 5 (OFF)"
-    speedBtn.BackgroundColor3 = speedActive and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(40, 40, 40)
+-- [ أنيميشن التشغيل ] --
+startBtn.MouseButton1Click:Connect(function()
+    startBtn.Text = "START."
+    task.wait(0.5)
+    startBtn.Text = "START.."
+    task.wait(0.5)
+    startBtn.Text = "START..."
+    task.wait(0.5)
+    startFrame.Visible = false
+    mainFrame.Visible = true
 end)
 
-game:GetService("RunService").Heartbeat:Connect(function()
-    if speedActive and player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.WalkSpeed = 50 -- سرعة 5 بمقياس روبلوكس
-    end
+-- [ نظام الإخفاء والتعليق ] --
+hideBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    topBar.Visible = true
 end)
 
--- [ الأيم بوت والدائرة ] --
+barBtn.MouseButton1Click:Connect(function()
+    topBar.Visible = false
+    mainFrame.Visible = true
+end)
+
+-- [ دائرة الأيم بوت الشفافة ] --
 local fovCircle = Drawing.new("Circle")
 fovCircle.Thickness = 1
 fovCircle.Color = Color3.new(1, 1, 1)
+fovCircle.Transparency = 0.5 -- شفافة
 fovCircle.Visible = false
 
 aimBtn.MouseButton1Click:Connect(function()
     aimbotEnabled = not aimbotEnabled
     fovCircle.Visible = aimbotEnabled
-    fireBtn.Visible = aimbotEnabled
     aimBtn.Text = aimbotEnabled and "Aimbot: ON" or "Aimbot: OFF"
 end)
 
-lockFovBtn.MouseButton1Click:Connect(function()
-    lockFovCenter = not lockFovCenter
-    lockFovBtn.Text = lockFovCenter and "تثبيت الدائرة: ON" or "تثبيت الدائرة: OFF"
-end)
-
-fovInput.FocusLost:Connect(function() fovRadius = tonumber(fovInput.Text) or 100 end)
-
-local targetPlayer = nil
 game:GetService("RunService").RenderStepped:Connect(function()
+    fovCircle.Position = Vector2.new(mouse.X, mouse.Y + 36)
     fovCircle.Radius = fovRadius
-    if lockFovCenter then
-        fovCircle.Position = workspace.CurrentCamera.ViewportSize / 2
-    else
-        fovCircle.Position = Vector2.new(mouse.X, mouse.Y + 36)
-    end
-    
-    -- البحث عن هدف
-    local minDist = fovRadius
-    targetPlayer = nil
-    for _, p in pairs(game.Players:GetPlayers()) do
-        if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-            local pos, vis = workspace.CurrentCamera:WorldToViewportPoint(p.Character.HumanoidRootPart.Position)
-            local mag = (Vector2.new(pos.X, pos.Y) - fovCircle.Position).Magnitude
-            if mag < minDist and vis then
-                minDist = mag
-                targetPlayer = p.Character
-            end
-        end
-    end
 end)
 
--- [ ضرب النار بدون صوت ] --
-fireBtn.MouseButton1Click:Connect(function()
-    if targetPlayer and targetPlayer:FindFirstChild("Humanoid") then
-        -- محاكاة ضربة (Damage) بدون صوت إذا كان السكربت يملك صلاحية أو إطلاق وهمي
-        print("NX2 Shooting at: " .. targetPlayer.Name)
-        -- هنا يمكنك إضافة كود الريموت الخاص باللعبة لإحداث ضرر حقيقي
+-- [ السرعة والنطة ] --
+speedBtn.MouseButton1Click:Connect(function()
+    speedActive = not speedActive
+    speedBtn.Text = speedActive and "Speed: 5 (ON)" or "Speed: 5 (OFF)"
+end)
+
+local jumpActive = false
+jumpBtn.MouseButton1Click:Connect(function()
+    jumpActive = not jumpActive
+    jumpBtn.Text = jumpActive and "Jump: 3.5 (ON)" or "Jump: 3.5 (OFF)"
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        if speedActive then player.Character.Humanoid.WalkSpeed = 50 end
+        if jumpActive then player.Character.Humanoid.JumpPower = 100 end -- قوة 3.5
     end
 end)
 
--- [ الاختراق - يطفي عند الموت ] --
-player.CharacterAdded:Connect(function()
-    noclipEnabled = false
-    noclipBtn.Text = "Noclip (اختراق): OFF"
-end)
-
+-- [ الاختراق والديسكورد ] --
 noclipBtn.MouseButton1Click:Connect(function()
     noclipEnabled = not noclipEnabled
-    noclipBtn.Text = noclipEnabled and "Noclip (اختراق): ON" or "Noclip (اختراق): OFF"
+    noclipBtn.Text = noclipEnabled and "Noclip: ON" or "Noclip: OFF"
 end)
 
 game:GetService("RunService").Stepped:Connect(function()
@@ -183,4 +193,11 @@ game:GetService("RunService").Stepped:Connect(function()
             if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
+end)
+
+discBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/syPpUv8Jf")
+    discBtn.Text = "تم النسخ!"
+    task.wait(2)
+    discBtn.Text = "نسخ ديسكورد"
 end)
