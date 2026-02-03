@@ -1,4 +1,7 @@
--- NX2 — تعديل نهائي: شريط علوي أصفر، زر شيل القائمة فوق السكربت، عنوان NX2 فوق START، تحميل 1.5s، واجهة غير قابلة للسحب، دوائر الأيم قابلة للسحب، ESP أخضر، وخط أيم أحمر عند الاستهداف
+-- NX2 — نسخة مُحدّثة: شاشة افتتاحية بنيّة مع كتابة بطيئة "Welcome is script NX2" لمدة ~2s
+-- ثم يظهر زر START. عند الضغط يبدأ تحميل (1.5s) ثم تُعرض واجهة الأوامر.
+-- الأوامر موجودة (Aimbot، دوائر FIRE، ESP، Noclip، الخ) و Speed/Jump تُفعّل تلقائياً بقيم
+-- WalkSpeed = 5.5 و JumpPower = 7 (تطبّق على الشخصية الحالية وعلى إعادة التوليد).
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
@@ -6,30 +9,27 @@ local Camera = workspace.CurrentCamera
 
 local player = Players.LocalPlayer
 
--- حماية بسيطة فقط للعرض
-if not getgenv then
-    print("NX2: Protection Active")
-end
-
--- إزالة أي واجهة قديمة
+-- تنظيف أي واجهة قديمة
 if CoreGui:FindFirstChild("NX2_Carshoot") then
-    CoreGui.NX2_Carshoot:Destroy()
+    pcall(function() CoreGui.NX2_Carshoot:Destroy() end)
 end
 
--- إنشاء الـ ScreenGui
+-- إنشاء ScreenGui
 local sg = Instance.new("ScreenGui", CoreGui)
 sg.Name = "NX2_Carshoot"
 sg.ResetOnSpawn = false
 sg.DisplayOrder = 9999
 
--- حالات / اتصالات للحذف لاحقاً
+-- حالات واشتباكات للتنظيف لاحقاً
 local connections = {}
-local espGuis = {} -- map player -> BillboardGui
+local espGuis = {}
+local drawAvailable, aimLine = false, nil
 
--- حالات التحكم
-local sOn, jOn, nOn = false, false, false
+-- خيارات افتراضية قابلة للتعديل
+local AUTO_WALKSPEED = 5.5
+local AUTO_JUMPPOWER = 7
 
--- حفظ القيم الافتراضية (لإعادتها عند التنظيف)
+-- تخزين القيم الافتراضية لإعادتها عند التنظيف
 local defaultWalkSpeed = 16
 local defaultJumpPower = 50
 local function cacheDefaults()
@@ -45,133 +45,141 @@ local function cacheDefaults()
 end
 cacheDefaults()
 
--- ---------------- شريط علوي ثابت (يظهر دائماً) ----------------
-local topBar = Instance.new("Frame", sg)
-topBar.Name = "NX2_TopBar"
-topBar.Size = UDim2.new(1, 0, 0, 34)
-topBar.Position = UDim2.new(0, 0, 0, 0)
-topBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-topBar.ZIndex = 10000
-topBar.BorderSizePixel = 0
+-- حالات التحكم
+local sOn, jOn, nOn = false, false, false
 
-local topLabel = Instance.new("TextLabel", topBar)
-topLabel.Name = "Label"
-topLabel.Size = UDim2.new(0, 120, 1, 0)
-topLabel.Position = UDim2.new(0, 8, 0, 0)
-topLabel.BackgroundTransparency = 1
-topLabel.Text = "NX2"
-topLabel.TextColor3 = Color3.fromRGB(255, 255, 0) -- صفراء كما طلبت
-topLabel.TextScaled = true
-topLabel.Font = Enum.Font.SourceSansBold
-topLabel.TextXAlignment = Enum.TextXAlignment.Left
-topLabel.ZIndex = 10001
-
--- زر شيل القائمة (يوجد فوق السكربت بجانب NX2)
-local topRemoveBtn = Instance.new("TextButton", topBar)
-topRemoveBtn.Name = "TopRemove"
-topRemoveBtn.Size = UDim2.new(0, 110, 1, 0)
-topRemoveBtn.Position = UDim2.new(0, 140, 0, 0)
-topRemoveBtn.Text = "شيل القائمة"
-topRemoveBtn.TextColor3 = Color3.fromRGB(255,255,255)
-topRemoveBtn.BackgroundTransparency = 1
-topRemoveBtn.Font = Enum.Font.SourceSans
-topRemoveBtn.TextSize = 16
-topRemoveBtn.ZIndex = 10002
-
--- زر إظهار/إخفاء الواجهة على الشريط (محفوظ)
-local toggleBtn = Instance.new("TextButton", topBar)
-toggleBtn.Name = "Toggle"
-toggleBtn.Size = UDim2.new(0, 60, 1, 0)
-toggleBtn.Position = UDim2.new(1, -60, 0, 0)
-toggleBtn.Text = "فتح"
-toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
-toggleBtn.BackgroundTransparency = 1
-toggleBtn.Font = Enum.Font.SourceSans
-toggleBtn.TextSize = 18
-toggleBtn.ZIndex = 10002
-
--- زر خروج نهائي
-local closeBtn = Instance.new("TextButton", topBar)
-closeBtn.Name = "Close"
-closeBtn.Size = UDim2.new(0, 60, 1, 0)
-closeBtn.Position = UDim2.new(1, -140, 0, 0)
-closeBtn.Text = "خروج"
-closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-closeBtn.BackgroundTransparency = 1
-closeBtn.Font = Enum.Font.SourceSans
-closeBtn.TextSize = 18
-closeBtn.ZIndex = 10002
-
--- --------- لافتة بداية NX2 تظهر لبضع ثواني ---------
+-- ------------ شاشة البداية البنية + كتابة بطيئة ------------
 local splash = Instance.new("Frame", sg)
-splash.Name = "Splash"
-splash.Size = UDim2.new(0, 360, 0, 120)
-splash.Position = UDim2.new(0.5, -180, 0.15, 0)
-splash.BackgroundColor3 = Color3.fromRGB(0,0,0)
-splash.ZIndex = 10005
-splash.AnchorPoint = Vector2.new(0.5, 0)
-Instance.new("UICorner", splash)
-local sLabel = Instance.new("TextLabel", splash)
-sLabel.Size = UDim2.new(1,0,1,0)
-sLabel.BackgroundTransparency = 1
-sLabel.Text = "NX2"
-sLabel.TextColor3 = Color3.fromRGB(0,255,127)
-sLabel.Font = Enum.Font.SourceSansBold
-sLabel.TextScaled = true
-sLabel.ZIndex = 10006
+splash.Name = "FullSplash"
+splash.Size = UDim2.new(1, 0, 1, 0) -- تغطي الشاشة كاملة
+splash.Position = UDim2.new(0, 0, 0, 0)
+splash.BackgroundColor3 = Color3.fromRGB(95, 57, 30) -- بني
+splash.ZIndex = 20000
+
+-- لوحة النص (ليس بالمنتصف تماماً كما طلبت: موقعها أعلى قليلاً ومائل لليسار)
+local splashText = Instance.new("TextLabel", splash)
+splashText.Size = UDim2.new(0.8, 0, 0, 60)
+splashText.Position = UDim2.new(0.1, 0, 0.28, 0) -- ليست في المنتصف تماماً
+splashText.BackgroundTransparency = 1
+splashText.Text = ""
+splashText.TextColor3 = Color3.fromRGB(255, 255, 255)
+splashText.Font = Enum.Font.SourceSansBold
+splashText.TextSize = 30
+splashText.TextXAlignment = Enum.TextXAlignment.Left
+splashText.ZIndex = 20001
+
+-- كتابة بطيئة (typewriter). نريد أن تستغرِق تقريباً 2 ثانية كاملة.
+local welcome = "Welcome is script NX2"
+local totalTime = 2
+local interval = totalTime / math.max(1, #welcome)
 
 task.spawn(function()
-    task.wait(2)
+    -- اكتب حرفًا حرفًا
+    for i = 1, #welcome do
+        splashText.Text = string.sub(welcome, 1, i)
+        task.wait(interval)
+    end
+    -- بعد انتهاء الكتابة انتظر قليلًا ثم امحُ الشاشة القديمة (ننتقل إلى شاشة START)
+    task.wait(0.2)
     if splash and splash.Parent then
         pcall(function() splash:Destroy() end)
     end
 end)
 
--- --------- واجهة START (مع عنوان NX2 فوق START باللون الأصفر) ---------
+-- ------------ واجهة START (مركزيّة) ------------
 local startFrame = Instance.new("Frame", sg)
 startFrame.Name = "StartFrame"
-startFrame.Size = UDim2.new(0, 300, 0, 180)
-startFrame.Position = UDim2.new(0.5, -150, 0.45, -90)
+startFrame.Size = UDim2.new(0, 320, 0, 160)
+startFrame.Position = UDim2.new(0.5, -160, 0.45, -80)
 startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-startFrame.ZIndex = 900
+startFrame.ZIndex = 19000
 Instance.new("UICorner", startFrame)
-local stroke = Instance.new("UIStroke", startFrame)
-stroke.Color = Color3.fromRGB(0, 170, 255)
+local startStroke = Instance.new("UIStroke", startFrame)
+startStroke.Color = Color3.fromRGB(0, 170, 255)
 
--- عنوان NX2 فوق زر START
 local startTitle = Instance.new("TextLabel", startFrame)
-startTitle.Size = UDim2.new(1, 0, 0, 40)
+startTitle.Size = UDim2.new(1, 0, 0, 48)
 startTitle.Position = UDim2.new(0, 0, 0, 8)
 startTitle.BackgroundTransparency = 1
 startTitle.Text = "NX2"
-startTitle.TextColor3 = Color3.fromRGB(255, 255, 0) -- أصفر
+startTitle.TextColor3 = Color3.fromRGB(255, 255, 0)
 startTitle.Font = Enum.Font.SourceSansBold
 startTitle.TextScaled = true
-startTitle.ZIndex = 902
+startTitle.ZIndex = 19001
 
 local sBtn = Instance.new("TextButton", startFrame)
-sBtn.Size = UDim2.new(0.6, 0, 0, 50)
-sBtn.Position = UDim2.new(0.2, 0, 0.45, 0)
+sBtn.Size = UDim2.new(0.6, 0, 0, 48)
+sBtn.Position = UDim2.new(0.2, 0, 0.55, 0)
 sBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
 sBtn.Text = "START"
 sBtn.TextColor3 = Color3.new(1, 1, 1)
 sBtn.TextSize = 22
 sBtn.Font = Enum.Font.SourceSansBold
-sBtn.ZIndex = 901
+sBtn.ZIndex = 19002
 Instance.new("UICorner", sBtn)
 
--- --------- القائمة الرئيسية (غير قابلة للسحب كما طلبت) ---------
+-- ------------ الشريط العلوي NX2 فقط ------------
+local topBar = Instance.new("Frame", sg)
+topBar.Name = "TopBar"
+topBar.Size = UDim2.new(1,0,0,34)
+topBar.Position = UDim2.new(0,0,0,0)
+topBar.BackgroundColor3 = Color3.fromRGB(0,0,0)
+topBar.ZIndex = 20010
+local topLabel = Instance.new("TextLabel", topBar)
+topLabel.Size = UDim2.new(0,160,1,0)
+topLabel.Position = UDim2.new(0,8,0,0)
+topLabel.BackgroundTransparency = 1
+topLabel.Text = "NX2"
+topLabel.TextColor3 = Color3.fromRGB(255,255,0)
+topLabel.Font = Enum.Font.SourceSansBold
+topLabel.TextScaled = true
+topLabel.ZIndex = 20011
+
+-- ------------ الدوال المساعدة: تطبيق السرعة/القفز وإعادة القيم الافتراضية ------------
+local function applySpeedJumpToHumanoid(hum)
+    if not hum then return end
+    pcall(function()
+        hum.WalkSpeed = AUTO_WALKSPEED
+        if hum.JumpPower and hum.UseJumpPower then
+            hum.JumpPower = AUTO_JUMPPOWER
+        else
+            -- بعض الألعاب تستخدم JumpHeight; محاولة تعيين JumpPower فقط
+            hum.JumpPower = AUTO_JUMPPOWER
+        end
+    end)
+end
+
+local function restoreCharacterParts(ch)
+    if not ch then return end
+    for _, v in pairs(ch:GetDescendants()) do
+        if v:IsA("BasePart") then
+            pcall(function() v.CanCollide = true end)
+        end
+    end
+    local hum = ch:FindFirstChildOfClass("Humanoid")
+    if hum then
+        pcall(function()
+            hum.WalkSpeed = defaultWalkSpeed
+            if hum.JumpPower and hum.UseJumpPower then
+                hum.JumpPower = defaultJumpPower
+            else
+                hum.JumpPower = defaultJumpPower
+            end
+        end)
+    end
+end
+
+-- ------------ واجهة الأوامر (تُعرض بعد START) ------------
 local main = Instance.new("Frame", sg)
 main.Name = "MainFrame"
 main.Size = UDim2.new(0, 380, 0, 460)
 main.Position = UDim2.new(0.5, -190, 0.55, -230)
 main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 main.Visible = false
-main.ZIndex = 900
-main.Draggable = false -- غير قابلة للسحب
+main.ZIndex = 18000
 Instance.new("UICorner", main)
 local mainStroke = Instance.new("UIStroke", main)
-mainStroke.Color = Color3.fromRGB(255, 255, 0)
+mainStroke.Color = Color3.fromRGB(255,255,0)
 
 local p1 = Instance.new("Frame", main); p1.Size = UDim2.new(1,0,1,-100); p1.Position = UDim2.new(0,0,0,100); p1.BackgroundTransparency = 1
 local p2 = Instance.new("Frame", main); p2.Size = p1.Size; p2.Position = p1.Position; p2.BackgroundTransparency = 1; p2.Visible = false
@@ -194,99 +202,29 @@ local function btn(t, y, p)
     return b
 end
 
--- أزرار
+-- أزرار الأوامر
 local aim = btn("Aimbot: OFF", 0.05, p1)
-local aimAlt = btn("Aimbot Circle 2: OFF", 0.13, p1) -- زر ثاني للأيم
-local copyDisc = btn("سيرفر ديسكورد ل سكربتات زياده!", 0.21, p1) -- كما طلبت تحت الأيم في تبويب اللعب
+local aimAlt = btn("Aimbot Circle 2: OFF", 0.13, p1)
+local copyDisc = btn("سيرفر ديسكورد ل سكربتات زياده!", 0.21, p1)
 
-local speed = btn("Speed 4 (Safe): OFF", 0.05, p2)
-local jump = btn("Jump 3.5: OFF", 0.2, p2)
+local speedBtn = btn("Speed: OFF", 0.05, p2)
+local jumpBtn = btn("Jump: OFF", 0.2, p2)
 local noclip = btn("Noclip (الاختراق): OFF", 0.35, p2)
 local hideBtn = btn("إخفاء القائمة", 0.55, p2)
 local removeScriptBtn = btn("إغلاق السكربت نهائياً", 0.9, p2)
 
--- START سلوك التحميل 1.5 ثانية ثم إظهار القائمة
-sBtn.MouseButton1Click:Connect(function()
-    sBtn.Text = "START..."
-    sBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 0)
-    task.wait(1.5) -- تحميل لمدة ثانية ونص كما طلبت
-    startFrame.Visible = false
-    main.Visible = true
-    toggleBtn.Text = "إخفاء"
-end)
-
-toggleBtn.MouseButton1Click:Connect(function()
-    main.Visible = not main.Visible
-    toggleBtn.Text = main.Visible and "إخفاء" or "فتح"
-end)
-
--- زر شيل القائمة فوق السكربت (ينهي الواجهة بسرعة)
-local function restoreCharacterParts(ch)
-    if not ch then return end
-    for _, v in pairs(ch:GetDescendants()) do
-        if v:IsA("BasePart") then
-            pcall(function() v.CanCollide = true end)
-        end
-    end
-    local hum = ch:FindFirstChildOfClass("Humanoid")
-    if hum then
-        pcall(function()
-            hum.WalkSpeed = defaultWalkSpeed
-            if hum.JumpPower and hum.UseJumpPower then
-                hum.JumpPower = defaultJumpPower
-            else
-                hum.JumpPower = defaultJumpPower
-            end
-        end)
-    end
-end
-
-local heartbeatConn, characterAddedConn
-local function cleanup()
-    -- فصل جميع الاتصالات
-    if heartbeatConn then heartbeatConn:Disconnect(); heartbeatConn = nil end
-    for _, c in ipairs(connections) do
-        if c and c.Connected then pcall(function() c:Disconnect() end) end
-    end
-    connections = {}
-
-    -- إزالة ESPs
-    for pl, gui in pairs(espGuis) do
-        if gui and gui.Parent then pcall(function() gui:Destroy() end) end
-    end
-    espGuis = {}
-
-    -- إزالة خط الأيم إن وُجد
-    if _G.__NX2_aimLine and type(_G.__NX2_aimLine.Destroy) == "function" then
-        pcall(function() _G.__NX2_aimLine:Destroy() end)
-        _G.__NX2_aimLine = nil
-    end
-
-    -- إعادة القيم على الشخصية الحالية
-    if player.Character then restoreCharacterParts(player.Character) end
-    if characterAddedConn then characterAddedConn:Disconnect(); characterAddedConn = nil end
-
-    -- تدمير الواجهة
-    if sg and sg.Parent then pcall(function() sg:Destroy() end) end
-    print("NX2: Script removed and cleaned up.")
-end
-
-closeBtn.MouseButton1Click:Connect(function() cleanup() end)
-removeScriptBtn.MouseButton1Click:Connect(function() cleanup() end)
-topRemoveBtn.MouseButton1Click:Connect(function() cleanup() end)
-
--- ---------------- دائرتي الأيم (الأول كبير والثاني صغير) ----------------
+-- ------------ دوائر FIRE وESP وخط الأيم ------------
 local fire1 = Instance.new("TextButton", sg)
 fire1.Name = "FireCircle1"
-fire1.Size = UDim2.new(0, 120, 0, 120) -- أكبر
+fire1.Size = UDim2.new(0, 120, 0, 120)
 fire1.Position = UDim2.new(0.75, 0, 0.55, 0)
 fire1.BackgroundColor3 = Color3.new(0,0,0)
 fire1.Text = "FIRE\nNX2"
 fire1.TextColor3 = Color3.new(1,1,1)
 fire1.Font = Enum.Font.SourceSansBold
 fire1.Visible = false
-fire1.Draggable = true -- الدائرة قابلة للسحب
-fire1.TextScaled = true -- تكبير الاسم داخل الدائرة
+fire1.Draggable = true
+fire1.TextScaled = true
 Instance.new("UICorner", fire1).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", fire1).Color = Color3.new(1,0,0)
 
@@ -304,28 +242,22 @@ fire2.TextScaled = true
 Instance.new("UICorner", fire2).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", fire2).Color = Color3.fromRGB(0,255,127)
 
-aim.MouseButton1Click:Connect(function()
-    fire1.Visible = not fire1.Visible
-    aim.Text = fire1.Visible and "Aimbot: ON" or "Aimbot: OFF"
+-- تفعيل Drawing line إن توفر
+pcall(function()
+    if Drawing and Drawing.new then
+        aimLine = Drawing.new("Line")
+        aimLine.Visible = false
+        aimLine.Thickness = 2
+        aimLine.Color = Color3.fromRGB(255,0,0)
+        drawAvailable = true
+        _G.__NX2_aimLine = aimLine
+    end
 end)
 
-aimAlt.MouseButton1Click:Connect(function()
-    fire2.Visible = not fire2.Visible
-    aimAlt.Text = fire2.Visible and "Aimbot Circle 2: ON" or "Aimbot Circle 2: OFF"
-end)
-
--- ---------------- حالات السرعة والقفز وnoclip ----------------
-speed.MouseButton1Click:Connect(function() sOn = not sOn; speed.Text = sOn and "Speed: ON" or "Speed: OFF" end)
-jump.MouseButton1Click:Connect(function() jOn = not jOn; jump.Text = jOn and "Jump: ON" or "Jump: OFF" end)
-noclip.MouseButton1Click:Connect(function() nOn = not nOn; noclip.Text = nOn and "Noclip: ON" or "Noclip: OFF" end)
-copyDisc.MouseButton1Click:Connect(function() pcall(setclipboard, "https://discord.gg/syPpUv8Jf") end)
-hideBtn.MouseButton1Click:Connect(function() main.Visible = false; toggleBtn.Text = "فتح" end)
-
--- ---------------- ESP: كشف اللاعبين باللون الأخضر ----------------
+-- دالة لإنشاء ESP لكل لاعب باستثناء المحلي
 local function createESPForPlayer(plr)
     if not plr or plr == player then return end
     if espGuis[plr] and espGuis[plr].Parent then return end
-
     local function attachToCharacter(ch)
         if not ch then return end
         local hrp = ch:FindFirstChild("HumanoidRootPart") or ch:FindFirstChild("Head")
@@ -350,80 +282,41 @@ local function createESPForPlayer(plr)
         espGuis[plr] = bg
     end
 
-    if plr.Character then
-        attachToCharacter(plr.Character)
-    end
-
-    -- تحد��ث عند إعادة التوليد
-    local chConn
-    chConn = plr.CharacterAdded:Connect(function(ch)
+    if plr.Character then attachToCharacter(plr.Character) end
+    local chConn = plr.CharacterAdded:Connect(function(ch)
         task.wait(0.3)
-        if espGuis[plr] and espGuis[plr].Parent then
-            pcall(function() espGuis[plr]:Destroy() end)
-        end
+        if espGuis[plr] and espGuis[plr].Parent then pcall(function() espGuis[plr]:Destroy() end) end
         attachToCharacter(ch)
     end)
     table.insert(connections, chConn)
 end
 
 local function removeESPForPlayer(plr)
-    if espGuis[plr] then
-        pcall(function() espGuis[plr]:Destroy() end)
-        espGuis[plr] = nil
-    end
+    if espGuis[plr] then pcall(function() espGuis[plr]:Destroy() end) espGuis[plr] = nil end
 end
 
 for _, pl in pairs(Players:GetPlayers()) do
     if pl ~= player then createESPForPlayer(pl) end
 end
+table.insert(connections, Players.PlayerAdded:Connect(function(pl) createESPForPlayer(pl) end))
+table.insert(connections, Players.PlayerRemoving:Connect(function(pl) removeESPForPlayer(pl) end))
 
-local playerAddedConn = Players.PlayerAdded:Connect(function(pl)
-    createESPForPlayer(pl)
-end)
-local playerRemovingConn = Players.PlayerRemoving:Connect(function(pl)
-    removeESPForPlayer(pl)
-end)
-table.insert(connections, playerAddedConn)
-table.insert(connections, playerRemovingConn)
-
--- ---------------- خط الأيم الأحمر عند الاستهداف (Drawing إن توفرت) ----------------
-local drawAvailable, aimLine = false, nil
-pcall(function()
-    if Drawing and Drawing.new then
-        aimLine = Drawing.new("Line")
-        aimLine.Color = Color3.fromRGB(255, 0, 0)
-        aimLine.Thickness = 2
-        aimLine.Visible = false
-        drawAvailable = true
-        _G.__NX2_aimLine = aimLine
-    end
-end)
-
+-- ------------ مساعدة الاستهداف عبر الماوس (خط أحمر) ------------
 local function getTargetFromMouse()
-    local targetPart = nil
-    local mouse = player:GetMouse()
-    if mouse then
-        targetPart = mouse.Target
-    end
+    local m = player:GetMouse()
+    local targetPart = (m and m.Target) or nil
     if not targetPart then return nil end
-    local char = targetPart:FindFirstAncestorOfClass("Model")
-    if not char then char = targetPart.Parent end
+    local char = targetPart:FindFirstAncestorOfClass("Model") or targetPart.Parent
     if char and char:FindFirstChildOfClass("Humanoid") then
         return Players:GetPlayerFromCharacter(char)
     end
     return nil
 end
 
--- تحديث الرسم كل إطار (RenderStepped)
-local renderConn
-renderConn = RunService.RenderStepped:Connect(function()
+local renderConn = RunService.RenderStepped:Connect(function()
     if not drawAvailable or not aimLine then return end
     local activeAim = fire1.Visible or fire2.Visible
-    if not activeAim then
-        aimLine.Visible = false
-        return
-    end
-
+    if not activeAim then aimLine.Visible = false return end
     local targetPlayer = getTargetFromMouse()
     if targetPlayer and targetPlayer.Character then
         local targetRoot = targetPlayer.Character:FindFirstChild("Head") or targetPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -444,18 +337,24 @@ renderConn = RunService.RenderStepped:Connect(function()
 end)
 table.insert(connections, renderConn)
 
--- ---------------- حلقة Heartbeat لتطبيق التأثيرات ----------------
-heartbeatConn = RunService.Heartbeat:Connect(function()
-    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
-    local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+-- ------------ حلقة Heartbeat لتطبيق السرعة/القفز وNoclip إن شغلت ------------
+local heartbeatConn = RunService.Heartbeat:Connect(function()
+    if not player.Character then return end
     local hum = player.Character:FindFirstChildOfClass("Humanoid")
-    if not hrp or not hum then return end
+    if not hum then return end
 
-    if sOn and hum.MoveDirection.Magnitude > 0 then
-        hrp.Velocity = Vector3.new(hum.MoveDirection.X * 45, hrp.Velocity.Y, hum.MoveDirection.Z * 45)
+    if sOn then
+        pcall(function() hum.WalkSpeed = AUTO_WALKSPEED end)
     end
-
-    if jOn then pcall(function() hum.JumpPower = 100 end) end
+    if jOn then
+        pcall(function()
+            if hum.JumpPower and hum.UseJumpPower then
+                hum.JumpPower = AUTO_JUMPPOWER
+            else
+                hum.JumpPower = AUTO_JUMPPOWER
+            end
+        end)
+    end
 
     if nOn then
         for _, v in pairs(player.Character:GetDescendants()) do
@@ -467,20 +366,115 @@ heartbeatConn = RunService.Heartbeat:Connect(function()
 end)
 table.insert(connections, heartbeatConn)
 
--- تحديث ESP عند إعادة توليد الشخصية للاعب المحلي
-characterAddedConn = player.CharacterAdded:Connect(function(ch)
-    task.wait(0.5)
-    cacheDefaults()
-    for pl, gui in pairs(espGuis) do
-        pcall(function()
-            if gui and gui.Parent and pl.Character then
-                local hrp = pl.Character:FindFirstChild("HumanoidRootPart") or pl.Character:FindFirstChild("Head")
-                if hrp then gui.Adornee = hrp end
-            end
-        end)
+-- تطبيق القيم على الشخصية الحالية (عند فتح الواجهة بعد التحميل)
+local function enableAutoSpeedJump()
+    sOn = true; jOn = true
+    speedBtn.Text = "Speed: ON (5.5)"
+    jumpBtn.Text = "Jump: ON (7)"
+    if player.Character then
+        local hum = player.Character:FindFirstChildOfClass("Humanoid")
+        applySpeedJumpToHumanoid(hum)
+    end
+end
+
+-- ------------ أزرار التفاعل ------------
+aim.MouseButton1Click:Connect(function()
+    fire1.Visible = not fire1.Visible
+    aim.Text = fire1.Visible and "Aimbot: ON" or "Aimbot: OFF"
+end)
+aimAlt.MouseButton1Click:Connect(function()
+    fire2.Visible = not fire2.Visible
+    aimAlt.Text = fire2.Visible and "Aimbot Circle 2: ON" or "Aimbot Circle 2: OFF"
+end)
+speedBtn.MouseButton1Click:Connect(function()
+    sOn = not sOn
+    speedBtn.Text = sOn and ("Speed: ON ("..tostring(AUTO_WALKSPEED)..")") or "Speed: OFF"
+    if sOn and player.Character then
+        applySpeedJumpToHumanoid(player.Character:FindFirstChildOfClass("Humanoid"))
     end
 end)
-table.insert(connections, characterAddedConn)
+jumpBtn.MouseButton1Click:Connect(function()
+    jOn = not jOn
+    jumpBtn.Text = jOn and ("Jump: ON ("..tostring(AUTO_JUMPPOWER)..")") or "Jump: OFF"
+    if jOn and player.Character then
+        applySpeedJumpToHumanoid(player.Character:FindFirstChildOfClass("Humanoid"))
+    end
+end)
+noclip.MouseButton1Click:Connect(function()
+    nOn = not nOn
+    noclip.Text = nOn and "Noclip: ON" or "Noclip: OFF"
+end)
+copyDisc.MouseButton1Click:Connect(function() pcall(setclipboard, "https://discord.gg/syPpUv8Jf") end)
+hideBtn.MouseButton1Click:Connect(function() main.Visible = false end)
+removeScriptBtn.MouseButton1Click:Connect(function()
+    -- تنظيف نهائي
+    cleanup()
+end)
 
--- تنبيه للمستخدم
-print("NX2 loaded. الشريط العلوي ظاهر دائماً باللون الأصفر. زر 'شيل القائمة' فوق السكربت يحذف الواجهة فوراً. اضغط START للتحميل ثم فتح القائمة.")
+-- ------------ تنظيف (إيقاف الاتصالات وإزالة GUIs وإعادة القيم) ------------
+function cleanup()
+    -- فصل كل الاتصالات المحفوظة
+    for _, c in ipairs(connections) do
+        if c and c.Connected then
+            pcall(function() c:Disconnect() end)
+        end
+    end
+    connections = {}
+
+    -- إزالة الرسم الخطّي
+    if drawAvailable and _G.__NX2_aimLine then
+        pcall(function() _G.__NX2_aimLine:Destroy() end)
+        _G.__NX2_aimLine = nil
+    end
+
+    -- إزالة ESPs
+    for pl, gui in pairs(espGuis) do
+        if gui and gui.Parent then pcall(function() gui:Destroy() end) end
+    end
+    espGuis = {}
+
+    -- إعادة قِيَم الشخصية
+    if player.Character then restoreCharacterParts(player.Character) end
+
+    -- تدمير الواجهة
+    if sg and sg.Parent then
+        pcall(function() sg:Destroy() end)
+    end
+    print("NX2: cleaned up.")
+end
+
+-- فصل الاحداث المرتبطة باللاعب عند إعادة التوليد لإعادة تطبيق القيم إن لزم
+local charAddedConn = player.CharacterAdded:Connect(function(ch)
+    task.wait(0.5)
+    cacheDefaults()
+    if sOn or jOn then
+        local hum = ch:FindFirstChildOfClass("Humanoid")
+        applySpeedJumpToHumanoid(hum)
+    end
+end)
+table.insert(connections, charAddedConn)
+
+-- ------------ سلوك زر START: تحميل ثم فتح الواجهة وتفعيل السرعة/القفز ------------
+sBtn.MouseButton1Click:Connect(function()
+    -- تحميل متحرك لمدة 1.5 ثانية كما طلبت
+    local patterns = {"START", "START.", "START..", "START..."}
+    local totalLoad = 1.5
+    local interval = 0.25
+    local elapsed = 0
+    while elapsed < totalLoad do
+        for i = 1, #patterns do
+            sBtn.Text = patterns[i]
+            task.wait(interval)
+            elapsed = elapsed + interval
+            if elapsed >= totalLoad then break end
+        end
+    end
+
+    -- بعد التحميل: إظهار الواجهة الرئيسية وتفعيل السرعة/القفز تلقائياً
+    if startFrame and startFrame.Parent then pcall(function() startFrame:Destroy() end) end
+    main.Visible = true
+    enableAutoSpeedJump()
+end)
+
+-- تم التحميل: الآن عند التشغيل سيظهر splash البنّي مع كتابة بطيئة، ثم START، ثم عند الضغط يُعرض التحميل وتفتح الواجهة.
+print("NX2 loaded. Splash -> START -> main UI. Speed="..tostring(AUTO_WALKSPEED)..", Jump="..tostring(AUTO_JUMPPOWER))
