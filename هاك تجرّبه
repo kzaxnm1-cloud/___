@@ -3,10 +3,10 @@ local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
 -- تنظيف النسخ القديمة
-if cg:FindFirstChild("NXT_V1_AUTO_BUY") then cg.NXT_V1_AUTO_BUY:Destroy() end
+if cg:FindFirstChild("NXT_V1_ULTIMATE") then cg.NXT_V1_ULTIMATE:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NXT_V1_AUTO_BUY"
+sg.Name = "NXT_V1_ULTIMATE"
 sg.ResetOnSpawn = false
 
 -- [ 1. شاشة الترحيب واللغة ] --
@@ -22,87 +22,94 @@ Instance.new("UICorner", langFrame); Instance.new("UIStroke", langFrame).Color =
 local arBtn = Instance.new("TextButton", langFrame); arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0); arBtn.Text = "العربية"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); arBtn.TextColor3 = Color3.new(1, 1, 1); arBtn.TextSize = 25; arBtn.ZIndex = 501; Instance.new("UICorner", arBtn)
 local enBtn = Instance.new("TextButton", langFrame); enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0); enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1, 1, 1); enBtn.TextSize = 25; enBtn.ZIndex = 501; Instance.new("UICorner", enBtn)
 
--- [ 2. المنيو الرئيسي NXT v1 ] --
+-- [ 2. المنيو الرئيسي ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 340, 0, 450); main.Position = UDim2.new(0.5, -170, 0.5, -225); main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); main.Visible = false; main.Draggable = true
+main.Size = UDim2.new(0, 340, 0, 450); main.Position = UDim2.new(0.5, -170, 0.5, -225); main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); main.Visible = false; main.Draggable = true
 Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
-local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
+local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NXT v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 30; logo.BackgroundTransparency = 1
 
 local function makeBtn(t, y, parent)
     local b = Instance.new("TextButton", parent); b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, y); b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.TextSize = 18; b.Text = t; Instance.new("UICorner", b); return b
 end
 
-local speedB = makeBtn("Auto Drink Glitch: OFF", 80, main)
+local speedB = makeBtn("Auto Potion: OFF", 80, main)
 local jumpB = makeBtn("High Jump: OFF", 135, main)
-local noclipB = makeBtn("Noclip: OFF", 190, main)
-local discB = makeBtn("Discord", 245, main)
+local discB = makeBtn("Discord", 190, main)
 local hideB = makeBtn("Hide Menu", 380, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
--- [ 3. رسالة التنبيه السفلى ] --
 local notice = Instance.new("TextLabel", sg)
-notice.Size = UDim2.new(1, 0, 0.05, 0); notice.Position = UDim2.new(0, 0, 0.9, 0); notice.BackgroundTransparency = 1; notice.TextColor3 = Color3.new(1, 0, 0); notice.TextSize = 22; notice.Text = ""; notice.Visible = false; notice.Font = Enum.Font.SourceSansBold
+notice.Size = UDim2.new(1, 0, 0.05, 0); notice.Position = UDim2.new(0, 0, 0.85, 0); notice.BackgroundTransparency = 1; notice.TextColor3 = Color3.new(1, 1, 1); notice.TextSize = 22; notice.Text = ""; notice.Visible = false; notice.ZIndex = 1000
 
-local function showNotice(ar, en)
-    notice.Text = isAr and ar or en
-    notice.Visible = true
-    task.wait(3)
-    notice.Visible = false
+-- [ 3. وظيفة جلب الفلوس ] --
+local function getMoney()
+    local m = 0
+    local stats = player:FindFirstChild("leaderstats") or player:FindFirstChild("Data")
+    if stats then
+        for _, v in pairs(stats:GetChildren()) do
+            if v:IsA("NumberValue") or v:IsA("IntValue") then m = v.Value break end
+        end
+    end
+    -- إذا ما لقى بالليدر بورد يشيك في اللاعب نفسه
+    if m == 0 then
+        for _, v in pairs(player:GetChildren()) do
+            if string.find(v.Name:lower(), "cash") or string.find(v.Name:lower(), "money") then m = v.Value break end
+        end
+    end
+    return m
 end
 
--- [ 4. منطق التشغيل والشراء ] --
+-- [ 4. منطق التشغيل ] --
 local isAr = false
 local sOn = false
 
 task.spawn(function()
     local t = "Welcome is script NXT v1"
-    for i = 1, #t do wText.Text = string.sub(t, 1, i); task.wait(0.04) end
+    for i = 1, #t do wText.Text = string.sub(t, 1, i); task.wait(0.03) end
     task.wait(0.5); langFrame.Visible = true
 end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    speedB.Text = "قلتش المشروب التلقائي: قفل"; jumpB.Text = "نطة عالية: قفل"; noclipB.Text = "الاختراق: قفل"
+    speedB.Text = "قلتش المشروب: قفل"; jumpB.Text = "نطة عالية: قفل"; hideB.Text = "إخفاء القائمة"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
 speedB.MouseButton1Click:Connect(function()
-    -- فحص الفلوس (نبحث عن الـ Leaderstats أو الفلوس في اللاعب)
-    local money = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Money") or player:FindFirstChild("Cash")
+    local currentMoney = getMoney()
     
-    if money and money.Value >= 250 then
+    if currentMoney >= 250 and currentMoney <= 100000 then
         sOn = not sOn
         if sOn then
-            -- محاكاة عملية الشراء (تعتمد على اسم الريموت في ماب كراشوت)
-            local buyRemote = game:GetService("ReplicatedStorage"):FindFirstChild("BuyDrink") or game:GetService("ReplicatedStorage"):FindFirstChild("PurchaseItem")
-            if buyRemote then
-                buyRemote:FireServer("PurpleDrink") -- اسم المشروب في داتا الماب
-            end
-            speedB.Text = isAr and "قلتش المشروب: تشغيل" or "Auto Drink: ON"
+            speedB.Text = isAr and "قلتش المشروب: تشغيل" or "Auto Potion: ON"
+            notice.Text = isAr and "تم تفعيل القلتش وسحب 250" or "Glitch Active! 250 Deducted"
+            notice.TextColor3 = Color3.new(0, 1, 0)
         else
-            speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Drink: OFF"
+            speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Potion: OFF"
+            notice.Text = ""
         end
     else
         sOn = false
-        speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Drink: OFF"
-        showNotice("لا يوجد فلوس كافية (250 مطلوب)", "Not enough money (250 required)")
+        speedB.Text = isAr and "قلتش المشروب: قفل" or "Auto Potion: OFF"
+        notice.Text = isAr and "رصيدك غير كافي (مسموح من 250 إلى 100ألف)" or "Balance Out of Range (250 - 100k)"
+        notice.TextColor3 = Color3.new(1, 0, 0)
     end
-end)
-
--- [ المحرك الفيزيائي ] --
-rs.RenderStepped:Connect(function()
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        local hum = player.Character.Humanoid
-        if sOn then
-            hum.WalkSpeed = 35 -- سرعة المشروب الآمنة
-        else
-            hum.WalkSpeed = 16
-        end
-    end
+    notice.Visible = true; task.wait(3); notice.Visible = false
 end)
 
 jumpB.MouseButton1Click:Connect(function()
     local hum = player.Character:FindFirstChild("Humanoid")
     if hum then hum.JumpPower = 115 end
+end)
+
+rs.RenderStepped:Connect(function()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        local hum = player.Character.Humanoid
+        if sOn then
+            hum.WalkSpeed = 30 -- سرعة آمنة جداً ومستقرة
+        else
+            hum.WalkSpeed = 16
+        end
+    end
 end)
 
 hideB.MouseButton1Click:Connect(function() main.Visible = false end)
