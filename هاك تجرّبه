@@ -4,10 +4,10 @@ local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
 -- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_GLITCH_EDITION") then cg.NX2_GLITCH_EDITION:Destroy() end
+if cg:FindFirstChild("NX2_PURPLE_GLITCH") then cg.NX2_PURPLE_GLITCH:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_GLITCH_EDITION"
+sg.Name = "NX2_PURPLE_GLITCH"
 sg.ResetOnSpawn = false
 sg.DisplayOrder = 9999
 
@@ -57,32 +57,41 @@ local noclipB = makeBtn("Noclip: OFF", 300, main)
 local discB = makeBtn("Discord", 355, main)
 local hideB = makeBtn("Hide Menu", 430, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
+-- [ تأثير المشروب البنفسجي (Vignette) ] --
+local purpleFX = Instance.new("ImageLabel", sg)
+purpleFX.Size = UDim2.new(1, 0, 1, 0)
+purpleFX.BackgroundTransparency = 1
+purpleFX.Image = "rbxassetid://6284144458" -- تأثير هالة بنفسجية
+purpleFX.ImageColor3 = Color3.fromRGB(150, 0, 255)
+purpleFX.ImageTransparency = 1 -- مخفي في البداية
+purpleFX.ZIndex = 0
+
 -- [ منطق التشغيل ] --
 local isAr = false
 task.spawn(function()
     local t = "Welcome is script NX2 v1"
-    for i = 1, #t do wText.Text = string.sub(t, 1, i) task.wait(0.05) end
+    for i = 1, #t do wText.Text = string.sub(t, 1, i); task.wait(0.05) end
     task.wait(0.5); langFrame.Visible = true
 end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "قلتش السرعة: قفل"
+    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "قلتش المشروب: قفل"
     jumpB.Text = "قفزة خارقة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
--- [ ميزات كراشوت والقلتش ] --
+-- [ تفعيل القلتش والسرعة ] --
 local sOn, jOn, nOn, espOn = false, false, false, false
 
 speedB.MouseButton1Click:Connect(function()
     sOn = not sOn
-    speedB.Text = sOn and (isAr and "قلتش السرعة: تشغيل" or "Speed Glitch: ON") or (isAr and "قلتش السرعة: قفل" or "Speed Glitch: OFF")
-    -- محاكاة شرب المشروب (تغيير الخصائص مباشرة كأنه مشروب)
+    speedB.Text = sOn and (isAr and "قلتش المشروب: تشغيل" or "Drink Glitch: ON") or (isAr and "قلتش المشروب: قفل" or "Drink Glitch: OFF")
+    
     if sOn then
-        player.Character.Humanoid.WalkSpeed = 120 -- سرعة المشروب القوية
+        purpleFX.ImageTransparency = 0.6 -- إظهار الشاشة البنفسجية
     else
-        player.Character.Humanoid.WalkSpeed = 16
+        purpleFX.ImageTransparency = 1 -- إخفاء الشاشة البنفسجية
     end
 end)
 
@@ -91,29 +100,30 @@ jumpB.MouseButton1Click:Connect(function()
     jumpB.Text = jOn and (isAr and "قفزة خارقة: تشغيل" or "Super Jump: ON") or (isAr and "قفزة خارقة: قفل" or "Super Jump: OFF")
 end)
 
--- [ تحديث مستمر ] --
+-- [ التحديث المستمر ] --
 rs.Heartbeat:Connect(function()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         local hum = player.Character.Humanoid
-        -- القلتش يخلي اللعبة تظن إنك في حالة سرعة دائمة
+        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+        
         if sOn then
-            hum.WalkSpeed = 120 
+            -- سرعة المشروب البنفسجي القوية
+            hum.WalkSpeed = 150
+            -- إضافة تأثير مشي سريع (Field of View)
+            camera.FieldOfView = 100
+        else
+            camera.FieldOfView = 70
+            hum.WalkSpeed = 16
         end
-        -- النطة أسرع وأقوى
+        
         if jOn then
-            hum.JumpPower = 180
-            hum.JumpHeight = 100 -- لبعض نسخ كراشوت الجديدة
+            hum.JumpPower = 250 -- نطة كبيرة جداً
         else
             hum.JumpPower = 50
-        end
-        if nOn then
-            for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
         end
     end
 end)
 
--- باقي أزرار التحكم (إخفاء، ديسكورد، إلخ)
+-- باقي الأزرار
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = isAr and "تم النسخ!" or "Copied!"; task.wait(1); discB.Text = isAr and "رابط الديسكورد" or "Discord" end)
 hideB.MouseButton1Click:Connect(function() main.Visible = false end)
-discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
-aimB.MouseButton1Click:Connect(function() --[[ Aimbot Logic ]] end)
-espB.MouseButton1Click:Connect(function() espOn = not espOn end)
