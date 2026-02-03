@@ -3,44 +3,98 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local mouse = player:GetMouse()
 
--- المواقع المحددة
+-- المواقع المحددة للفتحات
 local safePoints = {
     Vector3.new(100, 5, 100), -- الفتحة الأولى
-    Vector3.new(200, 5, 200) -- الفتحة الثانية
+    Vector3.new(200, 5, 200), -- الفتحة الثانية
+    Vector3.new(300, 5, 300)  -- الفتحة الثالثة
 }
-local startPoint = character.PrimaryPart.Position -- الموقع الأصلي (البداية)
-local currentIndex = 0 -- الموقع الحالي (0 يعني البداية)
+local startPoint = character.PrimaryPart.Position -- الموقع الأصلي
+local currentIndex = 0 -- الموقع الحالي للاعب
 
--- واجهة المربع الأسود وزراره
+-- إنشاء الـ GUI (الواجهة)
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
 local frame = Instance.new("Frame", screenGui)
 local forwardButton = Instance.new("TextButton", frame)
 local backButton = Instance.new("TextButton", frame)
 local removeButton = Instance.new("TextButton", frame)
+local executeButton = Instance.new("TextButton", frame)
 
 -- تصميم المربع الأسود
-frame.Size = UDim2.new(0, 300, 0, 200)
-frame.Position = UDim2.new(0.5, -150, 0.8, -100)
+frame.Size = UDim2.new(0, 300, 0, 280)
+frame.Position = UDim2.new(0.5, -150, 0.8, -140)
 frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 
 -- تصميم زر "أمام"
-forwardButton.Size = UDim2.new(0, 100, 0, 50)
-forwardButton.Position = UDim2.new(0, 20, 0, 20)
+forwardButton.Size = UDim2.new(0, 140, 0, 50)
+forwardButton.Position = UDim2.new(0, 10, 0, 10)
 forwardButton.Text = "أمام"
+forwardButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 forwardButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
 
 -- تصميم زر "خلف"
-backButton.Size = UDim2.new(0, 100, 0, 50)
-backButton.Position = UDim2.new(0, 20, 0, 90)
+backButton.Size = UDim2.new(0, 140, 0, 50)
+backButton.Position = UDim2.new(0, 160, 0, 10)
 backButton.Text = "خلف"
+backButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 backButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
 
--- تصميم زر "يشيل الشي"
-removeButton.Size = UDim2.new(0, 100, 0, 50)
-removeButton.Position = UDim2.new(0, 180, 0, 55)
-removeButton.Text = "يشيل الشي"
+-- تصميم زر "حذف الشيء"
+removeButton.Size = UDim2.new(0, 280, 0, 50)
+removeButton.Position = UDim2.new(0, 10, 0, 70)
+removeButton.Text = "حذف الشيء (اضغط على أي شيء)"
+removeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 removeButton.BackgroundColor3 = Color3.fromRGB(150, 150, 50)
 
--- دالة التحرك بين الفتحات
+-- تصميم زر "تشغيل سكربت خارجي"
+executeButton.Size = UDim2.new(0, 280, 0, 50)
+executeButton.Position = UDim2.new(0, 10, 0, 130)
+executeButton.Text = "تشغيل سكربت خارجي"
+executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+executeButton.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+
+-- دالة تحريك اللاعب إلى موضع معين
 local function moveToPosition(index)
     if index == 0 then
+        humanoid:MoveTo(startPoint) -- العودة للبداية
+    elseif index > 0 and index <= #safePoints then
+        humanoid:MoveTo(safePoints[index]) -- الانتقال إلى الفتحة الحالية
+    end
+    currentIndex = index
+end
+
+-- زر "أمام"
+forwardButton.MouseButton1Click:Connect(function()
+    if currentIndex < #safePoints then
+        moveToPosition(currentIndex + 1) -- الانتقال إلى الفتحة التالية
+    end
+end)
+
+-- زر "خلف"
+backButton.MouseButton1Click:Connect(function()
+    if currentIndex > 0 then
+        moveToPosition(currentIndex - 1) -- العودة إلى الفتحة السابقة
+    end
+end)
+
+-- دالة حذف العنصر
+local function removeObject(target)
+    if target and target:IsA("BasePart") then -- التحقق من صحة العنصر
+        target:Destroy() -- حذف العنصر
+    end
+end
+
+-- زر "حذف الشيء"
+removeButton.MouseButton1Click:Connect(function()
+    mouse.Button1Down:Connect(function()
+        local target = mouse.Target -- تحديد العنصر المُحدد
+        removeObject(target) -- حذف العنصر
+    end)
+end)
+
+-- زر "تشغيل سكربت خارجي"
+executeButton.MouseButton1Click:Connect(function()
+    -- الرابط الخارجي لتشغيل السكربت
+    local scriptUrl = "https://raw.githubusercontent.com/kzaxnm1-cloud/___/refs/heads/main/mood%202"
+    loadstring(game:HttpGet(scriptUrl))() -- تشغيل السكربت من الرابط
+end)
