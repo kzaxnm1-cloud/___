@@ -3,11 +3,11 @@ local camera = workspace.CurrentCamera
 local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 
--- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_PURPLE_GLITCH") then cg.NX2_PURPLE_GLITCH:Destroy() end
+-- تنظيف السكربت القديم
+if cg:FindFirstChild("NX2_REAL_GLITCH") then cg.NX2_REAL_GLITCH:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_PURPLE_GLITCH"
+sg.Name = "NX2_REAL_GLITCH"
 sg.ResetOnSpawn = false
 sg.DisplayOrder = 9999
 
@@ -16,8 +16,7 @@ local welcome = Instance.new("Frame", sg)
 welcome.Size = UDim2.new(1, 0, 1, 0); welcome.BackgroundColor3 = Color3.fromRGB(101, 67, 33); welcome.ZIndex = 100
 local wText = Instance.new("TextLabel", welcome)
 wText.Size = UDim2.new(1, 0, 0.2, 0); wText.Position = UDim2.new(0, 0, 0.4, 0)
-wText.TextColor3 = Color3.new(1, 1, 1); wText.TextSize = 40; wText.Font = Enum.Font.Code
-wText.BackgroundTransparency = 1; wText.Text = ""; wText.ZIndex = 101
+wText.TextColor3 = Color3.new(1, 1, 1); wText.TextSize = 40; wText.Font = Enum.Font.Code; wText.BackgroundTransparency = 1; wText.Text = ""; wText.ZIndex = 101
 
 -- [ 2. واجهة اختيار اللغة ] --
 local langFrame = Instance.new("Frame", sg)
@@ -26,21 +25,16 @@ langFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); langFrame.Visible = fal
 Instance.new("UICorner", langFrame); Instance.new("UIStroke", langFrame).Color = Color3.new(1, 1, 1)
 
 local arBtn = Instance.new("TextButton", langFrame)
-arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0); arBtn.Text = "العربية"
-arBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); arBtn.TextColor3 = Color3.new(1, 1, 1); arBtn.TextSize = 25; arBtn.ZIndex = 501; Instance.new("UICorner", arBtn)
-
+arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0); arBtn.Text = "العربية"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); arBtn.TextColor3 = Color3.new(1, 1, 1); arBtn.TextSize = 25; arBtn.ZIndex = 501; Instance.new("UICorner", arBtn)
 local enBtn = Instance.new("TextButton", langFrame)
-enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0); enBtn.Text = "English"
-enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1, 1, 1); enBtn.TextSize = 25; enBtn.ZIndex = 501; Instance.new("UICorner", enBtn)
+enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0); enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1, 1, 1); enBtn.TextSize = 25; enBtn.ZIndex = 501; Instance.new("UICorner", enBtn)
 
 -- [ 3. المنيو الرئيسي NX2 ] --
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 340, 0, 500); main.Position = UDim2.new(0.5, -170, 0.5, -250)
 main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); main.Visible = false; main.Draggable = true
 Instance.new("UICorner", main); Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
-
-local logo = Instance.new("TextLabel", main)
-logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NX2 v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 35; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
+local logo = Instance.new("TextLabel", main); logo.Size = UDim2.new(1, 0, 0.15, 0); logo.Text = "NX2 v1"; logo.TextColor3 = Color3.new(1, 1, 0); logo.TextSize = 35; logo.BackgroundTransparency = 1; logo.Font = Enum.Font.SourceSansBold
 
 -- [ الأزرار ] --
 local function makeBtn(t, y, parent)
@@ -51,20 +45,16 @@ end
 
 local aimB = makeBtn("Aimbot: OFF", 80, main)
 local espB = makeBtn("ESP: OFF", 135, main)
-local speedB = makeBtn("Speed Glitch: OFF", 190, main)
-local jumpB = makeBtn("Super Jump: OFF", 245, main)
+local speedB = makeBtn("Purple Glitch: OFF", 190, main)
+local jumpB = makeBtn("Mega Jump: OFF", 245, main)
 local noclipB = makeBtn("Noclip: OFF", 300, main)
 local discB = makeBtn("Discord", 355, main)
 local hideB = makeBtn("Hide Menu", 430, main); hideB.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
 
--- [ تأثير المشروب البنفسجي (Vignette) ] --
-local purpleFX = Instance.new("ImageLabel", sg)
-purpleFX.Size = UDim2.new(1, 0, 1, 0)
-purpleFX.BackgroundTransparency = 1
-purpleFX.Image = "rbxassetid://6284144458" -- تأثير هالة بنفسجية
-purpleFX.ImageColor3 = Color3.fromRGB(150, 0, 255)
-purpleFX.ImageTransparency = 1 -- مخفي في البداية
-purpleFX.ZIndex = 0
+-- [ هالة المشروب البنفسجية ] --
+local purpleFX = Instance.new("Frame", sg)
+purpleFX.Size = UDim2.new(1, 0, 1, 0); purpleFX.BackgroundColor3 = Color3.fromRGB(130, 0, 255); purpleFX.BackgroundTransparency = 1; purpleFX.ZIndex = 0
+local grad = Instance.new("UIGradient", purpleFX); grad.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.5, 0.7), NumberSequenceKeypoint.new(1, 1)}); grad.Rotation = 45
 
 -- [ منطق التشغيل ] --
 local isAr = false
@@ -76,54 +66,47 @@ end)
 
 arBtn.MouseButton1Click:Connect(function()
     isAr = true; welcome:Destroy(); langFrame:Destroy(); main.Visible = true
-    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"; speedB.Text = "قلتش المشروب: قفل"
-    jumpB.Text = "قفزة خارقة: قفل"; noclipB.Text = "الاختراق: قفل"; discB.Text = "رابط الديسكورد"; hideB.Text = "إخفاء القائمة"
+    speedB.Text = "قلتش المشروب: قفل"; jumpB.Text = "نطة ميجا: قفل"; hideB.Text = "إخفاء القائمة"
 end)
 enBtn.MouseButton1Click:Connect(function() isAr = false; welcome:Destroy(); langFrame:Destroy(); main.Visible = true end)
 
--- [ تفعيل القلتش والسرعة ] --
-local sOn, jOn, nOn, espOn = false, false, false, false
+-- [ تفعيل الميزات ] --
+local sOn, jOn = false, false
 
 speedB.MouseButton1Click:Connect(function()
     sOn = not sOn
-    speedB.Text = sOn and (isAr and "قلتش المشروب: تشغيل" or "Drink Glitch: ON") or (isAr and "قلتش المشروب: قفل" or "Drink Glitch: OFF")
-    
-    if sOn then
-        purpleFX.ImageTransparency = 0.6 -- إظهار الشاشة البنفسجية
-    else
-        purpleFX.ImageTransparency = 1 -- إخفاء الشاشة البنفسجية
-    end
+    speedB.Text = sOn and (isAr and "قلتش المشروب: تشغيل" or "Purple Glitch: ON") or (isAr and "قلتش المشروب: قفل" or "Purple Glitch: OFF")
+    purpleFX.BackgroundTransparency = sOn and 0.85 or 1
 end)
 
 jumpB.MouseButton1Click:Connect(function()
     jOn = not jOn
-    jumpB.Text = jOn and (isAr and "قفزة خارقة: تشغيل" or "Super Jump: ON") or (isAr and "قفزة خارقة: قفل" or "Super Jump: OFF")
+    jumpB.Text = jOn and (isAr and "نطة ميجا: تشغيل" or "Mega Jump: ON") or (isAr and "نطة ميجا: قفل" or "Mega Jump: OFF")
 end)
 
--- [ التحديث المستمر ] --
+-- [ نظام الدفع الفيزيائي (عشان يشتغل القلتش غصب) ] --
 rs.Heartbeat:Connect(function()
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = player.Character.HumanoidRootPart
         local hum = player.Character.Humanoid
-        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
         
-        if sOn then
-            -- سرعة المشروب البنفسجي القوية
-            hum.WalkSpeed = 150
-            -- إضافة تأثير مشي سريع (Field of View)
-            camera.FieldOfView = 100
+        -- قلتش السرعة باستخدام الدفع (Velocity)
+        if sOn and hum.MoveDirection.Magnitude > 0 then
+            hrp.Velocity = Vector3.new(hum.MoveDirection.X * 280, hrp.Velocity.Y, hum.MoveDirection.Z * 280)
+            camera.FieldOfView = 110 -- توسيع الرؤية
         else
             camera.FieldOfView = 70
-            hum.WalkSpeed = 16
         end
         
+        -- قلتش النطة (دفع للأعلى)
         if jOn then
-            hum.JumpPower = 250 -- نطة كبيرة جداً
-        else
-            hum.JumpPower = 50
+            hum.JumpPower = 0 -- نلغي قوة النطة العادية
+            if hum.Jump then
+                hrp.Velocity = Vector3.new(hrp.Velocity.X, 350, hrp.Velocity.Z) -- دفع انفجاري للأعلى
+            end
         end
     end
 end)
 
--- باقي الأزرار
-discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf"); discB.Text = isAr and "تم النسخ!" or "Copied!"; task.wait(1); discB.Text = isAr and "رابط الديسكورد" or "Discord" end)
 hideB.MouseButton1Click:Connect(function() main.Visible = false end)
+discB.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
