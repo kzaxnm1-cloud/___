@@ -1,166 +1,362 @@
-local player = game:GetService("Players").LocalPlayer
-local cg = game:GetService("CoreGui")
-local rs = game:GetService("RunService")
-local vu = game:GetService("VirtualUser")
+– NX2 Tsunami Escape Script
+– Made for Escape Tsunami For Brainrots
 
--- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_LEGACY_STYLE") then cg.NX2_LEGACY_STYLE:Destroy() end
+game.StarterGui:SetCore(“SendNotification”, {
+Title = “NX2!”;
+Text = “Loading Tsunami Script…”;
+Duration = 3;
+})
 
-local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_LEGACY_STYLE"
-sg.ResetOnSpawn = false
+wait(0.3)
 
--- [ 1. شاشة الدخول الاحترافية بالصورة ] --
-local loaderFrame = Instance.new("Frame", sg)
-loaderFrame.Size = UDim2.new(1, 0, 1, 0)
-loaderFrame.BackgroundTransparency = 1
-loaderFrame.ZIndex = 100
+local player = game.Players.LocalPlayer
+local RunService = game:GetService(“RunService”)
 
-local loaderMain = Instance.new("ImageLabel", loaderFrame)
-loaderMain.Size = UDim2.new(0, 300, 0, 320)
-loaderMain.Position = UDim2.new(0.5, -150, 0.5, -160)
-loaderMain.Image = "rbxassetid://18911065261" -- صورتك
-loaderMain.ScaleType = Enum.ScaleType.Stretch
-Instance.new("UICorner", loaderMain)
-
-local title = Instance.new("TextLabel", loaderMain)
-title.Size = UDim2.new(1, 0, 0.4, 0)
-title.Text = "NX2 v1 !"
-title.TextColor3 = Color3.fromRGB(255, 255, 0) -- أصفر
-title.TextSize = 40
-title.Font = Enum.Font.SourceSansBold
-title.BackgroundTransparency = 1
-
-local startBtn = Instance.new("TextButton", loaderMain)
-startBtn.Size = UDim2.new(0.8, 0, 0, 55)
-startBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-startBtn.Text = "START"
-startBtn.TextColor3 = Color3.new(1, 1, 1)
-startBtn.TextSize = 28
-Instance.new("UICorner", startBtn)
-
--- [ 2. المنيو الرئيسي (الشكل القديم الفخم) ] --
-local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 250, 0, 430)
-main.Position = UDim2.new(0.5, -125, 0.5, -215)
-main.BackgroundColor3 = Color3.new(0, 0, 0)
-main.BackgroundTransparency = 0.2 -- شفافية سوداء فخمة
-main.Visible = false
-main.Active = true
-main.Draggable = true
-Instance.new("UICorner", main)
-local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.new(1, 0, 0) -- حواف حمراء
-stroke.Thickness = 2
-
--- صورة شعار داخل المنيو فوق
-local logoImg = Instance.new("ImageLabel", main)
-logoImg.Size = UDim2.new(0, 60, 0, 60)
-logoImg.Position = UDim2.new(0.5, -30, 0, 5)
-logoImg.Image = "rbxassetid://18911065261"
-logoImg.BackgroundTransparency = 1
-Instance.new("UICorner", logoImg).CornerRadius = UDim.new(1,0)
-
--- زر الإخفاء (_)
-local hideBtn = Instance.new("TextButton", main)
-hideBtn.Size = UDim2.new(0, 30, 0, 30)
-hideBtn.Position = UDim2.new(1, -35, 0, 5)
-hideBtn.Text = "_"
-hideBtn.TextColor3 = Color3.new(1, 1, 1)
-hideBtn.BackgroundTransparency = 1
-
--- الأيقونة الدائرية (صورتك - مو رصاصية)
-local mini = Instance.new("ImageButton", sg)
-mini.Size = UDim2.new(0, 75, 0, 75)
-mini.Position = UDim2.new(0.9, -15, 0.1, 0)
-mini.Visible = false
-mini.Image = "rbxassetid://18911065261" -- صورتك الدائرية
-Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
-local mStroke = Instance.new("UIStroke", mini)
-mStroke.Color = Color3.new(1, 0, 0)
-mStroke.Thickness = 2
-
--- وظيفة صنع الأزرار
-local function createBtn(t, y, c)
-    local b = Instance.new("TextButton", main)
-    b.Size = UDim2.new(0.9, 0, 0, 40)
-    b.Position = UDim2.new(0.05, 0, 0, y)
-    b.BackgroundColor3 = c or Color3.fromRGB(35, 35, 35)
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.Text = t
-    b.Font = Enum.Font.SourceSansBold
-    b.TextSize = 18
-    Instance.new("UICorner", b)
-    return b
+– Delete old GUIs
+for _, gui in pairs(player.PlayerGui:GetChildren()) do
+if gui.Name == “NX2_Tsunami” then
+gui:Destroy()
+end
 end
 
--- الأوامر (كلها OFF)
-local collectBtn = createBtn("Auto Collect: OFF", 80, Color3.fromRGB(0, 100, 0))
-local afkBtn = createBtn("AFK Mode: OFF", 135)
-local noclipBtn = createBtn("Noclip: OFF", 190)
-local zoomBtn = createBtn("Infinite Zoom: OFF", 245)
-local discordBtn = createBtn("Join Discord", 300, Color3.fromRGB(88, 101, 242)) -- ديسكورد صار تحت
-local cleanBtn = createBtn("Clean Up UI", 375, Color3.fromRGB(150, 0, 0))
+local screenGui = Instance.new(“ScreenGui”)
+screenGui.Name = “NX2_Tsunami”
+screenGui.Parent = player.PlayerGui
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- [ 3. البرمجة والتحميل ] --
+– Start Frame with NX2 Logo
+local startFrame = Instance.new(“Frame”, screenGui)
+startFrame.Size = UDim2.new(0, 280, 0, 200)
+startFrame.Position = UDim2.new(0.5, -140, 0.5, -100)
+startFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+startFrame.BorderSizePixel = 0
 
-startBtn.MouseButton1Click:Connect(function()
-    startBtn.Active = false
-    for i = 1, 10 do
-        startBtn.Text = "Loading" .. string.rep(".", i % 4)
-        task.wait(0.35)
-    end
-    loaderFrame:Destroy()
-    main.Visible = true
+local startCorner = Instance.new(“UICorner”, startFrame)
+startCorner.CornerRadius = UDim.new(0, 15)
+
+local startStroke = Instance.new(“UIStroke”, startFrame)
+startStroke.Color = Color3.fromRGB(255, 100, 100)
+startStroke.Thickness = 3
+
+– NX2 Logo Container
+local logoContainer = Instance.new(“Frame”, startFrame)
+logoContainer.Size = UDim2.new(0, 120, 0, 120)
+logoContainer.Position = UDim2.new(0.5, -60, 0, 15)
+logoContainer.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+logoContainer.BorderSizePixel = 0
+
+local logoCorner = Instance.new(“UICorner”, logoContainer)
+logoCorner.CornerRadius = UDim.new(1, 0)
+
+local logoStroke = Instance.new(“UIStroke”, logoContainer)
+logoStroke.Color = Color3.fromRGB(255, 150, 150)
+logoStroke.Thickness = 4
+
+– NX2 Text Inside Logo
+local nx2Text = Instance.new(“TextLabel”, logoContainer)
+nx2Text.Size = UDim2.new(1, 0, 1, 0)
+nx2Text.BackgroundTransparency = 1
+nx2Text.Text = “NX2!”
+nx2Text.TextColor3 = Color3.fromRGB(255, 255, 255)
+nx2Text.TextSize = 45
+nx2Text.Font = Enum.Font.GothamBold
+nx2Text.TextStrokeTransparency = 0.5
+nx2Text.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+
+– Subtitle
+local subtitle = Instance.new(“TextLabel”, startFrame)
+subtitle.Size = UDim2.new(1, 0, 0, 25)
+subtitle.Position = UDim2.new(0, 0, 0, 145)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = “TSUNAMI ESCAPE”
+subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+subtitle.TextSize = 16
+subtitle.Font = Enum.Font.GothamBold
+
+– Start Button
+local startButton = Instance.new(“TextButton”, startFrame)
+startButton.Size = UDim2.new(0.7, 0, 0, 40)
+startButton.Position = UDim2.new(0.15, 0, 1, -50)
+startButton.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+startButton.Text = “▶ START”
+startButton.TextColor3 = Color3.new(1, 1, 1)
+startButton.TextSize = 20
+startButton.Font = Enum.Font.GothamBold
+startButton.BorderSizePixel = 0
+
+local startBtnCorner = Instance.new(“UICorner”, startButton)
+startBtnCorner.CornerRadius = UDim.new(0, 10)
+
+– Main Control Frame
+local mainFrame = Instance.new(“Frame”, screenGui)
+mainFrame.Size = UDim2.new(0, 260, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -160)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = false
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local mainCorner = Instance.new(“UICorner”, mainFrame)
+mainCorner.CornerRadius = UDim.new(0, 15)
+
+local mainStroke = Instance.new(“UIStroke”, mainFrame)
+mainStroke.Color = Color3.fromRGB(255, 100, 100)
+mainStroke.Thickness = 3
+
+– Main Frame Header with Small NX2 Logo
+local headerFrame = Instance.new(“Frame”, mainFrame)
+headerFrame.Size = UDim2.new(1, 0, 0, 50)
+headerFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+headerFrame.BorderSizePixel = 0
+
+local headerCorner = Instance.new(“UICorner”, headerFrame)
+headerCorner.CornerRadius = UDim.new(0, 15)
+
+local smallLogo = Instance.new(“Frame”, headerFrame)
+smallLogo.Size = UDim2.new(0, 35, 0, 35)
+smallLogo.Position = UDim2.new(0, 10, 0.5, -17.5)
+smallLogo.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+smallLogo.BorderSizePixel = 0
+
+local smallLogoCorner = Instance.new(“UICorner”, smallLogo)
+smallLogoCorner.CornerRadius = UDim.new(1, 0)
+
+local smallNX2 = Instance.new(“TextLabel”, smallLogo)
+smallNX2.Size = UDim2.new(1, 0, 1, 0)
+smallNX2.BackgroundTransparency = 1
+smallNX2.Text = “NX2”
+smallNX2.TextColor3 = Color3.new(1, 1, 1)
+smallNX2.TextSize = 14
+smallNX2.Font = Enum.Font.GothamBold
+
+local headerTitle = Instance.new(“TextLabel”, headerFrame)
+headerTitle.Size = UDim2.new(1, -60, 1, 0)
+headerTitle.Position = UDim2.new(0, 55, 0, 0)
+headerTitle.BackgroundTransparency = 1
+headerTitle.Text = “TSUNAMI ESCAPE”
+headerTitle.TextColor3 = Color3.fromRGB(255, 100, 100)
+headerTitle.TextSize = 18
+headerTitle.Font = Enum.Font.GothamBold
+headerTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+– Button Creation Function
+local function createButton(text, yPos, color)
+local btn = Instance.new(“TextButton”, mainFrame)
+btn.Size = UDim2.new(0.88, 0, 0, 45)
+btn.Position = UDim2.new(0.06, 0, 0, yPos)
+btn.BackgroundColor3 = color
+btn.Text = text
+btn.TextColor3 = Color3.new(1, 1, 1)
+btn.TextSize = 16
+btn.Font = Enum.Font.GothamBold
+btn.BorderSizePixel = 0
+
+```
+local btnCorner = Instance.new("UICorner", btn)
+btnCorner.CornerRadius = UDim.new(0, 10)
+
+local btnStroke = Instance.new("UIStroke", btn)
+btnStroke.Color = Color3.fromRGB(255, 255, 255)
+btnStroke.Thickness = 0
+btnStroke.Transparency = 0.8
+
+return btn
+```
+
+end
+
+– Control Buttons
+local autoWalkBtn = createButton(“🏃 Auto Walk: OFF”, 65, Color3.fromRGB(150, 40, 40))
+local stopBtn = createButton(“⛔ STOP”, 125, Color3.fromRGB(180, 50, 50))
+local instantBtn = createButton(“⚡ Instant Take: OFF”, 185, Color3.fromRGB(150, 40, 40))
+local zoomBtn = createButton(“🔍 ZOOM: OFF”, 245, Color3.fromRGB(150, 40, 40))
+
+– Start Button Click
+startButton.MouseButton1Click:Connect(function()
+startFrame:TweenPosition(UDim2.new(0.5, -140, -0.5, 0), “Out”, “Back”, 0.4, true)
+wait(0.4)
+startFrame.Visible = false
+mainFrame.Visible = true
+mainFrame:TweenSize(UDim2.new(0, 260, 0, 320), “Out”, “Elastic”, 0.6, true)
+
+```
+game.StarterGui:SetCore("SendNotification", {
+    Title = "NX2!";
+    Text = "Ready to escape!";
+    Duration = 2;
+})
+```
+
 end)
 
-hideBtn.MouseButton1Click:Connect(function() main.Visible = false; mini.Visible = true end)
-mini.MouseButton1Click:Connect(function() main.Visible = true; mini.Visible = false end)
+– Safe Spots (Orange Corridors)
+local safeSpots = {
+Vector3.new(0, 8, 0),
+Vector3.new(-70, 8, 0),
+Vector3.new(70, 8, 0),
+Vector3.new(0, 8, -70),
+Vector3.new(0, 8, 70),
+Vector3.new(-55, 8, -55),
+Vector3.new(55, 8, -55),
+Vector3.new(-55, 8, 55),
+Vector3.new(55, 8, 55),
+}
 
--- إصلاح تجميع الأغراض (Auto Collect)
-local autoCollect = false
-collectBtn.MouseButton1Click:Connect(function()
-    autoCollect = not autoCollect
-    collectBtn.Text = autoCollect and "Auto Collect: ON" or "Auto Collect: OFF"
-    collectBtn.TextColor3 = autoCollect and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
-    
-    task.spawn(function()
-        while autoCollect do
-            for _, v in pairs(game.Workspace:GetDescendants()) do
-                if autoCollect and v:IsA("BasePart") and (v.Name == "Coin" or v.Name == "Part" or v.Name == "Money") and v:FindFirstChild("TouchInterest") then
-                    firetouchinterest(player.Character.HumanoidRootPart, v, 0)
-                    firetouchinterest(player.Character.HumanoidRootPart, v, 1)
-                end
-            end
-            task.wait(0.2) -- سرعة تجميع عالية
+local isAutoWalking = false
+local walkConnection = nil
+
+local function getNearestSpot()
+if not player.Character or not player.Character:FindFirstChild(“HumanoidRootPart”) then
+return safeSpots[1]
+end
+
+```
+local playerPos = player.Character.HumanoidRootPart.Position
+local nearest = safeSpots[1]
+local minDistance = 999999
+
+for _, spot in ipairs(safeSpots) do
+    local distance = (playerPos - spot).Magnitude
+    if distance < minDistance then
+        minDistance = distance
+        nearest = spot
+    end
+end
+
+return nearest
+```
+
+end
+
+local function startAutoWalk()
+if isAutoWalking then return end
+isAutoWalking = true
+autoWalkBtn.Text = “🏃 Auto Walk: ON”
+autoWalkBtn.BackgroundColor3 = Color3.fromRGB(40, 150, 40)
+
+```
+game.StarterGui:SetCore("SendNotification", {
+    Title = "NX2!";
+    Text = "Auto Walk Started!";
+    Duration = 2;
+})
+
+local currentTarget = getNearestSpot()
+
+walkConnection = RunService.Heartbeat:Connect(function()
+    pcall(function()
+        if not isAutoWalking then return end
+        
+        local character = player.Character
+        if not character or not character:FindFirstChild("Humanoid") or not character:FindFirstChild("HumanoidRootPart") then
+            return
         end
+        
+        local humanoid = character.Humanoid
+        local hrp = character.HumanoidRootPart
+        
+        -- Calculate horizontal distance
+        local horizontalDist = Vector3.new(
+            hrp.Position.X - currentTarget.X,
+            0,
+            hrp.Position.Z - currentTarget.Z
+        ).Magnitude
+        
+        -- Find new target if close
+        if horizontalDist < 12 then
+            currentTarget = getNearestSpot()
+        end
+        
+        -- Walk to target (same Y level to walk naturally)
+        local walkTarget = Vector3.new(currentTarget.X, hrp.Position.Y, currentTarget.Z)
+        humanoid:MoveTo(walkTarget)
     end)
 end)
+```
 
--- AFK Mode
-local afkOn = false
-afkBtn.MouseButton1Click:Connect(function()
-    afkOn = not afkOn
-    afkBtn.Text = afkOn and "AFK Mode: ON" or "AFK Mode: OFF"
-end)
-player.Idled:Connect(function()
-    if afkOn then vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame); task.wait(1); vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame) end
+end
+
+local function stopAutoWalk()
+isAutoWalking = false
+autoWalkBtn.Text = “🏃 Auto Walk: OFF”
+autoWalkBtn.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+
+```
+if walkConnection then
+    walkConnection:Disconnect()
+    walkConnection = nil
+end
+
+if player.Character and player.Character:FindFirstChild("Humanoid") then
+    player.Character.Humanoid:MoveTo(player.Character.HumanoidRootPart.Position)
+end
+```
+
+end
+
+– Auto Walk Button
+autoWalkBtn.MouseButton1Click:Connect(function()
+if isAutoWalking then
+stopAutoWalk()
+else
+startAutoWalk()
+end
 end)
 
--- Noclip & Zoom
-local nOn = false
-noclipBtn.MouseButton1Click:Connect(function() nOn = not nOn; noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF" end)
-rs.Stepped:Connect(function()
-    if nOn and player.Character then
-        for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
-    end
+– Stop Button
+stopBtn.MouseButton1Click:Connect(function()
+stopAutoWalk()
+game.StarterGui:SetCore(“SendNotification”, {
+Title = “NX2!”;
+Text = “Stopped!”;
+Duration = 1;
+})
 end)
 
+– Instant Take Feature
+local instantTakeActive = false
+
+instantBtn.MouseButton1Click:Connect(function()
+instantTakeActive = not instantTakeActive
+instantBtn.Text = instantTakeActive and “⚡ Instant Take: ON” or “⚡ Instant Take: OFF”
+instantBtn.BackgroundColor3 = instantTakeActive and Color3.fromRGB(40, 150, 40) or Color3.fromRGB(150, 40, 40)
+end)
+
+RunService.Heartbeat:Connect(function()
+if instantTakeActive then
+for _, obj in pairs(workspace:GetDescendants()) do
+if obj:IsA(“ProximityPrompt”) then
+obj.HoldDuration = 0
+end
+end
+end
+end)
+
+– Zoom Feature
 zoomBtn.MouseButton1Click:Connect(function()
-    player.CameraMaxZoomDistance = (player.CameraMaxZoomDistance == 70) and 500 or 70
-    zoomBtn.Text = (player.CameraMaxZoomDistance == 500) and "Infinite Zoom: ON" or "Infinite Zoom: OFF"
+local zoomActive = (zoomBtn.Text == “🔍 ZOOM: OFF”)
+player.CameraMaxZoomDistance = zoomActive and 1000 or 128
+zoomBtn.Text = zoomActive and “🔍 ZOOM: ON” or “🔍 ZOOM: OFF”
+zoomBtn.BackgroundColor3 = zoomActive and Color3.fromRGB(40, 150, 40) or Color3.fromRGB(150, 40, 40)
 end)
 
-discordBtn.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
-cleanBtn.MouseButton1Click:Connect(function() sg:Destroy() end)
+– Death Handler
+player.CharacterAdded:Connect(function(character)
+wait(1)
+if character:FindFirstChild(“Humanoid”) then
+character.Humanoid.Died:Connect(function()
+stopAutoWalk()
+end)
+end
+end)
+
+– Success Notification
+game.StarterGui:SetCore(“SendNotification”, {
+Title = “NX2!”;
+Text = “Script Loaded Successfully!”;
+Duration = 3;
+})
+
+print(“✅ NX2 Tsunami Script Loaded!”)
