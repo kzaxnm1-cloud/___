@@ -1,93 +1,84 @@
 local player = game:GetService("Players").LocalPlayer
-local mouse = player:GetMouse()
+local camera = workspace.CurrentCamera
 local rs = game:GetService("RunService")
 local cg = game:GetService("CoreGui")
 local uis = game:GetService("UserInputService")
 
--- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_ULTIMATE_HUB") then cg.NX2_ULTIMATE_HUB:Destroy() end
+-- تنظيف النسخ السابقة
+if cg:FindFirstChild("NX2_CARSHOOT_V3") then cg.NX2_CARSHOOT_V3:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_ULTIMATE_HUB"
+sg.Name = "NX2_CARSHOOT_V3"
 sg.ResetOnSpawn = false
 
--- [ 1. شاشة الترحيب (بني - 3 ثواني) ] --
-local welcomeFrame = Instance.new("Frame", sg)
-welcomeFrame.Size = UDim2.new(1, 0, 1, 0)
-welcomeFrame.BackgroundColor3 = Color3.fromRGB(101, 67, 33) -- بني
-welcomeFrame.ZIndex = 100
+-- [ 1. شاشة الترحيب البنية ] --
+local welcome = Instance.new("Frame", sg)
+welcome.Size = UDim2.new(1, 0, 1, 0)
+welcome.BackgroundColor3 = Color3.fromRGB(101, 67, 33)
+welcome.ZIndex = 1000
 
-local welcomeText = Instance.new("TextLabel", welcomeFrame)
-welcomeText.Size = UDim2.new(1, 0, 0.2, 0)
-welcomeText.Position = UDim2.new(0, 0, 0.4, 0)
-welcomeText.Text = "Welcome is script NX2"
-welcomeText.TextColor3 = Color3.new(1, 1, 1)
-welcomeText.TextSize = 40
-welcomeText.Font = Enum.Font.SourceSansBold
-welcomeText.BackgroundTransparency = 1
+local wTitle = Instance.new("TextLabel", welcome)
+wTitle.Size = UDim2.new(1, 0, 0.2, 0)
+wTitle.Position = UDim2.new(0, 0, 0.4, 0)
+wTitle.Text = "Welcome is script NX2"
+wTitle.TextColor3 = Color3.new(1, 1, 1)
+wTitle.TextSize = 45
+wTitle.Font = Enum.Font.SourceSansBold
+wTitle.BackgroundTransparency = 1
+wTitle.ZIndex = 1001
 
-local welcomeDisc = Instance.new("TextLabel", welcomeFrame)
-welcomeDisc.Size = UDim2.new(1, 0, 0.1, 0)
-welcomeDisc.Position = UDim2.new(0, 0, 0.55, 0)
-welcomeDisc.Text = "discord = https://discord.gg/syPpUv8Jf"
-welcomeDisc.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-welcomeDisc.TextSize = 20
-welcomeDisc.BackgroundTransparency = 1
+local wDisc = Instance.new("TextLabel", welcome)
+wDisc.Size = UDim2.new(1, 0, 0.1, 0)
+wDisc.Position = UDim2.new(0, 0, 0.55, 0)
+wDisc.Text = "discord = https://discord.gg/syPpUv8Jf"
+wDisc.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+wDisc.TextSize = 25
+wDisc.BackgroundTransparency = 1
+wDisc.ZIndex = 1001
 
--- [ 2. شاشة اختيار اللغة ] --
-local langFrame = Instance.new("Frame", sg)
-langFrame.Size = UDim2.new(0, 300, 0, 150)
-langFrame.Position = UDim2.new(0.5, -150, 0.4, -75)
-langFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-langFrame.Visible = false
-langFrame.ZIndex = 110
-Instance.new("UICorner", langFrame)
+-- [ 2. اختيار اللغة ] --
+local lang = Instance.new("Frame", sg)
+lang.Size = UDim2.new(0, 300, 0, 150)
+lang.Position = UDim2.new(0.5, -150, 0.4, -75)
+lang.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+lang.Visible = false
+lang.ZIndex = 900
+Instance.new("UICorner", lang)
 
-local arBtn = Instance.new("TextButton", langFrame)
-arBtn.Size = UDim2.new(0.4, 0, 0.4, 0)
-arBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
-arBtn.Text = "عربي"
-arBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-arBtn.TextColor3 = Color3.new(1, 1, 1)
+local arBtn = Instance.new("TextButton", lang)
+arBtn.Size = UDim2.new(0.4, 0, 0.4, 0); arBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
+arBtn.Text = "عربي"; arBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255); arBtn.TextColor3 = Color3.new(1,1,1)
 
-local enBtn = Instance.new("TextButton", langFrame)
-enBtn.Size = UDim2.new(0.4, 0, 0.4, 0)
-enBtn.Position = UDim2.new(0.55, 0, 0.3, 0)
-enBtn.Text = "English"
-enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-enBtn.TextColor3 = Color3.new(1, 1, 1)
+local enBtn = Instance.new("TextButton", lang)
+enBtn.Size = UDim2.new(0.4, 0, 0.4, 0); enBtn.Position = UDim2.new(0.55, 0, 0.3, 0)
+enBtn.Text = "English"; enBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); enBtn.TextColor3 = Color3.new(1,1,1)
 
 -- [ 3. واجهة START ] --
-local startFrame = Instance.new("Frame", sg)
-startFrame.Size = UDim2.new(0, 250, 0, 150)
-startFrame.Position = UDim2.new(0.5, -125, 0.4, -75)
-startFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-startFrame.Visible = false
-Instance.new("UICorner", startFrame)
+local startF = Instance.new("Frame", sg)
+startF.Size = UDim2.new(0, 250, 0, 180)
+startF.Position = UDim2.new(0.5, -125, 0.4, -90)
+startF.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+startF.Visible = false
+startF.ZIndex = 800
+Instance.new("UICorner", startF)
 
-local sTitle = Instance.new("TextLabel", startFrame)
-sTitle.Size = UDim2.new(1, 0, 0.4, 0)
-sTitle.Text = "NX2"
-sTitle.TextColor3 = Color3.new(1, 1, 0)
-sTitle.TextSize = 35
-sTitle.BackgroundTransparency = 1
+local logo = Instance.new("TextLabel", startF)
+logo.Size = UDim2.new(1, 0, 0.4, 0); logo.Text = "NX2"; logo.TextColor3 = Color3.new(1,1,0); logo.TextSize = 50; logo.BackgroundTransparency = 1
 
-local startBtn = Instance.new("TextButton", startFrame)
-startBtn.Size = UDim2.new(0.8, 0, 0.35, 0)
-startBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
-startBtn.Text = "START"
-startBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", startBtn)
+local sBtn = Instance.new("TextButton", startF)
+sBtn.Size = UDim2.new(0.8, 0, 0.3, 0); sBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
+sBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0); sBtn.Text = "START"; sBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", sBtn)
 
--- [ 4. القائمة الرئيسية ] --
+-- [ 4. المنيو الرئيسي ] --
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 360, 0, 440)
-main.Position = UDim2.new(0.5, -180, 0.5, -220)
+main.Size = UDim2.new(0, 360, 0, 450)
+main.Position = UDim2.new(0.5, -180, 0.5, -225)
 main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 main.Visible = false
 main.Draggable = true
 Instance.new("UICorner", main)
+Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
 
 -- [ 5. شريط الإخفاء العلوي ] --
 local topBar = Instance.new("Frame", sg)
@@ -97,98 +88,95 @@ topBar.BackgroundColor3 = Color3.new(0, 0, 0)
 topBar.Visible = false
 Instance.new("UICorner", topBar)
 
-local topLabel = Instance.new("TextLabel", topBar)
-topLabel.Size = UDim2.new(1, 0, 1, 0)
-topLabel.Text = "NX2"
-topLabel.TextColor3 = Color3.new(1, 1, 0) -- أصفر
-topLabel.TextSize = 25
-topLabel.Font = Enum.Font.SourceSansBold
-topLabel.BackgroundTransparency = 1
+local topLogo = Instance.new("TextLabel", topBar)
+topLogo.Size = UDim2.new(1, 0, 1, 0); topLogo.Text = "NX2"; topLogo.TextColor3 = Color3.new(1, 1, 0); topLogo.TextSize = 28; topLogo.BackgroundTransparency = 1
 
-local topBtn = Instance.new("TextButton", topBar)
-topBtn.Size = UDim2.new(1, 0, 1, 0)
-topBtn.BackgroundTransparency = 1
-topBtn.Text = ""
+local topOpen = Instance.new("TextButton", topBar)
+topOpen.Size = UDim2.new(1, 0, 1, 0); topOpen.BackgroundTransparency = 1; topOpen.Text = ""
 
 -- [ 6. زر النار FIRE NX2 ] --
 local fire = Instance.new("TextButton", sg)
-fire.Size = UDim2.new(0, 100, 0, 100)
-fire.Position = UDim2.new(0.8, 0, 0.6, 0)
+fire.Size = UDim2.new(0, 120, 0, 120)
+fire.Position = UDim2.new(0.8, 0, 0.5, 0)
 fire.BackgroundColor3 = Color3.new(0, 0, 0)
 fire.Text = "FIRE\nNX2"
 fire.TextColor3 = Color3.new(1, 1, 1)
-fire.TextSize = 22
+fire.TextSize = 24
 fire.Font = Enum.Font.SourceSansBold
 fire.Visible = false
 fire.Draggable = true
 Instance.new("UICorner", fire).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", fire).Color = Color3.new(1, 0, 0)
 
--- [ الصفحات والوظائف ] --
+-- [ وظائف ESP والكشف ] --
+local espObjects = {}
+local function createESP(plr)
+    local box = Drawing.new("Square")
+    box.Color = Color3.new(0, 1, 0) -- أخضر
+    box.Thickness = 2; box.Filled = false
+    local name = Drawing.new("Text")
+    name.Color = Color3.new(1, 1, 1); name.Size = 18; name.Center = true; name.Outline = true
+    local tracer = Drawing.new("Line")
+    tracer.Color = Color3.new(1, 0, 0); tracer.Thickness = 1 -- خط أحمر للايم
+    
+    return {box = box, name = name, tracer = tracer}
+end
+
+-- [ برمجة الصفحات ] --
 local p1 = Instance.new("Frame", main); p1.Size = UDim2.new(1,0,1,-80); p1.Position = UDim2.new(0,0,0,80); p1.BackgroundTransparency = 1
 local p2 = Instance.new("Frame", main); p2.Size = p1.Size; p2.Position = p1.Position; p2.BackgroundTransparency = 1; p2.Visible = false
 local p3 = Instance.new("Frame", main); p3.Size = p1.Size; p3.Position = p1.Position; p3.BackgroundTransparency = 1; p3.Visible = false
 
-local function createTab(t, x)
+local function makeTab(t, x)
     local b = Instance.new("TextButton", main)
     b.Size = UDim2.new(0.33, 0, 0, 40); b.Position = UDim2.new(x, 0, 0, 40)
-    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1)
-    b.Text = t; return b
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1, 1, 1); b.Text = t; return b
 end
-
-local t1 = createTab("Game", 0)
-local t2 = createTab("Char", 0.33)
-local t3 = createTab("Discord", 0.66)
-
+local t1 = makeTab("Game", 0); local t2 = makeTab("Char", 0.33); local t3 = makeTab("Discord", 0.66)
 t1.MouseButton1Click:Connect(function() p1.Visible=true; p2.Visible=false; p3.Visible=false end)
 t2.MouseButton1Click:Connect(function() p1.Visible=false; p2.Visible=true; p3.Visible=false end)
 t3.MouseButton1Click:Connect(function() p1.Visible=false; p2.Visible=false; p3.Visible=true end)
 
-local function quickBtn(txt, y, p)
+local function makeBtn(t, y, p)
     local b = Instance.new("TextButton", p)
     b.Size = UDim2.new(0.9, 0, 0, 40); b.Position = UDim2.new(0.05, 0, y, 0)
-    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.new(1, 1, 1); b.Text = txt
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.new(1,1,1); b.Text = t
     Instance.new("UICorner", b); return b
 end
 
-local aimB = quickBtn("Aimbot: OFF", 0.05, p1)
-local espB = quickBtn("ESP: OFF", 0.2, p1)
-local speedB = quickBtn("Speed: OFF", 0.05, p2)
-local jumpB = quickBtn("Jump: OFF", 0.2, p2)
-local noclipB = quickBtn("Noclip: OFF", 0.35, p2)
-local hideB = quickBtn("Hide Menu", 0.6, p2)
-local copyD = quickBtn("Copy Discord Link", 0.4, p3)
+local aimB = makeBtn("Aimbot: OFF", 0.05, p1)
+local espB = makeBtn("ESP (Green): OFF", 0.2, p1)
+local speedB = makeBtn("Speed (Safe): OFF", 0.05, p2)
+local jumpB = makeBtn("Jump: OFF", 0.2, p2)
+local noclipB = makeBtn("Noclip: OFF", 0.35, p2)
+local hideB = makeBtn("Hide Menu", 0.55, p2)
+local copyD = makeBtn("Copy Discord", 0.1, p3)
 
--- [ منطق الترجمة ] --
-local isArabic = false
+-- [ منطق التشغيل ] --
+task.wait(3); welcome:Destroy(); lang.Visible = true
+
+local isAr = false
 arBtn.MouseButton1Click:Connect(function()
-    isArabic = true; langFrame.Visible = false; startFrame.Visible = true
+    isAr = true; lang:Destroy(); startF.Visible = true
     t1.Text = "اللعب"; t2.Text = "الشخصية"; t3.Text = "ديسكورد"
-    aimB.Text = "الأيم بوت: قفل"; espB.Text = "كشف اللاعبين: قفل"
-    speedB.Text = "السرعة: قفل"; jumpB.Text = "النطة: قفل"
-    noclipB.Text = "الاختراق: قفل"; hideB.Text = "إخفاء القائمة"; copyD.Text = "نسخ رابط الديسكورد"
+    aimB.Text = "الأيم بوت: قفل"; espB.Text = "الكشف: قفل"; speedB.Text = "السرعة: قفل"; hideB.Text = "إخفاء القائمة"; copyD.Text = "نسخ الرابط"
 end)
-enBtn.MouseButton1Click:Connect(function()
-    isArabic = false; langFrame.Visible = false; startFrame.Visible = true
-end)
+enBtn.MouseButton1Click:Connect(function() lang:Destroy(); startF.Visible = true end)
 
--- [ تشغيل START ] --
-startBtn.MouseButton1Click:Connect(function()
-    startBtn.Text = "..."; task.wait(1.5)
-    startFrame:Destroy(); main.Visible = true
-end)
-
--- [ نظام الإخفاء ] --
+sBtn.MouseButton1Click:Connect(function() startF:Destroy(); main.Visible = true end)
 hideB.MouseButton1Click:Connect(function() main.Visible = false; topBar.Visible = true end)
-topBtn.MouseButton1Click:Connect(function() topBar.Visible = false; main.Visible = true end)
+topOpen.MouseButton1Click:Connect(function() topBar.Visible = false; main.Visible = true end)
 
--- [ البرمجة والوظائف ] --
+-- [ تفعيل الميزات ] --
 local sOn, jOn, nOn, espOn = false, false, false, false
-
 aimB.MouseButton1Click:Connect(function()
     fire.Visible = not fire.Visible
-    if isArabic then aimB.Text = fire.Visible and "الأيم بوت: تشغيل" or "الأيم بوت: قفل"
-    else aimB.Text = fire.Visible and "Aimbot: ON" or "Aimbot: OFF" end
+    aimB.Text = fire.Visible and (isAr and "الأيم بوت: تشغيل" or "Aimbot: ON") or (isAr and "الأيم بوت: قفل" or "Aimbot: OFF")
+end)
+
+espB.MouseButton1Click:Connect(function() 
+    espOn = not espOn 
+    espB.Text = espOn and (isAr and "الكشف: تشغيل" or "ESP: ON") or (isAr and "الكشف: قفل" or "ESP: OFF")
 end)
 
 speedB.MouseButton1Click:Connect(function() sOn = not sOn end)
@@ -196,11 +184,29 @@ jumpB.MouseButton1Click:Connect(function() jOn = not jOn end)
 noclipB.MouseButton1Click:Connect(function() nOn = not nOn end)
 copyD.MouseButton1Click:Connect(function() setclipboard("https://discord.gg/syPpUv8Jf") end)
 
--- نظام ESP (كشف اللاعبين)
-espB.MouseButton1Click:Connect(function()
-    espOn = not espOn
-    if isArabic then espB.Text = espOn and "كشف اللاعبين: تشغيل" or "كشف اللاعبين: قفل"
-    else espB.Text = espOn and "ESP: ON" or "ESP: OFF" end
+-- [ نظام التحديث المستمر (ESP / Speed / Noclip) ] --
+rs.RenderStepped:Connect(function()
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player then
+            if not espObjects[p] then espObjects[p] = createESP(p) end
+            local data = espObjects[p]
+            local char = p.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and espOn then
+                local pos, onScreen = camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
+                if onScreen then
+                    data.box.Size = Vector2.new(2000 / pos.Z, 3000 / pos.Z)
+                    data.box.Position = Vector2.new(pos.X - data.box.Size.X / 2, pos.Y - data.box.Size.Y / 2)
+                    data.box.Visible = true
+                    data.name.Position = Vector2.new(pos.X, pos.Y - (data.box.Size.Y / 2) - 20)
+                    data.name.Text = p.Name; data.name.Visible = true
+                    if fire.Visible then
+                        data.tracer.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                        data.tracer.To = Vector2.new(pos.X, pos.Y); data.tracer.Visible = true
+                    else data.tracer.Visible = false end
+                else data.box.Visible = false; data.name.Visible = false; data.tracer.Visible = false end
+            else data.box.Visible = false; data.name.Visible = false; data.tracer.Visible = false end
+        end
+    end
 end)
 
 rs.Heartbeat:Connect(function()
@@ -212,6 +218,3 @@ rs.Heartbeat:Connect(function()
         if nOn then for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
     end
 end)
-
--- مؤقت شاشة الترحيب
-task.delay(3, function() welcomeFrame:Destroy(); langFrame.Visible = true end)
