@@ -2,38 +2,38 @@ local player = game:GetService("Players").LocalPlayer
 local cg = game:GetService("CoreGui")
 local rs = game:GetService("RunService")
 
--- [ 1. نظام التحقق الحصري لماب تسونامي ] --
--- تم تحديد الرقم بناءً على الماب المرفق في الصورة
-local Tsunami_ID = 18911065261 
+-- [ 1. نظام التحقق الصارم - ماب تسونامي فقط ] --
+-- تم تحديث الـ ID ليتطابق مع الماب الموجود في الصورة
+local Tsunami_PlaceId = 18911065261
 
-if game.PlaceId ~= Tsunami_ID then
-    -- إذا الماب ليس تسونامي المذكور، يتم المنع
-    if cg:FindFirstChild("NX2_PROTECT") then cg.NX2_PROTECT:Destroy() end
-    local sg = Instance.new("ScreenGui", cg)
-    sg.Name = "NX2_PROTECT"
+if game.PlaceId ~= Tsunami_PlaceId then
+    -- إظهار شاشة المنع السوداء
+    if cg:FindFirstChild("NX2_DENIED") then cg.NX2_DENIED:Destroy() end
+    local screen = Instance.new("ScreenGui", cg)
+    screen.Name = "NX2_DENIED"
     
-    local frame = Instance.new("Frame", sg)
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundColor3 = Color3.new(0, 0, 0)
-    frame.ZIndex = 1000
+    local bg = Instance.new("Frame", screen)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.new(0, 0, 0)
+    bg.ZIndex = 9999
     
-    local txt = Instance.new("TextLabel", frame)
-    txt.Size = UDim2.new(1, 0, 0.3, 0)
-    txt.Position = UDim2.new(0, 0, 0.35, 0)
-    txt.TextColor3 = Color3.new(1, 0, 0)
-    txt.TextSize = 40
-    txt.Font = Enum.Font.SourceSansBold
-    txt.Text = "SYSTEM: BANNED\nممنوع السكربت بذا الماب فقط تسونامي"
+    local msg = Instance.new("TextLabel", bg)
+    msg.Size = UDim2.new(1, 0, 0.4, 0)
+    msg.Position = UDim2.new(0, 0, 0.3, 0)
+    msg.TextColor3 = Color3.new(1, 0, 0)
+    msg.TextSize = 45
+    msg.Font = Enum.Font.SourceSansBold
+    msg.Text = "SYSTEM ERROR: UNAUTHORIZED\nممنوع السكربت بذا الماب فقط تسونامي"
     
-    task.wait(4)
-    player:Kick("NX2 Security: Access Denied. This script is exclusive to Tsunami Brainrot.")
-    return 
+    task.wait(3)
+    player:Kick("\n[NX2 PROTECTION]\nهذا السكربت مخصص لماب تسونامي فقط.\nThis script is for Tsunami Brainrot only.")
+    return
 end
 
--- [ 2. تشغيل السكربت للماب المسموح ] --
-if cg:FindFirstChild("NX2_TSUNAMI") then cg.NX2_TSUNAMI:Destroy() end
+-- [ 2. تشغيل السكربت في ماب تسونامي المسموح ] --
+if cg:FindFirstChild("NX2_TSUNAMI_FINAL") then cg.NX2_TSUNAMI_FINAL:Destroy() end
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_TSUNAMI"
+sg.Name = "NX2_TSUNAMI_FINAL"
 sg.ResetOnSpawn = false
 
 local main = Instance.new("Frame", sg)
@@ -45,42 +45,44 @@ Instance.new("UICorner", main)
 Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
 
 local logo = Instance.new("TextLabel", main)
-logo.Size = UDim2.new(1, 0, 0.2, 0)
-logo.Text = "NX2 v1 - TSUNAMI"
+logo.Size = UDim2.new(1, 0, 0.25, 0)
+logo.Text = "NX2 v1"
 logo.TextColor3 = Color3.new(1, 1, 0)
-logo.TextSize = 22
+logo.TextSize = 28
 logo.BackgroundTransparency = 1
 
 local showBtn = Instance.new("TextButton", sg)
-showBtn.Size = UDim2.new(0, 80, 0, 30)
-showBtn.Position = UDim2.new(0.5, -40, 0, 5)
+showBtn.Size = UDim2.new(0, 100, 0, 35)
+showBtn.Position = UDim2.new(0.5, -50, 0, 10)
+showBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+showBtn.TextColor3 = Color3.new(1, 1, 0)
 showBtn.Text = "Show NX2"
 showBtn.Visible = false
 Instance.new("UICorner", showBtn)
 
 local function makeBtn(t, y)
     local b = Instance.new("TextButton", main)
-    b.Size = UDim2.new(0.9, 0, 0, 45)
+    b.Size = UDim2.new(0.9, 0, 0, 50)
     b.Position = UDim2.new(0.05, 0, 0, y)
-    b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     b.TextColor3 = Color3.new(1, 1, 1)
-    b.TextSize = 18
+    b.TextSize = 20
     b.Text = t
     Instance.new("UICorner", b)
     return b
 end
 
-local noclipB = makeBtn("Noclip: OFF", 70)
-local discB = makeBtn("Discord Server", 130)
-local hideB = makeBtn("Hide Menu", 210)
-hideB.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+local noclipB = makeBtn("Noclip: OFF", 80)
+local discB = makeBtn("Discord Link", 145)
+local hideB = makeBtn("Hide Menu", 215)
+hideB.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
 
--- [ 3. البرمجة ] --
+-- [ 3. الأوامر (الاختراق فقط) ] --
 local nOn = false
-
 noclipB.MouseButton1Click:Connect(function()
     nOn = not nOn
     noclipB.Text = nOn and "Noclip: ON" or "Noclip: OFF"
+    noclipB.TextColor3 = nOn and Color3.new(0, 1, 0) or Color3.new(1, 1, 1)
 end)
 
 rs.Stepped:Connect(function()
@@ -93,9 +95,9 @@ end)
 
 discB.MouseButton1Click:Connect(function()
     setclipboard("https://discord.gg/syPpUv8Jf")
-    discB.Text = "Link Copied!"
+    discB.Text = "Copied!"
     task.wait(2)
-    discB.Text = "Discord Server"
+    discB.Text = "Discord Link"
 end)
 
 hideB.MouseButton1Click:Connect(function() main.Visible = false; showBtn.Visible = true end)
