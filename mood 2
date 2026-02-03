@@ -1,7 +1,7 @@
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
-local mouse = player:GetMouse() -- ربط الماوس للاستخدام مع الزر الإضافي
+local mouse = player:GetMouse()
 
 -- المواقع المحددة
 local safePoints = {
@@ -9,29 +9,38 @@ local safePoints = {
     Vector3.new(200, 5, 200) -- الفتحة الثانية
 }
 local startPoint = character.PrimaryPart.Position -- الموقع الأصلي (البداية)
-
--- الحالة الحالية
 local currentIndex = 0 -- الموقع الحالي (0 يعني البداية)
+
+-- واجهة المربع الأسود وزراره
+local screenGui = Instance.new("ScreenGui", player.PlayerGui)
+local frame = Instance.new("Frame", screenGui)
+local forwardButton = Instance.new("TextButton", frame)
+local backButton = Instance.new("TextButton", frame)
+local removeButton = Instance.new("TextButton", frame)
+
+-- تصميم المربع الأسود
+frame.Size = UDim2.new(0, 300, 0, 200)
+frame.Position = UDim2.new(0.5, -150, 0.8, -100)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+-- تصميم زر "أمام"
+forwardButton.Size = UDim2.new(0, 100, 0, 50)
+forwardButton.Position = UDim2.new(0, 20, 0, 20)
+forwardButton.Text = "أمام"
+forwardButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+
+-- تصميم زر "خلف"
+backButton.Size = UDim2.new(0, 100, 0, 50)
+backButton.Position = UDim2.new(0, 20, 0, 90)
+backButton.Text = "خلف"
+backButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+
+-- تصميم زر "يشيل الشي"
+removeButton.Size = UDim2.new(0, 100, 0, 50)
+removeButton.Position = UDim2.new(0, 180, 0, 55)
+removeButton.Text = "يشيل الشي"
+removeButton.BackgroundColor3 = Color3.fromRGB(150, 150, 50)
 
 -- دالة التحرك بين الفتحات
 local function moveToPosition(index)
     if index == 0 then
-        humanoid:MoveTo(startPoint) -- النقطة الأصلية
-    elseif index > 0 and index <= #safePoints then
-        humanoid:MoveTo(safePoints[index]) -- الفتحات الآمنة
-    end
-    currentIndex = index -- تحديث الموقع الحالي
-end
-
--- جزء التحكم في الفتحات بالأزرار
-local userInputService = game:GetService("UserInputService")
-
-userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-
-    if input.KeyCode == Enum.KeyCode.E then
-        -- زر "E" للتحرك للأمام
-        if currentIndex < #safePoints then
-            moveToPosition(currentIndex + 1) -- التقدم إلى النقطة التالية
-        end
-    elseif input.KeyCode == Enum
