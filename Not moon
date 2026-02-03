@@ -1,30 +1,102 @@
-game.StarterGui:SetCore("SendNotification", {
-    Title = "🌊 TSUNAMI SCRIPT";
-    Text = "Loading...";
-    Duration = 3;
-})
+local player = game:GetService("Players").LocalPlayer
+local cg = game:GetService("CoreGui")
+local rs = game:GetService("RunService")
 
-wait(0.5)
+-- [ 1. نظام التحقق الحصري لماب تسونامي ] --
+-- تم تحديد الرقم بناءً على الماب المرفق في الصورة
+local Tsunami_ID = 18911065261 
 
-local player = game.Players.LocalPlayer
-local RunService = game:GetService("RunService")
-
--- حذف أي GUI قديمة
-for _, gui in pairs(player.PlayerGui:GetChildren()) do
-    if gui.Name == "TsunamiESP" then gui:Destroy() end
+if game.PlaceId ~= Tsunami_ID then
+    -- إذا الماب ليس تسونامي المذكور، يتم المنع
+    if cg:FindFirstChild("NX2_PROTECT") then cg.NX2_PROTECT:Destroy() end
+    local sg = Instance.new("ScreenGui", cg)
+    sg.Name = "NX2_PROTECT"
+    
+    local frame = Instance.new("Frame", sg)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.new(0, 0, 0)
+    frame.ZIndex = 1000
+    
+    local txt = Instance.new("TextLabel", frame)
+    txt.Size = UDim2.new(1, 0, 0.3, 0)
+    txt.Position = UDim2.new(0, 0, 0.35, 0)
+    txt.TextColor3 = Color3.new(1, 0, 0)
+    txt.TextSize = 40
+    txt.Font = Enum.Font.SourceSansBold
+    txt.Text = "SYSTEM: BANNED\nممنوع السكربت بذا الماب فقط تسونامي"
+    
+    task.wait(4)
+    player:Kick("NX2 Security: Access Denied. This script is exclusive to Tsunami Brainrot.")
+    return 
 end
 
-local sg = Instance.new("ScreenGui")
-sg.Name = "TsunamiESP"
-sg.Parent = player.PlayerGui
+-- [ 2. تشغيل السكربت للماب المسموح ] --
+if cg:FindFirstChild("NX2_TSUNAMI") then cg.NX2_TSUNAMI:Destroy() end
+local sg = Instance.new("ScreenGui", cg)
+sg.Name = "NX2_TSUNAMI"
 sg.ResetOnSpawn = false
-sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- زر البداية
-local startF = Instance.new("Frame", sg)
-startF.Size = UDim2.new(0, 200, 0, 150)
-startF.Position = UDim2.new(0.5, -100, 0.5, -75)
-startF.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-startF.BorderSizePixel = 0
-startF.ZIndex = 10
-Instance.new("UICorner", startF).CornerRadius =​​​​​​​​​​​​​​​​
+local main = Instance.new("Frame", sg)
+main.Size = UDim2.new(0, 260, 0, 280)
+main.Position = UDim2.new(0.5, -130, 0.5, -140)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+main.Draggable = true
+Instance.new("UICorner", main)
+Instance.new("UIStroke", main).Color = Color3.new(1, 1, 0)
+
+local logo = Instance.new("TextLabel", main)
+logo.Size = UDim2.new(1, 0, 0.2, 0)
+logo.Text = "NX2 v1 - TSUNAMI"
+logo.TextColor3 = Color3.new(1, 1, 0)
+logo.TextSize = 22
+logo.BackgroundTransparency = 1
+
+local showBtn = Instance.new("TextButton", sg)
+showBtn.Size = UDim2.new(0, 80, 0, 30)
+showBtn.Position = UDim2.new(0.5, -40, 0, 5)
+showBtn.Text = "Show NX2"
+showBtn.Visible = false
+Instance.new("UICorner", showBtn)
+
+local function makeBtn(t, y)
+    local b = Instance.new("TextButton", main)
+    b.Size = UDim2.new(0.9, 0, 0, 45)
+    b.Position = UDim2.new(0.05, 0, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.TextSize = 18
+    b.Text = t
+    Instance.new("UICorner", b)
+    return b
+end
+
+local noclipB = makeBtn("Noclip: OFF", 70)
+local discB = makeBtn("Discord Server", 130)
+local hideB = makeBtn("Hide Menu", 210)
+hideB.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+
+-- [ 3. البرمجة ] --
+local nOn = false
+
+noclipB.MouseButton1Click:Connect(function()
+    nOn = not nOn
+    noclipB.Text = nOn and "Noclip: ON" or "Noclip: OFF"
+end)
+
+rs.Stepped:Connect(function()
+    if nOn and player.Character then
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
+        end
+    end
+end)
+
+discB.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/syPpUv8Jf")
+    discB.Text = "Link Copied!"
+    task.wait(2)
+    discB.Text = "Discord Server"
+end)
+
+hideB.MouseButton1Click:Connect(function() main.Visible = false; showBtn.Visible = true end)
+showBtn.MouseButton1Click:Connect(function() main.Visible = true; showBtn.Visible = false end)
