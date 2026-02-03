@@ -3,31 +3,31 @@ local cg = game:GetService("CoreGui")
 local rs = game:GetService("RunService")
 local vu = game:GetService("VirtualUser")
 
--- حذف أي نسخة قديمة عشان ما تتراكم الشاشات السوداء
-if cg:FindFirstChild("NX2_ULTIMATE_CLEAR") then cg.NX2_ULTIMATE_CLEAR:Destroy() end
+-- تنظيف النسخ القديمة
+if cg:FindFirstChild("NX2_ULTIMATE_TRANSPARENT") then cg.NX2_ULTIMATE_TRANSPARENT:Destroy() end
 
 local sg = Instance.new("ScreenGui", cg)
-sg.Name = "NX2_ULTIMATE_CLEAR"
+sg.Name = "NX2_ULTIMATE_TRANSPARENT"
 sg.ResetOnSpawn = false
 
--- [ 1. شاشة الدخول - شفافة تماماً ] --
-local loaderFrame = Instance.new("Frame", sg)
-loaderFrame.Size = UDim2.new(1, 0, 1, 0)
-loaderFrame.BackgroundTransparency = 1 -- هنا السر: الشاشة صارت شفافة 100%
-loaderFrame.ZIndex = 100
+-- [ 1. شاشة الدخول - شفافة بـ 3.5 ثانية تحميل ] --
+local loaderBg = Instance.new("Frame", sg)
+loaderBg.Size = UDim2.new(1, 0, 1, 0)
+loaderBg.BackgroundTransparency = 1 -- شفافة تماماً عشان تشوف الماب
+loaderBg.ZIndex = 100
 
-local loaderMain = Instance.new("ImageLabel", loaderFrame)
+local loaderMain = Instance.new("ImageLabel", loaderBg)
 loaderMain.Size = UDim2.new(0, 280, 0, 300)
 loaderMain.Position = UDim2.new(0.5, -140, 0.5, -150)
-loaderMain.Image = "rbxassetid://18911065261" -- صورتك
-loaderMain.BackgroundTransparency = 0.3 -- المربع نفسه شفاف عشان تشوف الماب
+loaderMain.Image = "rbxassetid://18911065261"
+loaderMain.BackgroundTransparency = 0.4 -- شفافية المربع نفسه
 loaderMain.ScaleType = Enum.ScaleType.Stretch
 Instance.new("UICorner", loaderMain)
 
 local title = Instance.new("TextLabel", loaderMain)
 title.Size = UDim2.new(1, 0, 0.3, 0)
 title.Text = "NX2 v1 !"
-title.TextColor3 = Color3.fromRGB(255, 255, 0) -- لون أصفر
+title.TextColor3 = Color3.fromRGB(255, 255, 0) -- أصفر
 title.TextSize = 32
 title.Font = Enum.Font.SourceSansBold
 title.BackgroundTransparency = 1
@@ -35,27 +35,28 @@ title.BackgroundTransparency = 1
 local startBtn = Instance.new("TextButton", loaderMain)
 startBtn.Size = UDim2.new(0.8, 0, 0, 50)
 startBtn.Position = UDim2.new(0.1, 0, 0.75, 0)
-startBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255) -- أزرق
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 startBtn.Text = "START"
 startBtn.TextColor3 = Color3.new(1, 1, 1)
 startBtn.TextSize = 25
 Instance.new("UICorner", startBtn)
 
--- [ 2. المنيو الرئيسي - شفاف ] --
+-- [ 2. المنيو الرئيسي - شفافية 0.5 عشان تشوف اللعب ] --
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 250, 0, 420)
 main.Position = UDim2.new(0.5, -125, 0.5, -210)
-main.BackgroundTransparency = 0.4 -- شفاف عشان ما يحجب الرؤية
 main.BackgroundColor3 = Color3.new(0, 0, 0)
+main.BackgroundTransparency = 0.5 -- الحين شفافية قوية تشوف اللي وراه
 main.Visible = false
 main.Draggable = true
 Instance.new("UICorner", main)
 Instance.new("UIStroke", main).Color = Color3.new(1, 0, 0)
 
+-- زر الإخفاء (_)
 local hideBtn = Instance.new("TextButton", main)
 hideBtn.Size = UDim2.new(0, 30, 0, 30)
 hideBtn.Position = UDim2.new(1, -35, 0, 5)
-hideBtn.Text = "_" -- زر الإخفاء
+hideBtn.Text = "_"
 hideBtn.TextColor3 = Color3.new(1, 1, 1)
 hideBtn.BackgroundTransparency = 1
 
@@ -64,7 +65,8 @@ local mini = Instance.new("ImageButton", sg)
 mini.Size = UDim2.new(0, 65, 0, 65)
 mini.Position = UDim2.new(0.9, -10, 0.1, 0)
 mini.Visible = false
-mini.Image = "rbxassetid://18911065261" --
+mini.Image = "rbxassetid://18911065261"
+mini.BackgroundTransparency = 0.2
 Instance.new("UICorner", mini).CornerRadius = UDim.new(1, 0)
 
 -- وظيفة صنع الأزرار
@@ -73,15 +75,16 @@ local function createBtn(t, y, c)
     b.Size = UDim2.new(0.9, 0, 0, 35)
     b.Position = UDim2.new(0.05, 0, 0, y)
     b.BackgroundColor3 = c or Color3.fromRGB(45, 45, 45)
-    b.BackgroundTransparency = 0.2
+    b.BackgroundTransparency = 0.2 -- حتى الأزرار شفافة شوي
     b.TextColor3 = Color3.new(1, 1, 1)
     b.Text = t
+    b.TextSize = 16
     b.Font = Enum.Font.SourceSansBold
     Instance.new("UICorner", b)
     return b
 end
 
--- [ 3. الأوامر الجديدة ] --
+-- الأوامر
 local collectBtn = createBtn("Auto Collect: OFF", 70, Color3.fromRGB(0, 120, 0))
 local afkBtn = createBtn("AFK Mode: OFF", 115)
 local noclipBtn = createBtn("Noclip: OFF", 160)
@@ -89,23 +92,22 @@ local zoomBtn = createBtn("Infinite Zoom: OFF", 205)
 local discordBtn = createBtn("Join Discord", 250, Color3.fromRGB(88, 101, 242))
 local cleanBtn = createBtn("Clean Up UI", 360, Color3.fromRGB(150, 0, 0))
 
--- [ 4. البرمجة والتحميل ] --
+-- [ 3. البرمجة ] --
 
 startBtn.MouseButton1Click:Connect(function()
     startBtn.Active = false
-    -- تحميل 3.5 ثانية
     for i = 1, 10 do
         startBtn.Text = "Loading" .. string.rep(".", i % 4)
-        task.wait(0.35)
+        task.wait(0.35) -- تحميل 3.5 ثانية
     end
-    loaderFrame:Destroy()
+    loaderBg:Destroy()
     main.Visible = true
 end)
 
 hideBtn.MouseButton1Click:Connect(function() main.Visible = false; mini.Visible = true end)
 mini.MouseButton1Click:Connect(function() main.Visible = true; mini.Visible = false end)
 
--- نظام تجميع الأموال التلقائي
+-- وظيفة التجميع التلقائي (Auto Collect)
 local autoCollect = false
 collectBtn.MouseButton1Click:Connect(function()
     autoCollect = not autoCollect
@@ -113,7 +115,7 @@ collectBtn.MouseButton1Click:Connect(function()
     task.spawn(function()
         while autoCollect do
             for _, v in pairs(game.Workspace:GetDescendants()) do
-                if autoCollect and (v.Name == "Coin" or v.Name == "Part") and v:FindFirstChild("TouchInterest") then
+                if autoCollect and (v.Name == "Part" or v.Name == "Coin") and v:FindFirstChild("TouchInterest") then
                     firetouchinterest(player.Character.HumanoidRootPart, v, 0)
                     firetouchinterest(player.Character.HumanoidRootPart, v, 1)
                 end
@@ -123,22 +125,33 @@ collectBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- نظام AFK
+-- وظيفة AFK لمنع الطرد
 local afkOn = false
 afkBtn.MouseButton1Click:Connect(function()
     afkOn = not afkOn
     afkBtn.Text = afkOn and "AFK Mode: ON" or "AFK Mode: OFF"
 end)
+
 player.Idled:Connect(function()
-    if afkOn then vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame); task.wait(1); vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame) end
+    if afkOn then
+        vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end
 end)
 
--- Noclip & Zoom
+-- باقي الأوامر
 local nOn = false
-noclipBtn.MouseButton1Click:Connect(function() nOn = not nOn; noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF" end)
+noclipBtn.MouseButton1Click:Connect(function()
+    nOn = not nOn
+    noclipBtn.Text = nOn and "Noclip: ON" or "Noclip: OFF"
+end)
+
 rs.Stepped:Connect(function()
     if nOn and player.Character then
-        for _, v in pairs(player.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
+        end
     end
 end)
 
