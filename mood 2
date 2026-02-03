@@ -1,68 +1,37 @@
--- NX2 TSUNAMI SPECIAL V1
-local player = game:GetService("Players").LocalPlayer
+local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local root = character:WaitForChild("HumanoidRootPart")
-local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "NX2_TSUNAMI"
+local humanoid = character:WaitForChild("Humanoid")
+local mouse = player:GetMouse() -- ربط الماوس للاستخدام مع الزر الإضافي
 
--- [ القائمة الرئيسية ] --
-local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 220, 0, 180)
-main.Position = UDim2.new(0.5, -110, 0.5, -90)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-main.Active = true
-main.Draggable = true
-Instance.new("UICorner", main)
-
--- [ الشعار NX2 ] --
-local logo = Instance.new("TextLabel", main)
-logo.Size = UDim2.new(1, 0, 0.3, 0)
-logo.Text = "NX2"
-logo.TextColor3 = Color3.new(1, 1, 0)
-logo.TextSize = 30
-logo.Font = Enum.Font.SourceSansBold
-logo.BackgroundTransparency = 1
-
--- [ إعدادات الفتحات/الأدوار ] --
--- ملاحظة: الإحداثيات هنا تقريبية لماب التسونامي المشهورة
-local spots = {
-    Vector3.new(0, 30, 0),  -- الفتحة الأولى (الدور الأول)
-    Vector3.new(0, 60, 0),  -- الفتحة الثانية (الدور الثاني)
-    Vector3.new(0, 90, 0),  -- الفتحة الثالثة
-    Vector3.new(0, 120, 0), -- الفتحة الرابعة
-    Vector3.new(0, 150, 0)  -- أعلى قمة
+-- المواقع المحددة
+local safePoints = {
+    Vector3.new(100, 5, 100), -- الفتحة الأولى
+    Vector3.new(200, 5, 200) -- الفتحة الثانية
 }
-local currentSpot = 0
+local startPoint = character.PrimaryPart.Position -- الموقع الأصلي (البداية)
 
--- [ أزرار التحكم ] --
-local function createNavBtn(text, pos, color)
-    local b = Instance.new("TextButton", main)
-    b.Size = UDim2.new(0.8, 0, 0.25, 0)
-    b.Position = pos
-    b.Text = text
-    b.BackgroundColor3 = color
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.Font = Enum.Font.SourceSansBold
-    Instance.new("UICorner", b)
-    return b
+-- الحالة الحالية
+local currentIndex = 0 -- الموقع الحالي (0 يعني البداية)
+
+-- دالة التحرك بين الفتحات
+local function moveToPosition(index)
+    if index == 0 then
+        humanoid:MoveTo(startPoint) -- النقطة الأصلية
+    elseif index > 0 and index <= #safePoints then
+        humanoid:MoveTo(safePoints[index]) -- الفتحات الآمنة
+    end
+    currentIndex = index -- تحديث الموقع الحالي
 end
 
-local nextBtn = createNavBtn("قدام (الفتحة التالية)", UDim2.new(0.1, 0, 0.35, 0), Color3.fromRGB(0, 150, 0))
-local backBtn = createNavBtn("وراء (الفتحة السابقة)", UDim2.new(0.1, 0, 0.65, 0), Color3.fromRGB(150, 0, 0))
+-- جزء التحكم في الفتحات بالأزرار
+local userInputService = game:GetService("UserInputService")
 
--- [ برمجة الانتقال ] --
-nextBtn.MouseButton1Click:Connect(function()
-    if currentSpot < #spots then
-        currentSpot = currentSpot + 1
-        root.CFrame = CFrame.new(spots[currentSpot])
-        nextBtn.Text = "فتحة " .. currentSpot
-    end
-end)
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
 
-backBtn.MouseButton1Click:Connect(function()
-    if currentSpot > 1 then
-        currentSpot = currentSpot - 1
-        root.CFrame = CFrame.new(spots[currentSpot])
-        nextBtn.Text = "فتحة " .. currentSpot
-    end
-end)
+    if input.KeyCode == Enum.KeyCode.E then
+        -- زر "E" للتحرك للأمام
+        if currentIndex < #safePoints then
+            moveToPosition(currentIndex + 1) -- التقدم إلى النقطة التالية
+        end
+    elseif input.KeyCode == Enum
