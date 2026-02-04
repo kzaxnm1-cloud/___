@@ -1,23 +1,89 @@
--- إعداد الفتحات مع تحقق من وجود المجلد
-local partsFolder = workspace:FindFirstChild("TsunamiMapParts")
-if not partsFolder then
-    warn("TsunamiMapParts folder not found! Please create it in Workspace with proper parts.")
-    return
-end
+-- [[ سكربت تعديلات وضبط كامل ]] --
 
--- إعداد الشخصية مع تحقق إضافي
+-- التحقق من اللاعب وتحميل الشخصية
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-while not character.Parent do
+
+while not character.PrimaryPart do
     task.wait()
 end
 
--- تحقق من المكتبة قبل استخدامها
-local success, library = pcall(function()
-    return loadstring(game:HttpGet("https://pastebin.com/raw/UZp6G1QU"))()
-end)
-
-if not success then
-    warn("Failed to load Delta Library. Check the URL or your connection.")
+-- التحقق من وجود مجلد الفتحات
+local partsFolder = workspace:FindFirstChild("TsunamiMapParts")
+if not partsFolder then
+    warn("TsunamiMapParts folder not found! Please ensure it exists in the Workspace.")
     return
 end
+
+-- جمع الفتحات وترتيبها حسب التسلسل
+local parts = {}
+for _, part in ipairs(partsFolder:GetChildren()) do
+    if part:IsA("BasePart") then -- تأكد أن الأجسام أجزاء صالحة
+        table.insert(parts, part)
+    end
+end
+
+table.sort(parts, function(a, b) return a.Name < b.Name end) -- ترتيب الفتحات حسب الاسم
+
+if #parts == 0 then
+    warn("No valid parts found in TsunamiMapParts. Please add parts into the folder.")
+    return
+end
+
+-- إعدادات البداية
+local currentPartIndex = 1
+
+-- إعداد دلائل النقل
+local function teleportToPart(index)
+    if parts[index] then
+        character:SetPrimaryPartCFrame(parts[index].CFrame + Vector3.new(0, 5, 0)) -- النقل مع رفع الشخصية قليلًا
+        print("Teleported to: " .. parts[index].Name)
+    else
+        warn("Invalid part index: " .. tostring(index))
+    end
+end
+
+local function goForward()
+    if currentPartIndex < #parts then
+        currentPartIndex += 1
+    else
+        currentPartIndex = 1 -- العودة لنقطة البداية
+    end
+    teleportToPart(currentPartIndex)
+end
+
+local function goBackward()
+    if currentPartIndex > 1 then
+        currentPartIndex -= 1
+    else
+        currentPartIndex = #parts -- الرجوع للنهاية
+    end
+    teleportToPart(currentPartIndex)
+end
+
+-- تحميل مكتبة Delta UI
+local success, library = pcall(function()
+    return loadstring(game:HttpGet("https://pastebin.com/raw/UZp6G1QU"))() -- تأكد من أن الرابط صالح!
+end)
+
+if not success or not library then
+    warn("Failed to load Delta UI library. Please check the URL connection.")
+    return
+end
+
+-- إنشاء نافذة واجهة المستخدم
+local window = library:CreateWindow("Tsunami Teleport") -- نافذة جديدة بعنوان
+
+-- إضافة الأزرار إلى النافذة
+window:Button("أمام", function()
+    goForward()
+end)
+
+window:Button("خلف", function()
+    goBackward()
+end)
+
+-- تحميل المكتبة
+library:Ready()
+warn("Script loaded and ready!")
+print("Tsunami teleport GUI is now active.")
