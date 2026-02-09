@@ -1,0 +1,152 @@
+-- [[ No lag NX2 $ - FINAL VERSION WITH YOUR DISCORD ]] --
+local lp = game.Players.LocalPlayer
+local cg = game:GetService("CoreGui")
+local stats = game:GetService("Stats")
+local startTime = os.time()
+
+-- تنظيف النسخ القديمة
+if cg:FindFirstChild("NX2_FINAL_SYSTEM") then cg.NX2_FINAL_SYSTEM:Destroy() end
+if cg:FindFirstChild("NX2_INTRO") then cg.NX2_INTRO:Destroy() end
+
+-- [1] واجهة الدخول (3 ثواني)
+local function runIntro()
+    local introGui = Instance.new("ScreenGui", cg)
+    introGui.Name = "NX2_INTRO"
+    local bg = Instance.new("Frame", introGui)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.new(0, 0, 0)
+    bg.BackgroundTransparency = 0.7
+    
+    local t = Instance.new("TextLabel", introGui)
+    t.Size = UDim2.new(1, 0, 1, 0)
+    t.BackgroundTransparency = 1
+    t.TextColor3 = Color3.new(1, 1, 1)
+    t.Font = Enum.Font.SourceSansBold
+    t.TextSize = 100
+    t.Text = ""
+    
+    task.spawn(function()
+        local fullText = "No lag NX2 $"
+        for i = 1, #fullText do
+            t.Text = string.sub(fullText, 1, i)
+            task.wait(0.05)
+        end
+        task.wait(3)
+        introGui:Destroy()
+        createMainUI()
+    end)
+end
+
+-- [2] واجهة الأوامر (قابلة للتحريك + أزرار ذكية)
+function createMainUI()
+    local sg = Instance.new("ScreenGui", cg)
+    sg.Name = "NX2_FINAL_SYSTEM"
+    
+    local main = Instance.new("Frame", sg)
+    main.Size = UDim2.new(0, 200, 0, 220)
+    main.Position = UDim2.new(0.05, 0, 0.3, 0)
+    main.BackgroundColor3 = Color3.new(0, 0, 0)
+    main.BackgroundTransparency = 0.3
+    main.BorderSizePixel = 0
+    main.Active = true
+    main.Draggable = true
+    Instance.new("UICorner", main)
+
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(1, 0, 0.15, 0)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 18
+    title.Text = "No lag NX2 $"
+
+    local pingL = Instance.new("TextLabel", main)
+    pingL.Size = UDim2.new(1, 0, 0.15, 0)
+    pingL.Position = UDim2.new(0, 0, 0.15, 0)
+    pingL.BackgroundTransparency = 1
+    pingL.TextColor3 = Color3.fromRGB(0, 255, 120)
+    pingL.Font = Enum.Font.Code
+    pingL.TextSize = 15
+    task.spawn(function()
+        while task.wait(1) do 
+            local p = stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+            pingL.Text = "Ping: " .. math.floor(p) .. " ms"
+        end
+    end)
+
+    local function createBtn(txt, pos, func)
+        local b = Instance.new("TextButton", main)
+        b.Size = UDim2.new(0.85, 0, 0.14, 0)
+        b.Position = pos
+        b.BackgroundColor3 = Color3.new(1, 1, 1)
+        b.BackgroundTransparency = 0.1
+        b.TextColor3 = Color3.new(0, 0, 0)
+        b.Font = Enum.Font.SourceSansBold
+        b.TextSize = 14
+        b.Text = txt
+        b.AutoButtonColor = true
+        Instance.new("UICorner", b)
+        b.MouseButton1Click:Connect(function() func(b) end)
+        return b
+    end
+
+    -- زر No Lag
+    createBtn("No Lag / Booster", UDim2.new(0.075, 0, 0.32, 0), function(btn)
+        task.spawn(function()
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0 end
+                if v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
+                if v:IsA("ParticleEmitter") or v:IsA("Trail") then v.Enabled = false end
+            end
+        end)
+        btn.Text = "Applied ✅"
+        task.wait(1)
+        btn.Text = "No Lag / Booster"
+    end)
+
+    -- زر AFK (تبديل الاسم)
+    local afkOn = false
+    createBtn("AFK Mode", UDim2.new(0.075, 0, 0.48, 0), function(btn)
+        afkOn = not afkOn
+        if afkOn then
+            btn.Text = "Stop AFK ✅"
+            btn.TextColor3 = Color3.fromRGB(255, 0, 0)
+            _G.AFK_CONN = lp.Idled:Connect(function()
+                game:GetService("GuiService"):SetInspectMenuEnabled(false)
+            end)
+        else
+            btn.Text = "AFK Mode"
+            btn.TextColor3 = Color3.new(0, 0, 0)
+            if _G.AFK_CONN then _G.AFK_CONN:Disconnect() end
+        end
+    end)
+
+    -- زر الديسكورد (رابطك الجديد)
+    createBtn("Discord Server", UDim2.new(0.075, 0, 0.64, 0), function(btn)
+        if setclipboard then
+            setclipboard("https://discord.gg/XKvkedtd7")
+            btn.Text = "Copied ✅"
+            task.wait(1)
+            btn.Text = "Discord Server"
+        else
+            btn.Text = "Not Supported"
+        end
+    end)
+
+    local timeL = Instance.new("TextLabel", main)
+    timeL.Size = UDim2.new(1, 0, 0.15, 0)
+    timeL.Position = UDim2.new(0, 0, 0.82, 0)
+    timeL.BackgroundTransparency = 1
+    timeL.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    timeL.Font = Enum.Font.SourceSans
+    timeL.TextSize = 13
+    task.spawn(function()
+        while task.wait(1) do
+            local s = os.time() - startTime
+            timeL.Text = string.format("Session: %02d:%02d:%02d", math.floor(s/3600), math.floor(s/60)%60, s%60)
+        end
+    end)
+end
+
+runIntro()
