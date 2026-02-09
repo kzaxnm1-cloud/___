@@ -1,17 +1,22 @@
--- [[ No lag NX2 $ - FINAL VERSION WITH YOUR DISCORD ]] --
+-- [[ No lag NX2 $ - RESTART FIX ]] --
 local lp = game.Players.LocalPlayer
 local cg = game:GetService("CoreGui")
 local stats = game:GetService("Stats")
 local startTime = os.time()
 
--- تنظيف النسخ القديمة
-if cg:FindFirstChild("NX2_FINAL_SYSTEM") then cg.NX2_FINAL_SYSTEM:Destroy() end
-if cg:FindFirstChild("NX2_INTRO") then cg.NX2_INTRO:Destroy() end
+-- [نظام التنظيف القوي] يمسح أي نسخة سابقة عشان ما يعلق
+for _, old in pairs(cg:GetChildren()) do
+    if old.Name == "NX2_FINAL_SYSTEM" or old.Name == "NX2_INTRO" then
+        old:Destroy()
+    end
+end
 
 -- [1] واجهة الدخول (3 ثواني)
-local function runIntro()
+local function runIntro(callback)
     local introGui = Instance.new("ScreenGui", cg)
     introGui.Name = "NX2_INTRO"
+    introGui.IgnoreGuiInset = true
+    
     local bg = Instance.new("Frame", introGui)
     bg.Size = UDim2.new(1, 0, 1, 0)
     bg.BackgroundColor3 = Color3.new(0, 0, 0)
@@ -33,14 +38,15 @@ local function runIntro()
         end
         task.wait(3)
         introGui:Destroy()
-        createMainUI()
+        callback()
     end)
 end
 
--- [2] واجهة الأوامر (قابلة للتحريك + أزرار ذكية)
+-- [2] واجهة الأوامر
 function createMainUI()
     local sg = Instance.new("ScreenGui", cg)
     sg.Name = "NX2_FINAL_SYSTEM"
+    sg.ResetOnSpawn = false -- يخلي السكربت ما يختفي لو مت
     
     local main = Instance.new("Frame", sg)
     main.Size = UDim2.new(0, 200, 0, 220)
@@ -67,10 +73,12 @@ function createMainUI()
     pingL.TextColor3 = Color3.fromRGB(0, 255, 120)
     pingL.Font = Enum.Font.Code
     pingL.TextSize = 15
+    
     task.spawn(function()
-        while task.wait(1) do 
+        while sg.Parent do -- يتأكد إن الواجهة موجودة قبل التحديث
             local p = stats.Network.ServerStatsItem["Data Ping"]:GetValue()
             pingL.Text = "Ping: " .. math.floor(p) .. " ms"
+            task.wait(1)
         end
     end)
 
@@ -84,13 +92,11 @@ function createMainUI()
         b.Font = Enum.Font.SourceSansBold
         b.TextSize = 14
         b.Text = txt
-        b.AutoButtonColor = true
         Instance.new("UICorner", b)
         b.MouseButton1Click:Connect(function() func(b) end)
         return b
     end
 
-    -- زر No Lag
     createBtn("No Lag / Booster", UDim2.new(0.075, 0, 0.32, 0), function(btn)
         task.spawn(function()
             settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
@@ -105,7 +111,6 @@ function createMainUI()
         btn.Text = "No Lag / Booster"
     end)
 
-    -- زر AFK (تبديل الاسم)
     local afkOn = false
     createBtn("AFK Mode", UDim2.new(0.075, 0, 0.48, 0), function(btn)
         afkOn = not afkOn
@@ -122,16 +127,11 @@ function createMainUI()
         end
     end)
 
-    -- زر الديسكورد (رابطك الجديد)
     createBtn("Discord Server", UDim2.new(0.075, 0, 0.64, 0), function(btn)
-        if setclipboard then
-            setclipboard("https://discord.gg/XKvkedtd7")
-            btn.Text = "Copied ✅"
-            task.wait(1)
-            btn.Text = "Discord Server"
-        else
-            btn.Text = "Not Supported"
-        end
+        setclipboard("https://discord.gg/XKvkedtd7")
+        btn.Text = "Copied ✅"
+        task.wait(1)
+        btn.Text = "Discord Server"
     end)
 
     local timeL = Instance.new("TextLabel", main)
@@ -142,11 +142,13 @@ function createMainUI()
     timeL.Font = Enum.Font.SourceSans
     timeL.TextSize = 13
     task.spawn(function()
-        while task.wait(1) do
+        while sg.Parent do
             local s = os.time() - startTime
             timeL.Text = string.format("Session: %02d:%02d:%02d", math.floor(s/3600), math.floor(s/60)%60, s%60)
+            task.wait(1)
         end
     end)
 end
 
-runIntro()
+-- تشغيل السكربت
+runIntro(createMainUI)
