@@ -1,1 +1,184 @@
-local _0xNX2=function(_0xL)local _0xO=""local _0xK="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"_0xL=string.gsub(_0xL,'[^'.._0xK..'=]','')return(_0xL:gsub('.',function(x)if(x=='=')then return''end local r,f='',(_0xK:find(x)-1)for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and'1'or'0')end return r;end):gsub('%d%d%d%d%d%d%d%d',function(x)local r=0 for i=1,8 do r=r+(x:sub(i,i)=='1'and 2^(8-i)or 0)end return string.char(r)end))end;local _0xZ=""for i=1,9500 do _0xZ=_0xZ..string.char(math.random(33,126))end;local _0xPayload="bG9jYWwgUGxheWVycyA9IGdhbWU6R2V0U2VydmljZSgiUGxheWVycyIpCmxvY2FsIFJ1blNlcnZpY2UgPSBnYW1lOkdldFNlcnZpY2UoIlJ1blNlcnZpY2UiKQpsb2NhbCBVc2VySW5wdXRTZXJ2aWNlID0gZ2FtZTpHZXRTZXJ2aWNlKCJVc2VySW5wdXRTZXJ2aWNlIikKbG9jYWwgTG9jYWxQbGF5ZXIgPSBQbGF5ZXJzLkxvY2FsUGxheWVyCmdldGdlbnYoKS5TdGF0ZXMgPSBnZXRnZW52KCkuU3RhdGVzIG9yIHt9CmxvY2FsIFRoZW1lID0geyBHYWxheHlCYXNlID0gQ29sb3IzLmZyb21SR0IoMTUsIDEwLCAzMCksIEhlYWRlckNvbG9yID0gQ29sb3IzLmZyb21SR0IoNDAsIDIwLCA4MCksIEJ1dHRvbk9uID0gQ29sb3IzLmZyb21SR0IoMCwgMjU1LCAxNTApLCBCdXR0b25PZmYgPSBDb2xvclIzLmZyb21SR0IoNDUsIDQ1LCA2MCksIFZJUF9ZZWxsb3cgPSBDb2xvclIzLmZyb21SR0IoMjU1LCAyMTUsIDApIH0K" .. _0xZ;local _0xFinal=function() local _0xQ=" " .. _0xZ .. " "; loadstring(_0xNX2("bG9jYWwgUGxheWVycyA9IGdhbWU6R2V0U2VydmljZSgiUGxheWVycyIpCmxvY2FsIFJ1blNlcnZpY2UgPSBnYW1lOkdldFNlcnZpY2UoIlJ1blNlcnZpY2UiKQpsb2NhbCBVc2VySW5wdXRTZXJ2aWNlID0gZ2FtZTpHZXRTZXJ2aWNlKCJVc2VySW5wdXRTZXJ2aWNlIikKbG9jYWwgTG9jYWxQbGF5ZXIgPSBQbGF5ZXJzLkxvY2FsUGxheWVyCmdldGdlbnYoKS5TdGF0ZXMgPSBnZXRnZW52KCkuU3RhdGVzIG9yIHt9CmxvY2FsIFRoZW1lID0geyBHYWxheHlCYXNlID0gQ29sb3IzLmZyb21SR0IoMTUsIDEwLCAzMCksIEhlYWRlckNvbG9yID0gQ29sb3IzLmZyb21SR0IoNDAsIDIwLCA4MCksIEJ1dHRvbk9uID0gQ29sb3IzLmZyb21SR0IoMCwgMjU1LCAxNTApLCBCdXR0b25PZmYgPSBDb2xvclIzLmZyb21SR0IoNDUsIDQ1LCA2MCksIFZJUF9ZZWxsb3cgPSBDb2xvclIzLmZyb21SR0IoMjU1LCAyMTUsIDApIH0KZnVuY3Rpb24gR2V0SHViKCkgbG9jYWwgZSA9IEluc3RhbmNlLm5ldygiU2NyZWVuR3VpIiwgZ2FtZTpHZXRTZXJ2aWNlKCJDb3JlR3VpIikpIGxvY2FsIG0gPSBJbnN0YW5jZS5uZXcoIkZyYW1lIiwgZSkgbS5TaXplID0gVURpbTIubmV3KDAsIDMzMCwgMCwgNDgwKSBtLlBvc2l0aW9uID0gVURpbTIubmV3KDAuNSwgLTE2NSwgMC41LCAtMjQwKSBtLkJhY2tncm91bmRDb2xvcjMgPSBUaGVtZS5HYWxheHlCYXNlIGxvY2FsIGggPSBJbnN0YW5jZS5uZXcoIkZyYW1lIiwgbSkgaC5TaXplID0gVURpbTIubmV3KDEsIDAsIDAsIDgwKSBoLkJhY2tncm91bmRDb2xvcjMgPSBUaGVtZS5IZWFkZXJDb2xvciBsb2NhbCB0ID0gSW5zdGFudC5uZXcoIlRleHRMYWJlbCIsIGgpIHQuU2l6ZSA9IFVQaW0yLm5ldygxLCAwLCAxLCAwKSB0LlRleHQgPSAiTlgyIEhVQiIgbG9jYWwgcyA9IEluc3RhbmNlLm5ldygiU2Nyb2xsaW5nRnJhbWUiLCBtKSBzLlNpemUgPSBVUGltMi5uZXcoMSwgLTIwLCAxLCAtMTYwKSBzLlBvc2l0aW9uID0gVURpbTIubmV3KDAsIDEwLCAwLCAxNTApIHNvID0gSW5zdGFudC5uZXcoIlVJTGlzdExheW91dCIsIHMpIGxvY2FsIGZ1bmN0aW9uIENCKHQsIGksIGssIGMsIGdiKQpsb2NhbCBiID0gSW5zdGFudC5uZXcoIlRleHRCdXR0b24iLCBzKSBiLlNpemUgPSBVUGltMi5uZXcoMSwgMCwgMCwgNTApIGguQmFja2dyb3VuZENvbG9yMyA9IFRoZW1lLkJ1dHRvbk9mZiBsb2NhbCBsID0gSW5zdGFudC5uZXcoIlRleHRMYWJlbCIsIGIpIGwuU2l6ZSA9IFVQaW0yLm5ldygxLCAwLCAxLCAwKSBsLlRleHQgPSBpIC4uICIgICIgLi4gdCBnZXRnZW52KCkuU3RhdGVzW2tdID0gZ2V0Z2VudigpLlN0YXRlc1trXSBvciBmYWxzZSBiLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QoZnVuY3Rpb24oKSBnZXRnZW52KCkuU3RhdGVzW2tdID0gbm90IGdldGdlbnYoKS5TdGF0ZXNba10gZ2IoZ2V0Z2VudigpLlN0YXRlc1trXSkIGVuZCkgZW5kIENDKCJHb2QgTW9kZSIsICLShieldIsICJHb2QiLCBuaWwsIGZ1bmN0aW9uKHMpIHRhc2suc3Bhd24oZnVuY3Rpb24oKSB3aGlsZSB0YXNrLndhaXQoMC4zKSBkbyBpZiBub3QgZ2V0Z2VudigpLlN0YXRlc1siR29kIl0gdGhlbiBmb3IgXywgdiBpbiBwYWlycyh3b3Jrc3BhY2U6R2V0RGVzY2VuZGFudHMoKSkgZG8gaWYgdi1Jc0EoIkJhc2VQYXJ0IikgYW5kICh2Lk5hbWU6bG93ZXIoKTpmaW5kKCJsYXZhIikgb3Igdi5OYW1lOmxvd2VyKCk6ZmluZCgia2lsbCIpKSB0aGVuIHYuQ2FuVG91Y2ggPSB0cnVlIGVuZCBlbmQgYnJlYWsgZW5kIHBjYWxsKGZ1bmN0aW9uKCkgTG9jYWxQbGF5ZXIuQ2hhcmFjdGVyLkh1bWFub2lkLkhlYWx0aCA9IDEwMCBmb3IgXywgdiBpbiBwYWlycyh3b3Jrc3BhY2U6R2V0RGVzY2VuZGFudHMoKSkgZG8gaWYgdi1Jc0EoIkJhc2VQYXJ0IikgYW5kICh2Lk5hbWU6bG93ZXIoKTpmaW5kKCJsYXZhIikgb3Igdi5OYW1lOmxvd2VyKCk6ZmluZCgia2lsbCIpKSB0aGVuIHYuQ2FuVG91Y2ggPSBmYWxzZSBlbmQgZW5kIGVuZCkgZW5kIGVuZCkgZW5kKSBDQygiSW5maW5pdGUgSnVtcCIsICLwn66KIiwgIkluZkoiLCBuaWwsIGZ1bmN0aW9uKHMpIExvY2FsUGxheWVyLlVzZXJJbnB1dFNlcnZpY2UuSnVtcFJlcXVlc3Q6Q29ubmVjdChmdW5jdGlvbigpIGlmIGdldGdlbnYoKS5TdGF0ZXNbIkluZkoiXSB0aGVuIExvY2FsUGxheWVyLkNoYXJhY3Rlci5IdW1hbm9pZDpDaGFuZ2VTdGF0ZSgzKSBlbmQgZW5kKSBlbmQpIENDKCJBbnRpLUFGSyIsICLwn5K6IiwgIkFGSyIsIG5pbCwgZnVuY3Rpb24ocykgTG9jYWxQbGF5ZXIuSWRsZWQ6Q29ubmVjdChmdW5jdGlvbigpIGlmIGdldGdlbnYoKS5TdGF0ZXNbIkFGSyJdIHRoZW4gZ2FtZTpHZXRTZXJ2aWNlKCJWaXJ0dWFsVXNlciIpOkNhcHR1cmVDb250cm9sbGVyKCkgZ2FtZTpHZXRTZXJ2aWNlKCJWaXJ0dWFsVXNlciIpOkNsaWNrQnV0dG9uMihWZWN0b3IyLm5ldygpKSBlbmQgZW5kKSBlbmQpIENDKCJGUFMgQm9vc3QiLCAiw7rjIiwgIkZQUyIsIG5pbCwgZnVuY3Rpb24ocykgaWYgcyB0aGVuIHNldHRpbmdzKCkuUmVuZGVyaW5nLlF1YWxpdHlMZXZlbCA9IDEgZ2FtZTpHZXRTZXJ2aWNlKCJMaWdodGluZyIpLkdsb2JhbFNoYWRvd3MgPSBmYWxzZSBlbHNlIGdhbWU6R2V0U2VydmljZSgiTGlnaHRpbmciKS5HbG9iYWxTaGFkb3dzID0gdHJ1ZSBlbmQgZW5kKSBDQygiVW5sb2NrIFpvb20iLCAiw7rkIiwgIlpvb20iLCBuaWwsIGZ1bmN0aW9uKHMpIExvY2FsUGxheWVyLkNhbWVyYU1heFpvb21EaXN0YW5jZSA9IHMgYW5kIDk5OTk5IG9yIDEyOCBlbmQpIGVuZCBHZXRIdWIoKQ=="))() end;_0xFinal()
+-- [[ NX2 HUB - PRECISE EDITION ]] --
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- [ حفظ الحالات ] --
+getgenv().States = getgenv().States or {}
+
+local Theme = {
+    GalaxyBase = Color3.fromRGB(15, 10, 30),
+    HeaderColor = Color3.fromRGB(40, 20, 80),
+    ButtonOn = Color3.fromRGB(0, 255, 150),
+    ButtonOff = Color3.fromRGB(45, 45, 60),
+    VIP_Yellow = Color3.fromRGB(255, 215, 0),
+    WhiteText = Color3.fromRGB(255, 255, 255),
+    Black = Color3.fromRGB(0, 0, 0)
+}
+
+-- [ إنشاء الواجهة ] --
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "NX2_ULTIMATE_CLEAN"
+
+local OpenIcon = Instance.new("TextButton", ScreenGui)
+OpenIcon.Size = UDim2.new(0, 60, 0, 60); OpenIcon.Position = UDim2.new(0.02, 0, 0.45, 0)
+OpenIcon.BackgroundColor3 = Theme.Black; OpenIcon.Text = "NX2"; OpenIcon.TextColor3 = Theme.WhiteText
+OpenIcon.Font = "GothamBlack"; OpenIcon.TextSize = 18; OpenIcon.Visible = false
+Instance.new("UICorner", OpenIcon).CornerRadius = UDim.new(1, 0)
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 330, 0, 480); MainFrame.Position = UDim2.new(0.5, -165, 0.5, -240)
+MainFrame.BackgroundColor3 = Theme.GalaxyBase; Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 15)
+
+local Header = Instance.new("Frame", MainFrame)
+Header.Size = UDim2.new(1, 0, 0, 80); Header.BackgroundColor3 = Theme.HeaderColor; Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 15)
+
+local Title = Instance.new("TextLabel", Header)
+Title.Size = UDim2.new(1, 0, 1, 0); Title.Position = UDim2.new(0, 20, 0, 0)
+Title.Text = "NX2 HUB"; Title.Font = "GothamBlack"; Title.TextSize = 24; Title.TextColor3 = Theme.WhiteText; Title.TextXAlignment = "Left"; Title.BackgroundTransparency = 1
+
+local CloseBtn = Instance.new("TextButton", Header)
+CloseBtn.Size = UDim2.new(0, 35, 0, 35); CloseBtn.Position = UDim2.new(1, -45, 0, 22)
+CloseBtn.Text = "X"; CloseBtn.BackgroundColor3 = Theme.Black; CloseBtn.TextColor3 = Theme.WhiteText; Instance.new("UICorner", CloseBtn)
+
+CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; OpenIcon.Visible = true end)
+OpenIcon.MouseButton1Click:Connect(function() OpenIcon.Visible = false; MainFrame.Visible = true end)
+
+local Scroll = Instance.new("ScrollingFrame", MainFrame)
+Scroll.Size = UDim2.new(1, -20, 1, -160); Scroll.Position = UDim2.new(0, 10, 0, 150); Scroll.BackgroundTransparency = 1; Scroll.ScrollBarThickness = 0
+Instance.new("UIListLayout", Scroll).Padding = UDim.new(0, 8)
+
+local function CreateButton(text, icon, key, color, callback)
+    local btn = Instance.new("TextButton", Scroll)
+    btn.Size = UDim2.new(1, 0, 0, 50); btn.BackgroundColor3 = Theme.ButtonOff; btn.Text = ""
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+    local lbl = Instance.new("TextLabel", btn)
+    lbl.Size = UDim2.new(1, 0, 1, 0); lbl.Font = "GothamBold"; lbl.TextSize = 14; lbl.TextColor3 = Theme.WhiteText; lbl.BackgroundTransparency = 1
+    local function update()
+        btn.BackgroundColor3 = getgenv().States[key] and (color or Theme.ButtonOn) or Theme.ButtonOff
+        lbl.Text = icon .. "  " .. text .. (getgenv().States[key] and ": ON" or ": OFF")
+        lbl.TextColor3 = getgenv().States[key] and Theme.Black or Theme.WhiteText
+    end
+    update()
+    btn.MouseButton1Click:Connect(function() getgenv().States[key] = not getgenv().States[key]; update(); callback(getgenv().States[key]) end)
+end
+
+-- [[ تابة Main ]] --
+local function LoadMain()
+    for _, v in pairs(Scroll:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    
+    -- God Mode (يقتل عند الإطفاء)
+    CreateButton("God Mode", "🛡️", "God", nil, function(s) 
+        task.spawn(function()
+            while task.wait(0.3) do
+                if not getgenv().States["God"] then
+                    -- إرجاع اللمس للافا عند الإطفاء
+                    for _, v in pairs(workspace:GetDescendants()) do
+                        if v:IsA("BasePart") and (v.Name:lower():find("lava") or v.Name:lower():find("kill")) then v.CanTouch = true end
+                    end
+                    break
+                end
+                pcall(function()
+                    LocalPlayer.Character.Humanoid.Health = 100
+                    for _, v in pairs(workspace:GetDescendants()) do
+                        if v:IsA("BasePart") and (v.Name:lower():find("lava") or v.Name:lower():find("kill")) then v.CanTouch = false end
+                    end
+                end)
+            end
+        end)
+    end)
+
+    CreateButton("Infinite Jump", "🦘", "InfJ", nil, function(s) 
+        local c; c = UserInputService.JumpRequest:Connect(function() if getgenv().States["InfJ"] then LocalPlayer.Character.Humanoid:ChangeState(3) end end)
+    end)
+    
+    CreateButton("Anti-AFK", "💤", "AFK", nil, function(s)
+        LocalPlayer.Idled:Connect(function() if getgenv().States["AFK"] then game:GetService("VirtualUser"):CaptureController(); game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end end)
+    end)
+
+    CreateButton("FPS Boost", "⚡", "FPS", nil, function(s) 
+        if s then settings().Rendering.QualityLevel = 1; game:GetService("Lighting").GlobalShadows = false else game:GetService("Lighting").GlobalShadows = true end 
+    end)
+
+    CreateButton("Unlock Zoom", "🔓", "Zoom", nil, function(s) LocalPlayer.CameraMaxZoomDistance = s and 99999 or 128 end)
+end
+
+-- [[ تابة Auto ]] --
+local function LoadAuto()
+    for _, v in pairs(Scroll:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    
+    -- OPEN VIP (يخفي كلمة الشراء فوراً)
+    CreateButton("OPEN VIP", "👑", "VipPass", Theme.VIP_Yellow, function(s)
+        task.spawn(function()
+            while getgenv().States["VipPass"] do
+                pcall(function()
+                    for _, v in pairs(workspace:GetDescendants()) do
+                        if v:IsA("BasePart") and (v.Name:lower():find("vip") or v.Name:lower():find("premium")) then
+                            v.CanCollide = false; v.Transparency = 0.5
+                        end
+                    end
+                    -- إخفاء كلمة الشراء تماماً
+                    local purchaseUI = game:GetService("CoreGui"):FindFirstChild("PurchasePrompt")
+                    if purchaseUI then purchaseUI.Enabled = false end
+                end)
+                task.wait(0.1) -- فحص سريع جداً للحذف
+            end
+            -- إرجاع كل شيء عند الإطفاء
+            local purchaseUI = game:GetService("CoreGui"):FindFirstChild("PurchasePrompt")
+            if purchaseUI then purchaseUI.Enabled = true end
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("BasePart") and (v.Name:lower():find("vip") or v.Name:lower():find("premium")) then v.CanCollide = true; v.Transparency = 0 end
+            end
+        end)
+    end)
+    
+    CreateButton("Auto Rebirth", "🔄", "Rebirth", nil, function(s)
+        task.spawn(function()
+            while getgenv().States["Rebirth"] do
+                pcall(function()
+                    for _, v in pairs(workspace:GetDescendants()) do
+                        if v:IsA("ProximityPrompt") and v.ObjectText:lower():find("rebirth") then
+                            v.HoldDuration = 0; fireproximityprompt(v)
+                        end
+                    end
+                end)
+                task.wait(1)
+            end
+        end)
+    end)
+end
+
+-- [[ تابة ★ ]] --
+local function LoadStar()
+    for _, v in pairs(Scroll:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    local HopBtn = Instance.new("TextButton", Scroll)
+    HopBtn.Size = UDim2.new(1, 0, 0, 100); HopBtn.BackgroundColor3 = Theme.HeaderColor; HopBtn.Text = "🚀 SERVER HOP"; HopBtn.TextColor3 = Theme.WhiteText; HopBtn.Font = "GothamBlack"; HopBtn.TextSize = 25; Instance.new("UICorner", HopBtn).CornerRadius = UDim.new(0, 15)
+    HopBtn.MouseButton1Click:Connect(function()
+        local s = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"))
+        for _, v in pairs(s.data) do if v.playing < v.maxPlayers and v.id ~= game.JobId then game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, v.id, LocalPlayer) break end end
+    end)
+end
+
+-- [ التبديل والسحب ] --
+local TabHolder = Instance.new("Frame", MainFrame)
+TabHolder.Size = UDim2.new(1, -20, 0, 45); TabHolder.Position = UDim2.new(0, 10, 0, 95); TabHolder.BackgroundTransparency = 1
+local function AddTab(n, p, f)
+    local b = Instance.new("TextButton", TabHolder); b.Size = UDim2.new(0.31, 0, 1, 0); b.Position = p
+    b.Text = n; b.BackgroundColor3 = Theme.HeaderColor; b.TextColor3 = Theme.WhiteText; b.Font = "GothamBold"; Instance.new("UICorner", b)
+    b.MouseButton1Click:Connect(f)
+end
+AddTab("Main", UDim2.new(0, 0, 0, 0), LoadMain)
+AddTab("Auto", UDim2.new(0.34, 0, 0, 0), LoadAuto)
+AddTab("★", UDim2.new(0.68, 0, 0, 0), LoadStar)
+
+LoadMain()
+local function Drag(o)
+    local d, i, s, p
+    o.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then d = true; s = input.Position; p = o.Position end end)
+    o.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then i = input end end)
+    RunService.RenderStepped:Connect(function() if d and i then local delta = i.Position - s; o.Position = UDim2.new(p.X.Scale, p.X.Offset + delta.X, p.Y.Scale, p.Y.Offset + delta.Y) end end)
+    UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then d = false end end)
+end
+Drag(MainFrame); Drag(OpenIcon)
