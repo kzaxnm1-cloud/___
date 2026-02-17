@@ -1,0 +1,166 @@
+-- [[ NX2 HUB: THE BEAST MODE - SMART FLOOR RESET ]] --
+
+local LP = game:GetService("Players").LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+local VirtualUser = game:GetService("VirtualUser")
+
+-- 1. CLEANUP OLD UI
+for _, v in pairs(CoreGui:GetChildren()) do
+    if v.Name == "NX2_UI" or v.Name == "NX2_Notif" then v:Destroy() end
+end
+
+-- 2. CUSTOM NOTIFICATION (NX2 HUB 🌊 | TSUNAMI)
+local function Notify()
+    local sg = Instance.new("ScreenGui", CoreGui)
+    sg.Name = "NX2_Notif"
+    local f = Instance.new("Frame", sg)
+    f.Size = UDim2.new(0, 280, 0, 50)
+    f.Position = UDim2.new(1, 10, 0.8, 0)
+    f.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Instance.new("UICorner", f)
+    
+    local t = Instance.new("TextLabel", f)
+    t.Size = UDim2.new(1, 0, 1, 0)
+    t.BackgroundTransparency = 1
+    t.Text = "NX2 HUB 🌊 | TSUNAMI" -- شعارك مع اسم الماب
+    t.Font = Enum.Font.GothamBlack
+    t.TextSize = 16
+    
+    task.spawn(function()
+        while f.Parent do
+            for i = 0, 1, 0.01 do
+                t.TextColor3 = Color3.fromHSV(i, 0.7, 1)
+                task.wait(0.05)
+            end
+        end
+    end)
+    
+    f:TweenPosition(UDim2.new(1, -290, 0.8, 0), "Out", "Quad", 0.5)
+    task.wait(2) -- يظهر لمدة ثانيتين
+    f:TweenPosition(UDim2.new(1, 10, 0.8, 0), "In", "Quad", 0.5)
+    task.delay(0.5, function() sg:Destroy() end)
+end
+Notify()
+
+-- 3. MAIN UI
+local MainGui = Instance.new("ScreenGui", CoreGui)
+MainGui.Name = "NX2_UI"
+local Main = Instance.new("Frame", MainGui)
+Main.Size = UDim2.new(0, 260, 0, 180)
+Main.Position = UDim2.new(0.5, -130, 0.4, 0)
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Main.Active = true
+Main.Draggable = true
+Instance.new("UICorner", Main)
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.BackgroundTransparency = 1
+Title.Text = "NX2 HUB MONY"
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 20
+task.spawn(function()
+    while Title.Parent do
+        for i = 0, 1, 0.01 do
+            Title.TextColor3 = Color3.fromHSV(i, 0.8, 1)
+            task.wait(0.05)
+        end
+    end
+end)
+
+local function CreateBtn(txt, pos)
+    local b = Instance.new("TextButton", Main)
+    b.Size = UDim2.new(0.9, 0, 0, 50)
+    b.Position = pos
+    b.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    b.Text = txt
+    b.Font = Enum.Font.GothamBlack
+    b.TextSize = 14
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Instance.new("UICorner", b)
+    task.spawn(function()
+        while b.Parent do
+            for i = 0, 1, 0.01 do
+                b.TextColor3 = Color3.fromHSV(i, 0.4, 1)
+                task.wait(0.1)
+            end
+        end
+    end)
+    return b
+end
+
+local Farming = false
+local AFK_Active = false
+
+-- SMART HOME DETECTOR
+local function GetTargetHouse()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if (v:IsA("StringValue") or v:IsA("ObjectValue")) and (v.Value == LP.Name or v.Name == "Owner") then
+            return v.Parent
+        end
+    end
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("TextLabel") and (v.Text == LP.Name or string.find(v.Text, LP.DisplayName)) then
+            return v:FindFirstAncestorOfClass("Model")
+        end
+    end
+    return nil
+end
+
+-- 4. AUTO MONY BUTTON
+local AutoBtn = CreateBtn("Auto Mony 💰", UDim2.new(0.05, 0, 0.3, 0))
+AutoBtn.MouseButton1Click:Connect(function()
+    Farming = not Farming
+    AutoBtn.BackgroundColor3 = Farming and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(20, 20, 20)
+    
+    if Farming then
+        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            LP.Character:BreakJoints()
+        end
+        
+        task.wait(2)
+        local MyHouse = GetTargetHouse()
+        
+        task.spawn(function()
+            while Farming do
+                pcall(function()
+                    if MyHouse then
+                        local found_something = false
+                        for _, v in pairs(MyHouse:GetDescendants()) do
+                            if not Farming then break end
+                            if v:IsA("TouchTransmitter") and v.Parent then
+                                found_something = true
+                                local target = v.Parent
+                                LP.Character.HumanoidRootPart.CFrame = target.CFrame
+                                firetouchinterest(target, LP.Character.HumanoidRootPart, 0)
+                                task.wait(0.02)
+                                firetouchinterest(target, LP.Character.HumanoidRootPart, 1)
+                                task.wait(0.25)
+                            end
+                        end
+                        if not found_something then
+                             LP.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, -50, 0)
+                             task.wait(1)
+                        end
+                    end
+                end)
+                task.wait(0.1)
+            end
+        end)
+    end
+end)
+
+-- 5. AFK PROTECTION (🛡️)
+local AFKBtn = CreateBtn("AFK 🛡️", UDim2.new(0.05, 0, 0.65, 0))
+AFKBtn.MouseButton1Click:Connect(function()
+    AFK_Active = not AFK_Active
+    AFKBtn.BackgroundColor3 = AFK_Active and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(20, 20, 20)
+    if AFK_Active then
+        LP.Idled:Connect(function()
+            if AFK_Active then
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end
+        end)
+    end
+end)
