@@ -1,0 +1,135 @@
+-- NX2 511 V7 - REAL SHREDDER (NO PROTECTED)
+local Player = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+
+-- [1. شاشة الدخول - الأقمار تتجمع حول NX2 511]
+local IntroGui = Instance.new("ScreenGui", game.CoreGui)
+IntroGui.IgnoreGuiInset = true
+local Black = Instance.new("Frame", IntroGui)
+Black.Size = UDim2.new(1,0,1,0); Black.BackgroundColor3 = Color3.new(0,0,0)
+
+local Name = Instance.new("TextLabel", Black)
+Name.Size = UDim2.new(1,0,1,0); Name.Text = "NX2 511"; Name.TextColor3 = Color3.new(1,1,1)
+Name.TextSize = 130; Name.Font = Enum.Font.GothamBold; Name.BackgroundTransparency = 1
+
+for i = 1, 24 do
+    local Moon = Instance.new("TextLabel", Black)
+    Moon.Text = "🌑"; Moon.BackgroundTransparency = 1; Moon.TextSize = 40
+    local dirs = {UDim2.new(math.random(),0,-0.1,0), UDim2.new(math.random(),0,1.1,0), UDim2.new(-0.1,0,math.random(),0), UDim2.new(1.1,0,math.random(),0)}
+    Moon.Position = dirs[math.random(1,4)]
+    task.spawn(function()
+        while IntroGui.Parent do
+            Moon.Position = Moon.Position:Lerp(UDim2.new(0.5,0,0.5,0), 0.01)
+            task.wait(0.02)
+        end
+    end)
+end
+task.wait(4); IntroGui:Destroy()
+
+-- [2. الواجهة الرئيسية - V7]
+local MainUI = Instance.new("ScreenGui", game.CoreGui)
+local Menu = Instance.new("Frame", MainUI)
+Menu.Size = UDim2.new(0, 300, 0, 500); Menu.Position = UDim2.new(0.05, 0, 0.2, 0)
+Menu.BackgroundColor3 = Color3.fromRGB(15, 15, 15); Menu.Active = true; Menu.Draggable = true
+Instance.new("UICorner", Menu).CornerRadius = UDim.new(0, 20)
+
+local Title = Instance.new("TextLabel", Menu)
+Title.Size = UDim2.new(1, 0, 0, 60); Title.Text = "NX2 511 - V7"; Title.TextSize = 30
+Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1
+
+local function CreateBtn(txt, y, cb)
+    local b = Instance.new("TextButton", Menu)
+    b.Size = UDim2.new(0.9, 0, 0, 60); b.Position = UDim2.new(0.05, 0, 0, y)
+    b.Text = txt; b.TextSize = 24; b.Font = Enum.Font.GothamBold; b.TextColor3 = Color3.new(1,1,1)
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 45); Instance.new("UICorner", b)
+    local state = false
+    b.MouseButton1Click:Connect(function()
+        state = not state
+        b.BackgroundColor3 = state and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(40, 40, 45)
+        cb(state)
+    end)
+end
+
+-- [3. محرك الفحص والضرب]
+
+-- فحص الحماية (يتجاهل من فوق رأسه درع أو كلمة حماية)
+local function isShielded(model)
+    for _, v in pairs(model:GetDescendants()) do
+        if v:IsA("BillboardGui") and (v.Name:lower():find("safe") or v.Name:lower():find("protect") or v.Name:lower():find("shield")) then
+            return true
+        end
+        if v:IsA("ImageLabel") and v.Image:find("shield") then return true end
+    end
+    return false
+end
+
+local function RealClick()
+    -- يضغط على زر الضرب اللي في الصورة الثانية (الركن السفلي الأيمن)
+    local x = Player:GetMouse().ViewSizeX * 0.86
+    local y = Player:GetMouse().ViewSizeY * 0.82
+    VirtualUser:Button1Down(Vector2.new(x, y))
+    task.wait(0.01)
+    VirtualUser:Button1Up(Vector2.new(x, y))
+end
+
+-- [4. الأوامر]
+
+-- عدم الموت V7
+CreateBtn("وضع عدم الموت", 80, function(s)
+    _G.god = s
+    task.spawn(function()
+        while _G.god do
+            pcall(function()
+                local h = Player.Character:FindFirstChildOfClass("Humanoid")
+                h.Health = 100
+                h:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+                h:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+            end)
+            task.wait()
+        end
+    end)
+end)
+
+-- فرم قتل V7 (تصفية المحميين + مغناطيس)
+CreateBtn("فرم قتل V7", 160, function(s)
+    _G.farm = s
+    if s then
+        task.spawn(function()
+            while _G.farm do
+                local target = nil
+                local dist = 800
+                for _, v in pairs(workspace:GetChildren()) do
+                    if v:IsA("Model") and v ~= Player.Character and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
+                        -- شرط أساسي: ما يكون عنده حماية
+                        if not isShielded(v) then
+                            local d = (v.PrimaryPart.Position - Player.Character.PrimaryPart.Position).Magnitude
+                            if d < dist then target = v; dist = d end
+                        end
+                    end
+                end
+                
+                if target then
+                    while _G.farm and target and target.Humanoid.Health > 0 and not isShielded(target) do
+                        -- سحب مغناطيسي لظهر الهدف
+                        local goal = target.PrimaryPart.CFrame * CFrame.new(0, 0, 1.8)
+                        Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame:Lerp(goal, 0.4)
+                        
+                        RealClick()
+                        task.wait(0.02)
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end
+end)
+
+-- أزرار الارتفاع
+local up = Instance.new("TextButton", Menu)
+up.Size = UDim2.new(0.43,0,0,60); up.Position = UDim2.new(0.05,0,0,240); up.Text = "⬆️ رفع"; up.BackgroundColor3 = Color3.fromRGB(50,50,55); up.TextColor3 = Color3.new(1,1,1); up.TextSize = 22
+Instance.new("UICorner", up); up.MouseButton1Click:Connect(function() Player.Character.HumanoidRootPart.CFrame *= CFrame.new(0,15,0) end)
+
+local down = Instance.new("TextButton", Menu)
+down.Size = UDim2.new(0.43,0,0,60); down.Position = UDim2.new(0.52,0,0,240); down.Text = "⬇️ نزل"; down.BackgroundColor3 = Color3.fromRGB(50,50,55); down.TextColor3 = Color3.new(1,1,1); down.TextSize = 22
+Instance.new("UICorner", down); down.MouseButton1Click:Connect(function() Player.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-15,0) end)
